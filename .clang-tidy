@@ -1,7 +1,19 @@
 ---
-Checks:          '*,-fuchsia-*,-google-*,-zircon-*,-abseil-*,-modernize-use-trailing-return-type,-llvm*'
-WarningsAsErrors: '*'
+Checks: '
+    -*,
+    -fuchsia-*,
+    -google-*,
+    -zircon-*,
+    -abseil-*,
+    -modernize-use-trailing-return-type,
+    -llvm*,
+    bugprone-*,
+    clang-analyzer-*,
+    '
+
+WarningsAsErrors: '*,-llvm*'
 HeaderFilterRegex: ''
 FormatStyle:     none
 
-
+CompilerArgs: []
+BuildPath: buildVCPkg

@@ -7,7 +7,7 @@ project(cs4212StarterCode
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules")
 
 option(ENABLE_CPPCHECK "Enable static analysis with cppcheck" OFF)
-option(ENABLE_CLANG_TIDY "Enable static analysis with clang-tidy" OFF)
+option(ENABLE_CLANG_TIDY "Enable static analysis with clang-tidy" ON)
 
 if(ENABLE_CPPCHECK)
   find_program(CPPCHECK cppcheck)
@@ -26,10 +26,11 @@ if(ENABLE_CPPCHECK)
 endif()
 
 if(ENABLE_CLANG_TIDY)
-  find_program(CLANGTIDY clang-tidy-13)
+  find_program(CLANGTIDY clang-tidy)
   if(CLANGTIDY)
     set(CMAKE_C_CLANG_TIDY ${CLANGTIDY})
     set(CMAKE_CXX_CLANG_TIDY ${CLANGTIDY})
+    set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
   else()
     message(SEND_ERROR "clang-tidy could not be located.")
   endif()

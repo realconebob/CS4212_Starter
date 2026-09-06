@@ -3,7 +3,6 @@
 
 #include <cmath>
 #include <iostream>
-
 #include <concepts>
 
 template<typename T>
@@ -155,7 +154,18 @@ inline T dot(const VecX<T, X>& a, const VecX<T, X>& b) {
     return sum;
 }
 
-// TODO: Implement generic cross product
+template<Floating T, int X>
+requires (X == 3)
+inline VecX<T, X> cross(const VecX<T, X>& a, const VecX<T, X>& b) {
+    T res[X] = {
+        a[1] * b[2] - a[2] * b[1],
+        a[2] * b[0] - a[0] * b[2],
+        a[0] * b[1] - a[1] * b[0]
+    };
+    return VecX<T, X>(res);
+}
+// Cross product is specifically a 3d operation, so it's only defined here
+// Ok technically you can generalize it but I don't think we're going to need an 8D cross product
 
 template<Floating T, int X>
 inline VecX<T, X> unit(const VecX<T, X>& v) {
