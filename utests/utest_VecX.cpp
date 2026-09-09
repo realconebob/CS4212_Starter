@@ -129,5 +129,5 @@ TEST_CASE( "Generic Vector (VecX<double, 3>) Angle Between" ) {
     REQUIRE_DIFF(anglbetw(zerodeg, oneeightdeydeg), PI, epsilon);
     REQUIRE_DIFF(anglbetw(nindeydeg, twosevendeydeg), PI, epsilon);
     REQUIRE_DIFF(anglbetw(oneeightdeydeg, zerodeg), PI, epsilon);
-    REQUIRE_DIFF(anglbetw(twosevendeydeg, oneeightdeydeg), PI, epsilon);
+    REQUIRE_DIFF(anglbetw(twosevendeydeg, nindeydeg), PI, epsilon);
 }

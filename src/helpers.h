@@ -1,6 +1,12 @@
 #ifndef CS4212_GRAPHICS_HELPERS__14695208710861__
 #define CS4212_GRAPHICS_HELPERS__14695208710861__
 
+#define DEBUG 1
+
+#ifdef DEBUG
+#include <iostream>
+#endif
+
 #include <concepts>
 #include <cmath>
 
