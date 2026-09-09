@@ -4,10 +4,8 @@
 #include <cmath>
 #include <cstddef>
 #include <iostream>
-#include <concepts>
 
-template<typename T>
-concept Floating = std::same_as<T, float> || std::same_as<T, double> || std::same_as<T, long double>;
+#include "helpers.h"
 
 template<Floating T, std::size_t X>
 requires(X >= 1)
@@ -21,8 +19,8 @@ class VecX {
         VecX(): vals{} {}
 
         template<typename... Args>
-        requires (sizeof...(Args) == X) && (std::same_as<Args, T> && ...) // Note: change == to <= if filling out everything becomes annoying. Array init rules mean the first x elements will be copied, and anything after will just be zero
-        VecX(Args... args): vals{args...} {}
+        requires (sizeof...(Args) == X) && (std::convertible_to<Args, T> && ...) // Note: change == to <= if filling out everything becomes annoying. Array init rules mean the first x elements will be copied, and anything after will just be zero
+        VecX(Args... args): vals{static_cast<T>(args)...} {}
 
         explicit VecX(T (&args)[X]) {
             for(int i = 0; i < X; i++) {
@@ -58,7 +56,11 @@ class VecX {
         VecX& operator /=(T m) {
             return *this *= 1/m;
         }
+        #pragma endregion
 
+        #pragma region Misc
+        constexpr std::size_t size() const { return X; }
+        
         T length() const {
             return std::sqrt(length_squared());
         }
@@ -70,10 +72,7 @@ class VecX {
             }
             return sum;
         }
-        #pragma endregion
 
-        #pragma region Misc
-        constexpr std::size_t size() const { return X; }
         #pragma endregion
 };
 
@@ -194,12 +193,12 @@ inline VecX<T, X> linetr(const VecX<T, X>& v, T oldl, T oldh, T newl, T newh) {
 
 template<Floating T, std::size_t X>
 inline T anglbetw(const VecX<T, X>& a, const VecX<T, X>& b) {
-    return acos(dot(a, b) / (a.length() * b.length()));
+    return std::acos(dot(a, b) / (a.length() * b.length()));
 }
 
 template<Floating T, std::size_t X>
-inline VecX<T, X> dirto(const VecX<T, X>& a, const VecX<T, X>& b) {
-    return unit(b - a);
+inline VecX<T, X> dirto(const VecX<T, X>& src, const VecX<T, X>& dst) {
+    return unit(dst - src);
 }
 
 #pragma endregion
