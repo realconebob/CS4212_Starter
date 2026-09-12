@@ -17,7 +17,7 @@ template<typename T>
 concept Numeric = std::integral<T> || Floating<T>;
 
 template<Numeric T1, Numeric T2>
-inline bool withinDiff(T1 v1, T2 v2, double maxdiff) {
+inline bool withinDiff(const T1& v1, const T2& v2, double maxdiff) {
     double 
         dv1 = static_cast<double>(v1),
         dv2 = static_cast<double>(v2);

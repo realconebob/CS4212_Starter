@@ -180,7 +180,7 @@ inline VecX<T, X> normal(const VecX<T, X>& e1, const VecX<T, X>& e2) {
 }
 
 template<Floating T, std::size_t X>
-inline VecX<T, X> linetr(const VecX<T, X>& v, T oldl, T oldh, T newl, T newh) {
+inline VecX<T, X> linetr(const VecX<T, X>& v, const T& oldl, const T& oldh, const T& newl, const T& newh) {
     // (x - min(x)) / (max(x) - min(x)) * (max(new) - min(new)) + min(new)
     T val = 0.0;
     T res[X] = {};

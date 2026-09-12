@@ -1,11 +1,14 @@
 #ifndef CS4212_GRAPHICS_FRAMEBUFFER__110961598615200__
 #define CS4212_GRAPHICS_FRAMEBUFFER__110961598615200__
 
+#include "helpers.h"
 #include "vecx.h"
+
+#include <concepts>
 #include <cstring>
 #include <span>
-#include <array>
 #include <cstddef>
+#include <type_traits>
 
 template<Floating T, std::size_t X>
 class Framebuffer {
@@ -60,6 +63,32 @@ class Framebuffer {
 
         [[nodiscard]] constexpr std::size_t width() const {return width_;}
         [[nodiscard]] constexpr std::size_t height() const {return height_;}
+        [[nodiscard]] constexpr std::size_t size() const {return width_ * height_;}
+
+        template<typename... Args>
+        requires (std::same_as<Args, VecX<T, X>> && ...)
+        void clear_to(const Args&... colors) {
+            // For each row, calculate how much of each color should be in a given pixel
+            // Say with 2 colors, you'd have it look something like: fb[i] = (((size() - i) / size()) * color1 + (i / size()) * color2).unit()
+            // Idk what this looks like in pesudocode with 3+ values, but I'm sure it can be generalized
+
+            
+
+            return;
+        }
+
+        void clear() {
+            if constexpr (std::is_trivially_copyable_v<VecX<T, X>>) {
+                std::memset(mem_, 0, width_ * height_ * sizeof(VecX<T, X>));
+            } else {
+                for(std::size_t i = 0; i < width_ * height_; i++) {
+                    mem_[i] = VecX<T, X>{};
+                }
+            }
+
+            return;
+        }
+
         #pragma endregion
 };
 
