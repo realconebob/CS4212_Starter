@@ -16,15 +16,21 @@ concept Floating = std::same_as<T, float> || std::same_as<T, double> || std::sam
 template<typename T>
 concept Numeric = std::integral<T> || Floating<T>;
 
-template<Numeric T1, Numeric T2>
-inline bool withinDiff(const T1& v1, const T2& v2, double maxdiff) {
+template<typename T1, typename T2>
+requires (std::convertible_to<T1, double>) && (std::convertible_to<T2, double>)
+inline double relative_diff(const T1& v1, const T2& v2) {
     double 
         dv1 = static_cast<double>(v1),
         dv2 = static_cast<double>(v2);
-    
-    double res = (v1 != 0)
+
+    return (v1 != 0)
         ? std::abs((v2 - v1 ) / v1)
         : 0.0;
+}
+
+template<Numeric T1, Numeric T2>
+inline bool within_diff(const T1& v1, const T2& v2, double maxdiff) {
+    double res = relative_diff(v1, v2);
 
     #ifdef DEBUG
     std::cout << "Testing (" << v1 << ") against (" << v2 << ") with a diff epsilon of [" << maxdiff << "]: " << res << " <= " << maxdiff << " -> " << ((res <= maxdiff) ? "true" : "false") << "\n";
@@ -33,6 +39,6 @@ inline bool withinDiff(const T1& v1, const T2& v2, double maxdiff) {
     return res <= maxdiff;
 }
 
-#define REQUIRE_DIFF(v1, v2, max) REQUIRE(withinDiff((v1), (v2), (max)))
+#define REQUIRE_DIFF(v1, v2, max) REQUIRE(within_diff((v1), (v2), (max)))
 
 #endif

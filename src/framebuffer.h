@@ -4,8 +4,10 @@
 #include "helpers.h"
 #include "vecx.h"
 
+#include <algorithm>
 #include <concepts>
 #include <cstring>
+#include <iterator>
 #include <span>
 #include <cstddef>
 #include <type_traits>
@@ -66,13 +68,40 @@ class Framebuffer {
         [[nodiscard]] constexpr std::size_t size() const {return width_ * height_;}
 
         template<typename... Args>
-        requires (std::same_as<Args, VecX<T, X>> && ...)
+        requires (sizeof...(Args) >= 1) && (std::same_as<Args, VecX<T, X>> && ...)
         void clear_to(const Args&... colors) {
-            // For each row, calculate how much of each color should be in a given pixel
-            // Say with 2 colors, you'd have it look something like: fb[i] = (((size() - i) / size()) * color1 + (i / size()) * color2).unit()
-            // Idk what this looks like in pesudocode with 3+ values, but I'm sure it can be generalized
+            const std::size_t argnum = sizeof...(Args);
+            const VecX<T, X> carr[argnum] = {colors...};
 
-            
+            if(argnum == 1) {
+                std::fill(std::begin(mem_), std::end(mem_), carr[0]);
+                return;
+            }
+
+            VecX<T, X> curpix;
+            std::size_t low;
+            std::size_t mid;
+            std::size_t high;
+
+            const std::size_t memsize = size();
+            const T invargnum = 1 / (argnum - 1);
+
+            for(std::size_t i = 0; i < memsize; i++) {
+                curpix = VecX<T, X>{};
+
+                // Calculate the amount of color each color should contribute to the current pixel, then write it to the buffer
+                for(std::size_t ci = 0; ci < argnum; ci++) {
+                    low = ((ci * memsize - memsize) * invargnum);
+                    high = ((ci * memsize + memsize) * invargnum);
+                    mid = (low + high) * (1/2);
+
+                    curpix += 
+                        static_cast<int>((i > low) && (i <= high)) // Determine whether the color should be present for this particular pixel. Inside range = 1, outside range = 0
+                        * (1 - relative_diff(i, mid))
+                        * carr[ci];
+                }
+                mem_[i] = unit(curpix); // May not need to normalize but unsure yet. Need to get print to png working to test
+            }
 
             return;
         }
