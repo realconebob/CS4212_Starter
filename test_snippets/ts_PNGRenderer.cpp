@@ -19,6 +19,10 @@ int main(int argc, char *argv[]) {
     // Render a black image
     PNGRenderer<double>(fb, "black.png").render();
 
+    // Render a yellow image
+    fb.clear_to(Color3D{1, 1, 0});
+    PNGRenderer<double>(fb, "yellow.png").render();
+
     // Render a fade from blue to red
     fb.clear_to(Color3D{0, 0, 1}, Color3D{1, 0, 0});
     PNGRenderer<double>(fb, "blue-red-fade.png").render();
