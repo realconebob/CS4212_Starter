@@ -99,6 +99,8 @@ add_subdirectory(examples)
 #
 # Create your rendering library here....
 
+## Test snippets
+add_subdirectory(test_snippets)
 
 #
 # OpenGL Example

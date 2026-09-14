@@ -24,7 +24,7 @@ inline double relative_diff(const T1& v1, const T2& v2) {
         dv2 = static_cast<double>(v2);
 
     return (v1 != 0)
-        ? std::abs((v2 - v1 ) / v1)
+        ? std::abs((dv2 - dv1 ) / dv1)
         : 0.0;
 }
 

@@ -4,11 +4,8 @@
 #include "helpers.h"
 #include "vecx.h"
 
-#include <algorithm>
 #include <concepts>
 #include <cstring>
-#include <iterator>
-#include <span>
 #include <cstddef>
 #include <type_traits>
 
@@ -16,7 +13,7 @@ template<Floating T, std::size_t X>
 class Framebuffer {
     private:
         const std::size_t width_, height_;
-        VecX<T, X> mem_[];
+        VecX<T, X>* mem_; // spooky but it should be fine for now. Maybe rework to be a std::vector eventually
 
     public:
         #pragma region Construtors
@@ -60,8 +57,10 @@ class Framebuffer {
             return copy;
         }
 
+        /*
         [[nodiscard]] std::span<VecX<T, X>> as_span() {return {mem_.data(), mem_.size()};}
         [[nodiscard]] std::span<const VecX<T, X>> as_span() const {return {mem_.data(), mem_.size()};}
+        */
 
         [[nodiscard]] constexpr std::size_t width() const {return width_;}
         [[nodiscard]] constexpr std::size_t height() const {return height_;}
@@ -73,9 +72,16 @@ class Framebuffer {
             const std::size_t argnum = sizeof...(Args);
             const VecX<T, X> carr[argnum] = {colors...};
 
+
+            // currently blowing up my code for some reason
+            // if(argnum == 1) {
+            //     std::fill(std::begin(mem_), std::end(mem_), carr[0]);
+            //     return;
+            // }
             if(argnum == 1) {
-                std::fill(std::begin(mem_), std::end(mem_), carr[0]);
-                return;
+                for(std::size_t i = 0; i < size(); i++) {
+                    mem_[i] = carr[0];
+                }
             }
 
             VecX<T, X> curpix;
@@ -96,7 +102,7 @@ class Framebuffer {
                     mid = (low + high) * (1/2);
 
                     curpix += 
-                        static_cast<int>((i > low) && (i <= high)) // Determine whether the color should be present for this particular pixel. Inside range = 1, outside range = 0
+                        static_cast<int>((i >= low) && (i <= high)) // Determine whether the color should be present for this particular pixel. Inside range = 1, outside range = 0
                         * (1 - relative_diff(i, mid))
                         * carr[ci];
                 }
