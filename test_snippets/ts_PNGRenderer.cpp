@@ -15,7 +15,7 @@ int main(int argc, char *argv[]) {
 
     auto fb = Framebuffer<double, 3>{(std::size_t)args.width, (std::size_t)args.height};
     fb.clear();
-    
+
     // Render a black image
     PNGRenderer<double>(fb, "black.png").render();
 
@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
         Color3D{1, 1, 0},   // Yellow
         Color3D{0, 1, 0},   // Green
         Color3D{0, 0, 1},   // Blue
-        Color3D{.3, 0, .51},// Indigo 
+        Color3D{.3, 0, .51},// Indigo
         Color3D{.58, 0, .83}// Violet
     );
     PNGRenderer<double>(fb, "rainbow-fade.png").render();

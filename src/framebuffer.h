@@ -78,20 +78,20 @@ class Framebuffer {
                 return;
             }
 
-            
             VecX<T, X> curpix;
-            double brightest, diff;
+            double stop, diff;
             const std::size_t memsize = size();
+            const double spacing = memsize / double(argnum - 1);
 
-            for(std::size_t i = 0; i < width_ * height_; i++) {
+            for(std::size_t i = 0; i < memsize; i++) {
                 curpix = VecX<T, X>{};
                 for(std::size_t ci = 0; ci < argnum; ci++) {
-                    brightest = (memsize / double(argnum - 1)) * ci;
-                    diff = relative_diff(i, brightest);
-                    curpix += diff * carr[ci];
+                    stop = spacing * ci;
+                    diff = std::abs(stop - i) / spacing;
+                    curpix += (diff <= 1.0) * (1.0 - diff) * carr[ci];
                 }
 
-                mem_[i] = unit(curpix); // May not need to normalize but unsure yet. Need to get print to png working to test
+                mem_[i] = curpix;
             }
 
             return;

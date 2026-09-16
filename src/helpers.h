@@ -19,7 +19,7 @@ concept Numeric = std::integral<T> || Floating<T>;
 template<typename T1, typename T2>
 requires (std::convertible_to<T1, double>) && (std::convertible_to<T2, double>)
 inline double relative_diff(const T1& v1, const T2& v2) {
-    double 
+    double
         dv1 = static_cast<double>(v1),
         dv2 = static_cast<double>(v2);
 
@@ -40,5 +40,13 @@ inline bool within_diff(const T1& v1, const T2& v2, double maxdiff) {
 }
 
 #define REQUIRE_DIFF(v1, v2, max) REQUIRE(within_diff((v1), (v2), (max)))
+
+template<typename T>
+requires std::totally_ordered<T>
+T clamp(T val, T lo, T hi) {
+    val = (val < lo) ? lo : val;
+    val = (val > hi) ? hi : val;
+    return val;
+}
 
 #endif
