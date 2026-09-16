@@ -78,26 +78,19 @@ class Framebuffer {
                 return;
             }
 
+            
             VecX<T, X> curpix;
-            double low, mid, high;
-
+            double brightest, diff;
             const std::size_t memsize = size();
-            const double invargnum = 1.0 / (argnum - 1);
 
             for(std::size_t i = 0; i < width_ * height_; i++) {
                 curpix = VecX<T, X>{};
-
-                // Calculate the amount of color each color should contribute to the current pixel, then write it to the buffer
                 for(std::size_t ci = 0; ci < argnum; ci++) {
-                    low = ((ci * memsize - memsize) * invargnum);
-                    high = ((ci * memsize + memsize) * invargnum);
-                    mid = (low + high) * (1.0/2.0); // Integer divison is going to make me pop a blood vessel holy
-
-                    curpix += 
-                        static_cast<int>((i >= low) && (i < high)) // Determine whether the color should be present for this particular pixel. Inside range = 1, outside range = 0
-                        * (1.0 - relative_diff(i, mid))
-                        * carr[ci];
+                    brightest = (memsize / double(argnum - 1)) * ci;
+                    diff = relative_diff(i, brightest);
+                    curpix += diff * carr[ci];
                 }
+
                 mem_[i] = unit(curpix); // May not need to normalize but unsure yet. Need to get print to png working to test
             }
 
