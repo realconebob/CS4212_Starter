@@ -20,13 +20,13 @@ class RayX {
 
     #pragma region Getters
     const VecX<T, X>& origin() const {return point_;}
-    const VecX<T, X>& direction() const {return dir_;}
+    const VecX<T, X>& dir() const {return dir_;}
 
     #pragma endregion
 
     #pragma region Misc
     VecX<T, X> at(T t) const {
-        return origin() + t * direction();
+        return origin() + t * dir();
     }
 
     #pragma endregion
