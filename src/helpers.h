@@ -41,11 +41,26 @@ inline bool within_diff(const T1& v1, const T2& v2, double maxdiff) {
 
 #define REQUIRE_DIFF(v1, v2, max) REQUIRE(within_diff((v1), (v2), (max)))
 
+
+template<typename T>
+requires std::totally_ordered<T>
+T floor(T val, T min) {
+    val = (val < min) ? min : val;
+    return val;
+}
+
+template<typename T>
+requires std::totally_ordered<T>
+T ceil(T val, T maxx) {
+    val = (val > maxx) ? maxx : val;
+    return val;
+}
+
 template<typename T>
 requires std::totally_ordered<T>
 T clamp(T val, T lo, T hi) {
-    val = (val < lo) ? lo : val;
-    val = (val > hi) ? hi : val;
+    val = floor(val, lo);
+    val = ceil(val, hi);
     return val;
 }
 

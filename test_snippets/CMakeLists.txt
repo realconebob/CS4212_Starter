@@ -13,3 +13,11 @@ target_link_libraries(tsnip_PNGRenderer cs4212-util)
 target_link_libraries(tsnip_PNGRenderer ${Boost_PROGRAM_OPTIONS_LIBRARIES})
 target_link_libraries(tsnip_PNGRenderer PNG::PNG)
 target_link_libraries(tsnip_PNGRenderer ZLIB::ZLIB)
+
+add_executable(tsnip_Camera3D
+  ts_3DCameraTest.cpp
+)
+target_link_libraries(tsnip_PNGRenderer cs4212-util)
+target_link_libraries(tsnip_PNGRenderer ${Boost_PROGRAM_OPTIONS_LIBRARIES})
+target_link_libraries(tsnip_PNGRenderer PNG::PNG)
+target_link_libraries(tsnip_PNGRenderer ZLIB::ZLIB)
