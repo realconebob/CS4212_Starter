@@ -9,15 +9,19 @@ include_directories(${CMAKE_SOURCE_DIR}/src)
 add_executable(tsnip_PNGRenderer
   ts_PNGRenderer.cpp
 )
-target_link_libraries(tsnip_PNGRenderer cs4212-util)
-target_link_libraries(tsnip_PNGRenderer ${Boost_PROGRAM_OPTIONS_LIBRARIES})
-target_link_libraries(tsnip_PNGRenderer PNG::PNG)
-target_link_libraries(tsnip_PNGRenderer ZLIB::ZLIB)
+target_link_libraries(tsnip_PNGRenderer 
+  cs4212-util
+  ${Boost_PROGRAM_OPTIONS_LIBRARIES}
+  PNG::PNG
+  ZLIB::ZLIB
+)
 
 add_executable(tsnip_Camera3D
   ts_3DCameraTest.cpp
 )
-target_link_libraries(tsnip_PNGRenderer cs4212-util)
-target_link_libraries(tsnip_PNGRenderer ${Boost_PROGRAM_OPTIONS_LIBRARIES})
-target_link_libraries(tsnip_PNGRenderer PNG::PNG)
-target_link_libraries(tsnip_PNGRenderer ZLIB::ZLIB)
+target_link_libraries(tsnip_Camera3D 
+  cs4212-util
+  ${Boost_PROGRAM_OPTIONS_LIBRARIES}
+  PNG::PNG
+  ZLIB::ZLIB
+)

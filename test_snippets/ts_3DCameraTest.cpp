@@ -16,7 +16,7 @@ int main(int argc, char *argv[]) {
 
     auto camera = Camera3D<double>(args.width, args.height, args.width, args.height, 1);
     camera.rendertobuffer(fb, [](const RayX<double, 3>& ray){
-        return Vec3D{1, 0, 0};
+        return Vec3D{1, 1, 1};
     });
 
     PNGRenderer<double>(fb, "camera3d-white.png").render();
