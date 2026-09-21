@@ -90,4 +90,6 @@ T clamp(T val, T lo, T hi) {
     return val;
 }
 
+double degtorad(double deg);
+
 #endif

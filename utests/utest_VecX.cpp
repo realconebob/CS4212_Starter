@@ -2,8 +2,8 @@
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 #include <numbers>
 
-#include "../src/helpers.h"
-#include "../src/vecx.h"
+#include "helpers.h"
+#include "vecx.h"
 
 const static auto 
     PI = std::numbers::pi,

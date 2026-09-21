@@ -11,6 +11,7 @@ add_executable(tsnip_PNGRenderer
 )
 target_link_libraries(tsnip_PNGRenderer 
   cs4212-util
+  internallib
   ${Boost_PROGRAM_OPTIONS_LIBRARIES}
   PNG::PNG
   ZLIB::ZLIB
@@ -21,6 +22,7 @@ add_executable(tsnip_Camera3D
 )
 target_link_libraries(tsnip_Camera3D 
   cs4212-util
+  internallib
   ${Boost_PROGRAM_OPTIONS_LIBRARIES}
   PNG::PNG
   ZLIB::ZLIB

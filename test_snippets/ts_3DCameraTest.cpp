@@ -11,19 +11,10 @@ int main(int argc, char *argv[]) {
     sivelab::GraphicsArgs args;
     args.process(argc, argv);
 
-    auto aspect_ratio = 16.0 / 9.0;
-    int 
-        width = 400,
-        height {int(width / aspect_ratio)};
-    height = (height < 1) ? 1 : height;
-
-    auto vheight = 2.0;
-    auto vwidth = vheight * (double(width)/height);
-
-    auto fb = Framebuffer<double, 3>{(std::size_t)width, (std::size_t)height};
+    auto camera = Camera3D<double>{};
+    auto fb = Framebuffer<double, 3>{(std::size_t)camera.get_imagewidth(), (std::size_t)camera.get_imageheight()};
     fb.clear();
 
-    auto camera = Camera3D<double>(width, height, vwidth, vheight, 1);
     camera.rendertobuffer(fb, [](const RayX<double, 3>& r){
         Vec3D udir = unit(r.dir());
         auto a = 0.5 * (udir[1] + 1.0);
