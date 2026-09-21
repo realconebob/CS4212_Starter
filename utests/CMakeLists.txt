@@ -18,9 +18,9 @@ include(Catch)
 # compile into an executable.
 # 
 set(UTESTS 
-  utest_Success
-  utest_Failure
-  utest_VecX)
+  utest_VecX
+  utest_RayX  
+)
 
 # 
 # For each of the executables named in ${UTESTS}, compile them into a

@@ -19,7 +19,10 @@ class PNGRenderer {
         PNGRenderer(const Framebuffer<T, 3>& fb, std::string path):
             framebuffer_{fb}, path_{std::move(path)} {} 
 
-        bool render() const {
+        /**
+         * @brief Render the framebuffer to the respectively named png 
+         */
+        void render() const {
             std::size_t
                 w = framebuffer_.width(),
                 h = framebuffer_.height();
@@ -34,7 +37,7 @@ class PNGRenderer {
 	        }}
             imgData.write(path_);
 
-            return true;
+            return;
         }
 };
 

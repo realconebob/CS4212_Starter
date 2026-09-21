@@ -5,15 +5,17 @@
 #include "../src/helpers.h"
 #include "../src/vecx.h"
 
-const auto PI = std::numbers::pi;
-const auto HALF_PI = std::numbers::pi / 2;
-const auto FOURTH_PI = std::numbers::pi / 4;
+const static auto 
+    PI = std::numbers::pi,
+    HALF_PI = std::numbers::pi / 2,
+    FOURTH_PI = std::numbers::pi / 4;
 
-auto v1 = Vec3D({0.1, 0.2, 0.3}),
-        v2 = Vec3D({1.0, 2.0, 3.0}),
-        v3 = Vec3D({10.0, 20.0, 30.0});
+static auto
+    v1 = Vec3D({0.1, 0.2, 0.3}),
+    v2 = Vec3D({1.0, 2.0, 3.0}),
+    v3 = Vec3D({10.0, 20.0, 30.0});
 
-const double epsilon = 0.01;
+const static double epsilon = 0.01;
 
 TEST_CASE( "Generic Vector (VecX<double, 3>) Addition" ) {
     REQUIRE_DIFF((v1 + v2 + v3)[0], 11.1, epsilon);
