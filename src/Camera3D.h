@@ -20,8 +20,8 @@ class Camera3D {
 
     protected:
     #pragma region Variables
-    VecX<T, VECD> origin_;
-    
+    VecX<T, VECD> lookfrom_, lookat_;
+
     int // Will be useful layer for antialiasing and bouncing light
         samples_,
         max_depth_;
@@ -32,17 +32,18 @@ class Camera3D {
         aspect_,
         vfov_;
 
-    int 
+    int
         iwidth_,
         iheight_;
 
-    VecX<T, VECD> u_, v_;
+    VecX<T, VECD> u_, v_, w_, up_;
+    VecX<T, VECD> vu_, vv_;
     #pragma endregion
 
     #pragma region Protected Helper Functions
     const VecX<T, VECD> deltaU() const {return u_ / T(iwidth_);}
     const VecX<T, VECD> deltaV() const {return v_ / T(iheight_);}
-    const VecX<T, VECD> upperleft() const {return origin_ - VecX<T, VECD>{0, 0, focallen_} - (u_/2.0) - (v_/2.0);}
+    const VecX<T, VECD> upperleft() const {return lookfrom_ - (VecX<T, VECD>{0, 0, focallen_} * w_) - (vu_/2.0) - (vv_/2.0);}
     const VecX<T, VECD> pix00loc() const {return upperleft() + 0.5 * (deltaU() + deltaV());}
     inline const int iheight() {
         iheight_ = floor(int(iwidth_ / aspect_), 1);
@@ -55,20 +56,25 @@ class Camera3D {
     #pragma region Constructors
     /**
      * @brief Camera3D builder. Carries default values that make a valid camera, which can be changed
-     * 
+     *
      */
     class Builder {
         public:
-        VecX<T, VECD> origin = VecX<T, VECD>{};
-        int samples = 10, max_depth = 10;
-        double focallen = 1, aspect = (16.0 / 9.0), vfov = 90.0, iwidth = 200;
+        VecX<T, VECD>
+            lookfrom = VecX<T, VECD>{},
+            lookat = VecX<T, VECD>{0, 0, -1},
+            up = VecX<T, VECD>{0, 1, 0};
 
-        Builder& set_origin(VecX<T, VECD> o) {origin = o; return *this;}
+        int samples = 10, max_depth = 10;
+        double aspect = (16.0 / 9.0), vfov = 90.0, iwidth = 200;
+
+        Builder& set_lookfrom(VecX<T, VECD> lf) {lookfrom = lf; return *this;}
+        Builder& set_lookat(VecX<T, VECD> la) {lookat = la; return *this;}
+        Builder& set_up(VecX<T, VECD> u) {up = u; return *this;}
 
         Builder& set_samples(int s) {samples = s; return *this;}
         Builder& set_depth(int d) {max_depth = d; return *this;}
 
-        Builder& set_focallen(double f) {focallen = f; return *this;}
         Builder& set_aspect(double a)   {aspect = a; return *this;}
         Builder& set_vfov(double f)     {vfov = f; return *this;}
         Builder& set_iwidth(double w)   {iwidth = w; return *this;}
@@ -78,21 +84,26 @@ class Camera3D {
 
         double imgheight() {return floor(int(iwidth / aspect), 1);}
         double pixelsamplescale() {return 1.0 / samples;}
+        double focallen() {return (lookfrom - lookat).length();}
         double vheight() {
             auto theta = degtorad(vfov);
             auto h = std::tan(theta/2.0);
-            return 2 * h * focallen;
+            return 2 * h * focallen();
         }
         double vwidth() {return vheight() * double(iwidth / imgheight());}
-        VecX<T, VECD> vec_u() {return VecX<T, VECD>{vwidth(), 0, 0};}
-        VecX<T, VECD> vec_v() {return VecX<T, VECD>{0, -vheight(), 0};}
+        VecX<T, VECD> vec_u() {return unit(cross(up, vec_w()));}
+        VecX<T, VECD> vec_v() {return unit(cross(vec_w(), vec_u()));}
+        VecX<T, VECD> vec_w() {return unit(lookfrom - lookat);}
+        VecX<T, VECD> vec_vv() {return vwidth() * vec_u();}
+        VecX<T, VECD> vec_vu() {return vheight() * -vec_v();}
     };
-    explicit Camera3D(Builder&& b = Builder{}):
+    explicit Camera3D(Builder& b = Builder{}):
         samples_{b.samples}, max_depth_{b.max_depth}, samplerate_{b.pixelsamplescale()},
-        focallen_{b.focallen}, aspect_{b.aspect}, vfov_{b.vfov}, vwidth_{b.vwidth()},
+        focallen_{b.focallen()}, aspect_{b.aspect}, vfov_{b.vfov}, vwidth_{b.vwidth()},
         iwidth_{int(b.iwidth)}, iheight_{int(b.imgheight())},
-        u_{b.vec_u()}, v_{b.vec_v()},
-        origin_{b.origin}
+        u_{b.vec_u()}, v_{b.vec_v()}, w_{b.vec_w()},
+        vv_{b.vec_vv()}, vu_{b.vec_vu()},
+        lookfrom_{b.lookfrom}, lookat_(b.lookat), up_(b.up)
         {}
 
     #pragma endregion
@@ -107,12 +118,12 @@ class Camera3D {
             assert(colorizer != nullptr && "raycolorizer must not be null");
         }
 
-        const VecX<T, VECD> 
+        const VecX<T, VECD>
             pix0 {pix00loc()},
             du {deltaU()},
             dv {deltaV()};
-        
-        VecX<T, VECD> 
+
+        VecX<T, VECD>
             pixc,
             rdir,
             color;
@@ -122,9 +133,9 @@ class Camera3D {
         for(int j = 0; j < iheight_; j++) {
             for(int i = 0; i < iwidth_; i++) {
                 pixc = pix0 + ((i * 1.0) * du) + ((j * 1.0) * dv);
-                rdir = pixc - origin_;
+                rdir = pixc - lookfrom_;
 
-                r = RayX<T, VECD>{origin_, rdir};
+                r = RayX<T, VECD>{lookfrom_, rdir};
                 fb(i, j) = colorizer(r);
             }
         }

@@ -11,14 +11,20 @@ int main(int argc, char *argv[]) {
     sivelab::GraphicsArgs args;
     args.process(argc, argv);
 
-    auto camera = Camera3D<double>{};
+    auto cb = Camera3D<double>::Builder{}
+        .set_lookfrom(VecX<double, 3>{1, 1, 2})
+        .set_lookat(VecX<double, 3>{0, 0, -1})
+        .set_aspect(1.0)
+        .set_vfov(120);
+
+    auto camera = Camera3D<double>{cb};
     auto fb = Framebuffer<double, 3>{(std::size_t)camera.get_imagewidth(), (std::size_t)camera.get_imageheight()};
     fb.clear();
 
     camera.rendertobuffer(fb, [](const RayX<double, 3>& r){
-        Vec3D udir = unit(r.dir());
-        auto a = 0.5 * (udir[1] + 1.0);
-        return (1.0-a)*Vec3D(1.0, 1.0, 1.0) + a*Vec3D(0.5, 0.7, 1.0);
+        auto udir = unit(r.dir());
+        auto a = 0.5 * (udir + Vec3D(1.0, 1.0, 1.0));
+        return Vec3D(a[0], a[1], 1.0);
     });
 
     PNGRenderer<double>(fb, "camera3d-white.png").render();
