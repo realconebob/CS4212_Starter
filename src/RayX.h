@@ -48,4 +48,8 @@ class RayX {
     #pragma endregion
 };
 
+#pragma region Useful Aliases
+using Ray3D = RayX<double, 3>;
+#pragma endregion
+
 #endif
