@@ -13,6 +13,7 @@
 #define CS4212_GRAPHICS_HITTABLE__90832129712705__
 
 #include "RayX.h"
+#include <memory>
 
 template<typename Derived, typename T, std::size_t X>
 concept HittableImpl = Floating<T> && requires(const Derived& d, const RayX<T, X>& ray) {
@@ -30,6 +31,42 @@ class Hittable {
     bool intersect(const RayX<T, X>& ray) const requires (HittableImpl<D, T, X>) {
         return static_cast<const D*>(this)->_intersect(ray);
     };
+};
+
+
+template<Floating T, std::size_t X>
+class HittableAny {
+    // "interface" that must be "implemented" by any shape that is hittable 
+    struct Concept {
+        virtual ~Concept() = default;
+        virtual bool intersect(const RayX<T, X>&) const = 0;
+        virtual std::unique_ptr<Concept> clone() const = 0;
+    };
+
+    // Wrapper / adapter. "Stores" original type through template, but is "erased" to a Concept when stored in self_
+    template<typename H>
+    struct Model: Concept {
+        H obj;
+        explicit Model(H h) : obj(std::move(h)) {}
+        bool intersect(const RayX<T, X>& ray) const override {
+            return obj.intersect(ray); // dispatches into the CRTP call, still static from here down
+        }
+        std::unique_ptr<Concept> clone() const override {
+            return std::make_unique<Model>(obj);
+        }
+    };
+
+    std::unique_ptr<Concept> self_;
+
+public:
+    template<typename H>
+    requires (HittableImpl<H, T, X>) // Technically should be a concept that checks for intersect instead of _intersect, but I'm only going to be using my own CRTP-style Hittables anyway, so this shouldn't be a problem
+    HittableAny(H h) : self_(std::make_unique<Model<H>>(std::move(h))) {}
+
+    HittableAny(const HittableAny& o) : self_(o.self_->clone()) {}
+    HittableAny(HittableAny&&) = default;
+
+    bool intersect(const RayX<T, X>& ray) const { return self_->intersect(ray); }
 };
 
 #endif
