@@ -82,20 +82,20 @@ class Camera3D {
         private:
         friend Camera3D<T>;
 
-        double imgheight() {return floor(int(iwidth / aspect), 1);}
-        double pixelsamplescale() {return 1.0 / samples;}
-        double focallen() {return (lookfrom - lookat).length();}
-        double vheight() {
+        double imgheight() const {return floor(int(iwidth / aspect), 1);}
+        double pixelsamplescale() const {return 1.0 / samples;}
+        double focallen() const {return (lookfrom - lookat).length();}
+        double vheight() const {
             auto theta = degtorad(vfov);
             auto h = std::tan(theta/2.0);
             return 2 * h * focallen();
         }
-        double vwidth() {return vheight() * double(iwidth / imgheight());}
-        VecX<T, VECD> vec_u() {return unit(cross(up, vec_w()));}
-        VecX<T, VECD> vec_v() {return unit(cross(vec_w(), vec_u()));}
-        VecX<T, VECD> vec_w() {return unit(lookfrom - lookat);}
-        VecX<T, VECD> vec_vv() {return vwidth() * vec_u();}
-        VecX<T, VECD> vec_vu() {return vheight() * -vec_v();}
+        double vwidth() const {return vheight() * double(iwidth / imgheight());}
+        VecX<T, VECD> vec_u() const {return unit(cross(up, vec_w()));}
+        VecX<T, VECD> vec_v() const {return unit(cross(vec_w(), vec_u()));}
+        VecX<T, VECD> vec_w() const {return unit(lookfrom - lookat);}
+        VecX<T, VECD> vec_vv() const {return vwidth() * vec_u();}
+        VecX<T, VECD> vec_vu() const {return vheight() * -vec_v();}
     };
     explicit Camera3D(Builder& b = Builder{}):
         samples_{b.samples}, max_depth_{b.max_depth}, samplerate_{b.pixelsamplescale()},
