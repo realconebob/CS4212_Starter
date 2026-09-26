@@ -15,18 +15,28 @@
 #include "RayX.h"
 #include <memory>
 
+/**
+ * @brief Concept requiring the implementation of a member function `bool _intersect(const RayX<T, X>& ray)`
+ *
+ * @tparam Derived Deriving class
+ * @tparam T Size of floating point in RayX
+ * @tparam X Number of floating points in RayX
+ */
 template<typename Derived, typename T, std::size_t X>
 concept HittableImpl = Floating<T> && requires(const Derived& d, const RayX<T, X>& ray) {
     { d._intersect(ray) } -> std::convertible_to<bool>;
 };
 
 template<typename Derived, Floating T, std::size_t X>
+/**
+ * @brief CRTP Hittable. Derive from this and implement _intersect() to be a generic Hittable
+ *
+ */
 class Hittable {
     protected:
     ~Hittable() = default;
 
     public:
-    // I've gotta figure out how to make this requires work nicely. Currently it's annoying
     template<typename D = Derived>
     bool intersect(const RayX<T, X>& ray) const requires (HittableImpl<D, T, X>) {
         return static_cast<const D*>(this)->_intersect(ray);
@@ -35,15 +45,19 @@ class Hittable {
 
 
 template<Floating T, std::size_t X>
+/**
+ * @brief Type erasure wrapper for Hittable. Means you can store disperate Hittable types in a single STL
+ *
+ */
 class HittableAny {
-    // "interface" that must be "implemented" by any shape that is hittable 
+    /// "interface" that must be "implemented" by any shape that is hittable
     struct Concept {
         virtual ~Concept() = default;
         virtual bool intersect(const RayX<T, X>&) const = 0;
         virtual std::unique_ptr<Concept> clone() const = 0;
     };
 
-    // Wrapper / adapter. "Stores" original type through template, but is "erased" to a Concept when stored in self_
+    /// Wrapper / adapter. "Stores" original type through template, but is "erased" to a Concept when stored in self_
     template<typename H>
     struct Model: Concept {
         H obj;

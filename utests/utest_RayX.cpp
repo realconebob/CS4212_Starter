@@ -2,19 +2,19 @@
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "RayX.h"
-#include "helpers.h"
-#include "vecx.h"
+#include "Helpers.h"
+#include "VecX.h"
 
 static auto
-    xunit = RayX<double, 3>{VecX<double, 3>{}, VecX<double, 3>{1, 0, 0}},
-    yunit = RayX<double, 3>{VecX<double, 3>{}, VecX<double, 3>{0, 1, 0}},
-    zunit = RayX<double, 3>{VecX<double, 3>{}, VecX<double, 3>{0, 0, 1}};
+    xunit = Ray3D{Vec3D{}, Vec3D{1, 0, 0}},
+    yunit = Ray3D{Vec3D{}, Vec3D{0, 1, 0}},
+    zunit = Ray3D{Vec3D{}, Vec3D{0, 0, 1}};
 
 const static double epsilon = 0.01;
-const static auto units = (double[]){0.0, 1.0, -1.0}; 
+const static auto units = (double[]){0.0, 1.0, -1.0};
 
-TEST_CASE("Generic Ray (RayX<double, 3>) At()") {
-    auto offset = RayX<double, 3>{VecX<double, 3>{1, 2, 3}, VecX<double, 3>{1, 0.5, 0.25}};
+TEST_CASE("Generic Ray (Ray3D) At()") {
+    auto offset = Ray3D{VecX<double, 3>{1, 2, 3}, VecX<double, 3>{1, 0.5, 0.25}};
 
     // Unit checking
     for(int i = 0 ; i < 3; i++) {

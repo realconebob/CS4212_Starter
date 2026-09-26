@@ -12,8 +12,8 @@
 #ifndef CS4212_GRAPHICS__PNG_RENDERER__3008151373543__
 #define CS4212_GRAPHICS__PNG_RENDERER__3008151373543__
 
-#include "helpers.h"
-#include "framebuffer.h"
+#include "Helpers.h"
+#include "Framebuffer.h"
 
 #include "png++/image.hpp"
 #include "png++/rgb_pixel.hpp"

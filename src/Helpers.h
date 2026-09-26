@@ -81,14 +81,14 @@ inline bool within_diff(const T1& v1, const T2& v2, double maxdiff) {
 
 template<typename T>
 requires std::totally_ordered<T>
-T floor(T val, T min) {
+T min(T val, T min) {
     val = (val < min) ? min : val;
     return val;
 }
 
 template<typename T>
 requires std::totally_ordered<T>
-T ceil(T val, T maxx) {
+T max(T val, T maxx) {
     val = (val > maxx) ? maxx : val;
     return val;
 }
@@ -96,8 +96,8 @@ T ceil(T val, T maxx) {
 template<typename T>
 requires std::totally_ordered<T>
 T clamp(T val, T lo, T hi) {
-    val = floor(val, lo);
-    val = ceil(val, hi);
+    val = min(val, lo);
+    val = max(val, hi);
     return val;
 }
 

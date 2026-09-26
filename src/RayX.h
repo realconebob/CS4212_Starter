@@ -12,8 +12,8 @@
 #ifndef CS4212_GRAPHICS_RAYX__147651356622894__
 #define CS4212_GRAPHICS_RAYX__147651356622894__
 
-#include "helpers.h"
-#include "vecx.h"
+#include "Helpers.h"
+#include "VecX.h"
 
 template<Floating T, std::size_t X>
 class RayX {

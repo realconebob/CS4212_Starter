@@ -2,10 +2,10 @@
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 #include <numbers>
 
-#include "helpers.h"
-#include "vecx.h"
+#include "Helpers.h"
+#include "VecX.h"
 
-const static auto 
+const static auto
     PI = std::numbers::pi,
     HALF_PI = std::numbers::pi / 2,
     FOURTH_PI = std::numbers::pi / 4;

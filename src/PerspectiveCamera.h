@@ -12,10 +12,10 @@
 #ifndef CS4212_GRAPHICS_CAMERA3D__78361307319100__
 #define CS4212_GRAPHICS_CAMERA3D__78361307319100__
 
-#include "framebuffer.h"
-#include "helpers.h"
+#include "Framebuffer.h"
+#include "Helpers.h"
 #include "RayX.h"
-#include "vecx.h"
+#include "VecX.h"
 
 #include <cmath>
 #include <cstddef>

@@ -12,8 +12,8 @@
 #ifndef CS4212_GRAPHICS_FRAMEBUFFER__110961598615200__
 #define CS4212_GRAPHICS_FRAMEBUFFER__110961598615200__
 
-#include "helpers.h"
-#include "vecx.h"
+#include "Helpers.h"
+#include "VecX.h"
 
 #include <concepts>
 #include <cstring>

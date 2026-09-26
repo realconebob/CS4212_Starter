@@ -1,6 +1,6 @@
 
-#include "vecx.h"
-#include "framebuffer.h"
+#include "VecX.h"
+#include "Framebuffer.h"
 #include "PNGRenderer.h"
 
 #include "handleGraphicsArgs.h"
