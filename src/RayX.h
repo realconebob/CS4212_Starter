@@ -1,3 +1,14 @@
+/**
+ * @file RayX.h
+ * @author Connor Walstrom (walst110@umn.edu)
+ * @brief
+ * @version 0.1
+ * @date 2026-09-26
+ *
+ * @copyright Copyright (c) 2026
+ *
+ */
+
 #ifndef CS4212_GRAPHICS_RAYX__147651356622894__
 #define CS4212_GRAPHICS_RAYX__147651356622894__
 

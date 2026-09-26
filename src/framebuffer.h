@@ -1,3 +1,14 @@
+/**
+ * @file framebuffer.h
+ * @author Connor Walstrom (walst110@umn.edu)
+ * @brief An implemetation of a framebuffer that stores generic vectors
+ * @version 0.1
+ * @date 2026-09-26
+ *
+ * @copyright Copyright (c) 2026
+ *
+ */
+
 #ifndef CS4212_GRAPHICS_FRAMEBUFFER__110961598615200__
 #define CS4212_GRAPHICS_FRAMEBUFFER__110961598615200__
 

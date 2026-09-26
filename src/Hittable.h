@@ -1,3 +1,14 @@
+/**
+ * @file Hittable.h
+ * @author Connor Walstrom (walst110@umn.edu)
+ * @brief CRTP interface for something that can intersect a ray
+ * @version 0.1
+ * @date 2026-09-26
+ *
+ * @copyright Copyright (c) 2026
+ *
+ */
+
 #ifndef CS4212_GRAPHICS_HITTABLE__90832129712705__
 #define CS4212_GRAPHICS_HITTABLE__90832129712705__
 
@@ -12,8 +23,9 @@ template<typename Derived, Floating T, std::size_t X>
 class Hittable {
     protected:
     ~Hittable() = default;
-    
+
     public:
+    // I've gotta figure out how to make this requires work nicely. Currently it's annoying
     bool intersect(const RayX<T, X>& ray) const requires (HittableImpl<Derived, T, X>) {
         return static_cast<const Derived*>(this)->_intersect(ray);
     };

@@ -15,7 +15,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with libSIVELab.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -27,7 +27,7 @@
 
 namespace sivelab {
 
-  class Random 
+  class Random
   {
   public:
     Random();
@@ -42,7 +42,7 @@ namespace sivelab {
     // Returns a random number pulled from a normal distribution with
     // mean 0 and standard deviation of 1.
     double normal();
-    double boxMuller_normal();   
+    double boxMuller_normal();
 
     double lcg();
 
@@ -57,15 +57,15 @@ namespace sivelab {
       double retVal = static_cast<double>((tVal / static_cast<double>(std::numeric_limits<unsigned int>::max())));
       return retVal;
     }
-    
+
   private:
       static thread_local std::default_random_engine m_prng;
-      
+
       std::uniform_real_distribution<double> m_uniform_dist;
       std::normal_distribution<double> m_normal_dist;
 
     void init(long s);
-	
+
     double randVal()
     {
         //return m_uniform_dist(m_prng);  // Need to make this safe
@@ -76,7 +76,7 @@ namespace sivelab {
     bool m_normal_value;
     double m_remaining_value;
 
-    unsigned long m_lcg_m, m_lcg_c, m_lcg_a, m_lcg_x; 
+    unsigned long m_lcg_m, m_lcg_c, m_lcg_a, m_lcg_x;
     unsigned long m_taus_z1, m_taus_z2, m_taus_z3, m_taus_z4;
 
     // Based on GPU Gems 3, Random Number Generators, page 813: S1, S2,
@@ -93,6 +93,6 @@ namespace sivelab {
       return z = (A*z+C);
     }
   };
-  
+
 }
 

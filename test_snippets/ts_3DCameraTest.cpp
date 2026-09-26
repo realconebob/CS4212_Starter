@@ -1,6 +1,6 @@
 #include "handleGraphicsArgs.h"
 
-#include "Camera3D.h"
+#include "PerspectiveCamera3D.h"
 #include "PNGRenderer.h"
 #include "vecx.h"
 #include "Sphere.h"
@@ -13,14 +13,8 @@ int main(int argc, char *argv[]) {
     sivelab::GraphicsArgs args;
     args.process(argc, argv);
 
-    auto cb = Camera3D<double>::Builder{}
-        .set_lookfrom(Vec3D{0, 0, 0})
-        .set_lookat(Vec3D{0, 0, -1})
-        .set_aspect(16.0/9)
-        .set_vfov(90);
-
-    auto camera = Camera3D<double>{cb};
-    auto fb = Framebuffer<double, 3>{(std::size_t)camera.get_imagewidth(), (std::size_t)camera.get_imageheight()};
+    auto camera = PerspectiveCamera3D<double>{};
+    auto fb = Framebuffer<double, 3>{(std::size_t)camera.get_iwidth(), (std::size_t)camera.get_iheight()};
     fb.clear();
 
     auto sphere = Sphere3D<double>(Vec3D(0, 0, -2), 1);

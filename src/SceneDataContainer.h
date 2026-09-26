@@ -6,7 +6,7 @@
 
 #include <boost/property_tree/ptree.hpp>
 
-namespace sivelab 
+namespace sivelab
 {
 
   using boost::property_tree::ptree;
@@ -24,17 +24,17 @@ namespace sivelab
       };
 
     SceneDataContainer() : dtype(UNKNOWN), name(""), val(""), isSet(false) {}
-    SceneDataContainer(const SceneDataType dt, const std::string &n, const std::string& v, bool setState=true) 
+    SceneDataContainer(const SceneDataType dt, const std::string &n, const std::string& v, bool setState=true)
       : dtype(dt), name(n), val(v), isSet(setState) {}
 
-    static SceneDataContainer emptyProp(const std::string &s) 
-    { 
-      return SceneDataContainer(SceneDataContainer::PROPERTY, s, "", false); 
+    static SceneDataContainer emptyProp(const std::string &s)
+    {
+      return SceneDataContainer(SceneDataContainer::PROPERTY, s, "", false);
     }
 
-    static SceneDataContainer emptyElem(const std::string &s) 
-    { 
-      return SceneDataContainer(SceneDataContainer::ELEMENT, s, "", false); 
+    static SceneDataContainer emptyElem(const std::string &s)
+    {
+      return SceneDataContainer(SceneDataContainer::ELEMENT, s, "", false);
     }
 
     SceneDataType dtype;
@@ -60,10 +60,10 @@ namespace sivelab
 	UNKNOWN_TYPE
       };
 
-    SceneElementCreator() 
+    SceneElementCreator()
       : m_otype(SceneElementCreator::UNKNOWN_TYPE) {}
     virtual ~SceneElementCreator() {}
-    
+
     virtual void instance( ptree::value_type const &v ) = 0;
 
     SceneObjectType m_otype;

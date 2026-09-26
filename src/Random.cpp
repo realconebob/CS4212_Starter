@@ -68,18 +68,18 @@ double Random::normal()
 double Random::boxMuller_normal()
 {
   double rsq, v1, v2;
-  
+
   if (m_normal_value == false)
     {
-      do 
+      do
 	{
 	  v1 = 2.0 * randVal() - 1.0;
 	  v2 = 2.0 * randVal() - 1.0;
 	  rsq = v1*v1 + v2*v2;
 	} while (rsq >= 1.0);
-      
+
       rsq = sqrt( (-2.0 * log(rsq) ) / rsq );
-      
+
       m_remaining_value = v2 * rsq;
       m_normal_value = true;
 
@@ -91,7 +91,7 @@ double Random::boxMuller_normal()
       return m_remaining_value;
     }
 }
- 
+
 double Random::lcg()
 {
   m_lcg_x = (m_lcg_a * m_lcg_x + m_lcg_c) % m_lcg_m;
