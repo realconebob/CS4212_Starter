@@ -26,8 +26,9 @@ class Hittable {
 
     public:
     // I've gotta figure out how to make this requires work nicely. Currently it's annoying
-    bool intersect(const RayX<T, X>& ray) const requires (HittableImpl<Derived, T, X>) {
-        return static_cast<const Derived*>(this)->_intersect(ray);
+    template<typename D = Derived>
+    bool intersect(const RayX<T, X>& ray) const requires (HittableImpl<D, T, X>) {
+        return static_cast<const D*>(this)->_intersect(ray);
     };
 };
 

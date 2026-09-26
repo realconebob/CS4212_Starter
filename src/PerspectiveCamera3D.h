@@ -26,7 +26,7 @@ concept RayColorizer = std::is_invocable_r_v<VecX<T, X>, F, const RayX<T, X>&>;
 
 template<Floating T>
 class PerspectiveCamera3D {
-    private:
+    public:
     #pragma region Set variables
     VecX<T, 3> lookfrom_, lookat_, up;
 
@@ -34,6 +34,7 @@ class PerspectiveCamera3D {
     int iwidth;
     #pragma endregion
 
+    private:
     #pragma region Calculated variables
     int iheight() const {
         auto tmp = int(iwidth / aspectratio);
