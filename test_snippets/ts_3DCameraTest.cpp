@@ -7,6 +7,7 @@
 #include "Sphere.h"
 #include "World.h"
 #include "Hittable.h"
+#include "Triangle.h"
 
 #include <cstddef>
 
@@ -17,13 +18,14 @@ using Sphere3DD = Sphere3D<double>;
 using World3DD = World3D<double>;
 using Hittable3D = HittableAny<double, 3>;
 using HitRecord3D = HitRecord<double, 3>;
+using Triangle3D = Triangle3<double>;
 
 int main(int argc, char *argv[]) {
     sivelab::GraphicsArgs args;
     args.process(argc, argv);
 
     auto camera = PC3D{};
-    camera.iwidth = 2000;
+    camera.iwidth = 200;
     camera.aspectratio = 1;
     camera.vfov = 100;
 
@@ -31,7 +33,8 @@ int main(int argc, char *argv[]) {
     fb.clear();
 
     World3DD world {
-        Hittable3D{Sphere3DD(Vec3D(-1, 0, -2), 0.75)},
+        Hittable3D{Sphere3DD(Vec3D(-1, 0, -4), 0.75)},
+        Hittable3D{Triangle3D(Vec3D(-0.5, 0, -3), Vec3D(1, 1, -3), Vec3D(1, -1, -3))},
         Hittable3D{Sphere3DD(Vec3D(1, 0, -2), 0.5)}
     };
     auto rec = HitRecord3D{};
