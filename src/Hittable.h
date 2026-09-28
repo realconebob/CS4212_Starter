@@ -14,6 +14,8 @@
 
 #include "RayX.h"
 #include "VecX.h"
+#include "Interval.h"
+
 #include <cmath>
 #include <cstddef>
 #include <memory>
@@ -22,7 +24,7 @@ template<typename Derived, Floating T, std::size_t X> class Hittable;
 
 /**
  * @brief Record class describing how/if a ray hit some `Hittable` object
- * 
+ *
  * @tparam T Width of floating point number
  * @tparam X Size of vector
  */
@@ -40,7 +42,7 @@ class HitRecord {
     HitRecord(VecX<T, X> point = {}, VecX<T, X> normal = {}, T t = NAN, bool front = true):
         point_{point}, normal_{normal}, t_(t), front_face_(front)
         {}
-    
+
     const VecX<T, X>& point() const {return point_;}
     const VecX<T, X>& normal() const {return normal_;}
     T t() const {return t_;}
@@ -55,8 +57,8 @@ class HitRecord {
  * @tparam X Number of floating points in RayX
  */
 template<typename Derived, typename T, std::size_t X>
-concept HittableImpl = Floating<T> && requires(const Derived& d, const RayX<T, X>& ray, HitRecord<T, X>& record) {
-    { d._intersect(ray, record) } -> std::convertible_to<bool>;
+concept HittableImpl = Floating<T> && requires(const Derived& d, const RayX<T, X>& ray, HitRecord<T, X>& record, const Interval<T>& range) {
+    { d._intersect(ray, record, range) } -> std::convertible_to<bool>;
 };
 
 template<typename Derived, Floating T, std::size_t X>
@@ -70,11 +72,11 @@ class Hittable {
 
     /**
      * @brief Friend function of HitRecord. Used to update the contents of a record when checking for intersects
-     * 
-     * @param record 
-     * @param point 
-     * @param normal 
-     * @param t 
+     *
+     * @param record
+     * @param point
+     * @param normal
+     * @param t
      */
     static void update(HitRecord<T, X>& record, const VecX<T, X>& point, T t, const RayX<T, X>& ray, const VecX<T, X>& out_normal) {
         record.front_face_ = dot(ray.dir(), out_normal) < 0;
@@ -85,8 +87,8 @@ class Hittable {
 
     public:
     template<typename D = Derived>
-    bool intersect(const RayX<T, X>& ray, HitRecord<T, X>& record) const requires (HittableImpl<D, T, X>) {
-        return static_cast<const D*>(this)->_intersect(ray, record);
+    bool intersect(const RayX<T, X>& ray, HitRecord<T, X>& record, const Interval<T>& range) const requires (HittableImpl<D, T, X>) {
+        return static_cast<const D*>(this)->_intersect(ray, record, range);
     };
 };
 
@@ -100,7 +102,7 @@ class HittableAny {
     /// "interface" that must be "implemented" by any shape that is hittable
     struct Concept {
         virtual ~Concept() = default;
-        virtual bool intersect(const RayX<T, X>&, HitRecord<T, X>&) const = 0;
+        virtual bool intersect(const RayX<T, X>&, HitRecord<T, X>&, const Interval<T>&) const = 0;
         virtual std::unique_ptr<Concept> clone() const = 0;
     };
 
@@ -109,8 +111,8 @@ class HittableAny {
     struct Model: Concept {
         H obj;
         explicit Model(H h) : obj(std::move(h)) {}
-        bool intersect(const RayX<T, X>& ray, HitRecord<T, X>& record) const override {
-            return obj.intersect(ray, record); // dispatches into the CRTP call, still static from here down
+        bool intersect(const RayX<T, X>& ray, HitRecord<T, X>& record, const Interval<T>& range) const override {
+            return obj.intersect(ray, record, range); // dispatches into the CRTP call, still static from here down
         }
         std::unique_ptr<Concept> clone() const override {
             return std::make_unique<Model>(obj);
@@ -127,7 +129,7 @@ public:
     HittableAny(const HittableAny& o) : self_(o.self_->clone()) {}
     HittableAny(HittableAny&&) = default;
 
-    bool intersect(const RayX<T, X>& ray, HitRecord<T, X>& record) const { return self_->intersect(ray, record); }
+    bool intersect(const RayX<T, X>& ray, HitRecord<T, X>& record, const Interval<T>& range) const { return self_->intersect(ray, record, range); }
 };
 
 #endif

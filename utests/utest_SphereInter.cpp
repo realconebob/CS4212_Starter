@@ -8,18 +8,19 @@
 
 auto record = HitRecord<double, 3>{};
 auto sphere = Sphere3D<double>{Vec3D{0, 0, 0}, 1};
+auto range = Interval<double>::universe();
 
 TEST_CASE("Sphere miss") {
     auto ray = Ray3D{Vec3D{1, 1, 1}, Vec3D{0, 0, -1}};
-    REQUIRE_FALSE(sphere.intersect(ray, record));
+    REQUIRE_FALSE(sphere.intersect(ray, record, range));
 }
 
 TEST_CASE("Sphere tangent") {
     auto ray = Ray3D{Vec3D{1, 0, 0}, Vec3D{0, 0, -1}};
-    REQUIRE(sphere.intersect(ray, record));
+    REQUIRE(sphere.intersect(ray, record, range));
 }
 
 TEST_CASE("Sphere through") {
     auto ray = Ray3D{Vec3D{0, 0, 0}, Vec3D{0, 0, -1}};
-    REQUIRE(sphere.intersect(ray, record));
+    REQUIRE(sphere.intersect(ray, record, range));
 }

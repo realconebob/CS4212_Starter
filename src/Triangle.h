@@ -30,7 +30,7 @@ class Triangle3: public Hittable<Triangle3<T>, T, 3> {
         normal_{unit(cross(e1_, e2_))}
         {}
 
-    bool _intersect(const RayX<T, 3>& ray, HitRecord<T, 3>& record) const {
+    bool _intersect(const RayX<T, 3>& ray, HitRecord<T, 3>& record, const Interval<T>& range) const {
         // Got this from claude because the slides were not clear on how to do this
         constexpr T eps = std::numeric_limits<T>::epsilon() * 10;
 
@@ -48,7 +48,7 @@ class Triangle3: public Hittable<Triangle3<T>, T, 3> {
         if (v < 0 || u + v > 1) return false;
 
         T t = dot(e2_, q) * inv;
-        if (t < eps) return false; // behind the origin or too close (self-hit)
+        if(!range.surrounds(t)) return false;
 
         VecX<T, 3> point = ray.origin() + t * ray.dir();
         this->update(record, point, t, ray, normal_);

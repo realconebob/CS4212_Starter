@@ -28,7 +28,7 @@ class Sphere3D: public Hittable<Sphere3D<T>, T, 3> {
         origin_{origin}, radius_{std::abs(radius)}
         {}
 
-    bool _intersect(const RayX<T, 3>& ray, HitRecord<T, 3>& record) const {
+    bool _intersect(const RayX<T, 3>& ray, HitRecord<T, 3>& record, const Interval<T>& range) const {
         VecX<T, 3> oc = origin_ - ray.origin();
 
         T
@@ -41,14 +41,10 @@ class Sphere3D: public Hittable<Sphere3D<T>, T, 3> {
 
         auto sqrtd = std::sqrt(discrim);
 
-        // TODO: Replace these with the interval class when ready. Not doing it now because I JUST changed intersect's signature and I don't want to again
-        const T ray_tmin = -100;
-        const T ray_tmax = -ray_tmin;
-
         auto root = (h - sqrtd) / a;
-        if (root <= ray_tmin || ray_tmax <= root) {
+        if (root <= range.min || range.max <= root) {
             root = (h + sqrtd) / a;
-            if (root <= ray_tmin || ray_tmax <= root)
+            if (root <= range.min || range.max <= root)
                 return false;
         }
         auto p = ray.at(root);

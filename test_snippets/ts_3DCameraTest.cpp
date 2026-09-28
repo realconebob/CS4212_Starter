@@ -1,4 +1,5 @@
 #include "Framebuffer.h"
+#include "Interval.h"
 #include "handleGraphicsArgs.h"
 
 #include "PerspectiveCamera.h"
@@ -38,9 +39,10 @@ int main(int argc, char *argv[]) {
         Hittable3D{Sphere3DD(Vec3D(1, 0, -2), 0.5)}
     };
     auto rec = HitRecord3D{};
+    auto range = Interval<double>::camera();
 
-    camera.rendertobuffer(fb, [&world, &rec](const Ray3D& r){
-        if(world.intersect(r, rec)) return 0.5 * Vec3D{rec.normal()[0] + 1, rec.normal()[1] + 1, rec.normal()[2] + 1};
+    camera.rendertobuffer(fb, [&world, &rec, &range](const Ray3D& r){
+        if(world.intersect(r, rec, range)) return 0.5 * Vec3D{rec.normal()[0] + 1, rec.normal()[1] + 1, rec.normal()[2] + 1};
 
         auto udir = unit(r.dir());
         auto a = 0.5 * (udir + Vec3D(1.0, 1.0, 1.0));
