@@ -14,6 +14,8 @@
 
 #include "Hittable.h"
 #include "RayX.h"
+#include "VecX.h"
+#include <cmath>
 
 template<Floating T>
 class Sphere3D: public Hittable<Sphere3D<T>, T, 3> {
@@ -26,15 +28,34 @@ class Sphere3D: public Hittable<Sphere3D<T>, T, 3> {
         origin_{origin}, radius_{std::abs(radius)}
         {}
 
-    bool _intersect(const RayX<T, 3>& ray) const {
+    bool _intersect(const RayX<T, 3>& ray, HitRecord<T, 3>& record) const {
         VecX<T, 3> oc = origin_ - ray.origin();
-        T
-            a = dot(ray.dir(), ray.dir()),
-            b = -2.0 * dot(ray.dir(), oc),
-            c = dot(oc, oc) - radius_ * radius_;
 
-        T discrim = b * b - 4 * a * c;
-        return (discrim >= 0);
+        T
+            a = ray.dir().length_squared(),
+            h = dot(ray.dir(), oc),
+            c = oc.length_squared() - radius_*radius_,
+            discrim = h*h - a*c;
+
+        if(discrim < 0) return false;
+
+        auto sqrtd = std::sqrt(discrim);
+
+        // TODO: Replace these with the interval class when ready. Not doing it now because I JUST changed intersect's signature and I don't want to again
+        const T ray_tmin = -100;
+        const T ray_tmax = -ray_tmin;
+
+        auto root = (h - sqrtd) / a;
+        if (root <= ray_tmin || ray_tmax <= root) {
+            root = (h + sqrtd) / a;
+            if (root <= ray_tmin || ray_tmax <= root)
+                return false;
+        }
+        auto p = ray.at(root);
+        VecX<T, 3> out_normal = (p - origin_) / radius_;
+        this->update(record, p, root, ray, out_normal);
+
+        return true;
     }
 };
 

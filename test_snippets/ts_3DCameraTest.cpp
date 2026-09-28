@@ -16,6 +16,7 @@ using FB3D = Framebuffer<double, 3>;
 using Sphere3DD = Sphere3D<double>;
 using World3DD = World3D<double>;
 using Hittable3D = HittableAny<double, 3>;
+using HitRecord3D = HitRecord<double, 3>;
 
 int main(int argc, char *argv[]) {
     sivelab::GraphicsArgs args;
@@ -23,21 +24,24 @@ int main(int argc, char *argv[]) {
 
     auto camera = PC3D{};
     camera.iwidth = 2000;
+    camera.aspectratio = 1;
+    camera.vfov = 100;
 
     auto fb = FB3D{(std::size_t)camera.get_iwidth(), (std::size_t)camera.get_iheight()};
     fb.clear();
 
-    auto world = World3DD{
+    World3DD world {
         Hittable3D{Sphere3DD(Vec3D(-1, 0, -2), 0.75)},
         Hittable3D{Sphere3DD(Vec3D(1, 0, -2), 0.5)}
     };
+    auto rec = HitRecord3D{};
 
-    camera.rendertobuffer(fb, [&world](const Ray3D& r){
-        if(world.intersect(r)) return Vec3D(1, 0, 0);
+    camera.rendertobuffer(fb, [&world, &rec](const Ray3D& r){
+        if(world.intersect(r, rec)) return 0.5 * Vec3D{rec.normal()[0] + 1, rec.normal()[1] + 1, rec.normal()[2] + 1};
 
         auto udir = unit(r.dir());
         auto a = 0.5 * (udir + Vec3D(1.0, 1.0, 1.0));
-        return Vec3D(1.0 - a[0], 1.0 - a[1], 1.0);
+        return Vec3D(a[0], a[1], a[2]);
     });
 
     // Not sure why the spheres are rendering as ovals. That's a problem for later me to solve
