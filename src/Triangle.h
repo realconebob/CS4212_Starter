@@ -24,6 +24,7 @@ class Triangle3: public Hittable<Triangle3<T>, T, 3> {
     VecX<T, 3> e1_, e2_, normal_;
 
     public:
+    explicit Triangle3() {}
     Triangle3(VecX<T, 3> a, VecX<T, 3> b, VecX<T, 3> c):
         a_{a}, b_{b}, c_{c},
         e1_{b - a}, e2_{c - a},

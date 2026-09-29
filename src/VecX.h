@@ -38,6 +38,12 @@ class VecX {
                 vals[i] = args[i];
             }
         }
+
+        static VecX<T, X> Ones() {
+            T ones[X] = {};
+            for(int i = 0; i < X; i++) ones[i] = T(1);
+            return VecX<T, X>(ones);
+        }
         #pragma endregion
 
         #pragma region Operators
