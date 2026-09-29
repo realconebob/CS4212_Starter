@@ -10,6 +10,7 @@
 #include "World.h"
 #include "Hittable.h"
 #include "Triangle.h"
+#include "Cube.h"
 
 #include <cstddef>
 
@@ -22,6 +23,7 @@ using Hittable3D = HittableAny<double, 3>;
 using HitRecord3D = HitRecord<double, 3>;
 using Triangle3D = Triangle3<double>;
 using Plane3D = Plane3<double>;
+using Cube3D = Cube3<double>;
 
 int main(int argc, char *argv[]) {
     sivelab::GraphicsArgs args;
@@ -39,7 +41,8 @@ int main(int argc, char *argv[]) {
         Hittable3D{Sphere3DD(Vec3D(-1, 0, -4), 0.75)},
         Hittable3D{Triangle3D(Vec3D(-0.5, 0, -3), Vec3D(1, 1, -3), Vec3D(1, -1, -3))},
         Hittable3D{Sphere3DD(Vec3D(1, 0, -2), 0.5)},
-        Hittable3D{Plane3D{{-1, 1, -3}, {1, -1, -2}}} // Figure this out
+        Hittable3D{Plane3D{{-1, 1, -3}, {1, -1, -2}}},
+        Hittable3D{Cube3D{{-0.5, 0.5, -2}, {0.5, -0.5, -1}}}
     };
     auto rec = HitRecord3D{};
     auto range = Interval<double>::camera();

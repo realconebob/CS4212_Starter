@@ -12,9 +12,6 @@
 #ifndef CS4212_GRAPHICS_PLANE__21057231487604__
 #define CS4212_GRAPHICS_PLANE__21057231487604__
 
-#include "Helpers.h"
-#include "Hittable.h"
-#include "RayX.h"
 #include "Triangle.h"
 
 #include <limits>
@@ -38,6 +35,10 @@ class Plane3: public Hittable<Plane3<T>, T, 3> {
 
         tris_[0] = t1;
         tris_[1] = t2;
+    }
+
+    static Plane3<T> empty() {
+        return Plane3<T>{{}, {}};
     }
 
     bool _intersect(const RayX<T, 3>& ray, HitRecord<T, 3>& record, const Interval<T>& range) const {
