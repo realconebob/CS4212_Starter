@@ -14,6 +14,8 @@
 
 #include "Framebuffer.h"
 #include "Helpers.h"
+#include "Hittable.h"
+#include "Interval.h"
 #include "RayX.h"
 #include "VecX.h"
 
@@ -25,7 +27,7 @@ template <typename F, typename T, std::size_t X>
 concept RayColorizer = std::is_invocable_r_v<VecX<T, X>, F, const RayX<T, X>&>;
 
 template<Floating T>
-class PerspectiveCamera3D {
+class PerspectiveCamera3 {
     public:
     #pragma region Set variables
     VecX<T, 3> lookfrom_, lookat_, up;
@@ -76,7 +78,7 @@ class PerspectiveCamera3D {
     #pragma endregion
 
     public:
-    PerspectiveCamera3D(
+    PerspectiveCamera3(
             VecX<T, 3> lookfrom = VecX<T, 3>{0, 0, 0},
             VecX<T, 3> lookat = VecX<T, 3>{0, 0, -1},
             VecX<T, 3> vup = VecX<T, 3>{0, 1, 0},
@@ -91,6 +93,19 @@ class PerspectiveCamera3D {
 
     int get_iwidth() const {return iwidth;}
     int get_iheight() const {return iheight();}
+
+    VecX<T, 3> raycolor(const Ray3D& ray, const HittableAny<T, 3>& world, HitRecord<T, 3>& record, const Interval<T>& range, int depth) {
+        if(depth <= 0) return VecX<T, 3>{};
+
+        if(world.intersect(ray, record, range)) {
+            auto dir = record.normal() + randunitv<T, 3>();
+            return 0.5 * raycolor(RayX<T, 3>(record.point(), dir), world, record, range, depth - 1);
+        }
+
+        VecX<T, 3> udir = unit(ray.dir());
+        auto a = T(0.5) * (udir[1] + T(1.0));
+        return (T(1.0) - a) * VecX<T, 3>::Ones() + a * VecX<T, 3>(0.5, 0.7, 1.0);
+    }
 
     template <RayColorizer<T, 3> Colorizer>
     void rendertobuffer(Framebuffer<T, 3>& fb, Colorizer colorizer) const {

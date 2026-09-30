@@ -12,6 +12,8 @@
 #ifndef CS4212_GRAPHICS_HELPERS__14695208710861__
 #define CS4212_GRAPHICS_HELPERS__14695208710861__
 
+#include <cstddef>
+#include <cstdlib>
 #define DEBUG 1
 
 #ifdef DEBUG
@@ -20,6 +22,8 @@
 
 #include <concepts>
 #include <cmath>
+
+#define forever for(;;)
 
 /**
  * @brief Concept describing the typical floating point number sizes
@@ -36,6 +40,17 @@ concept Floating = std::same_as<T, float> || std::same_as<T, double> || std::sam
  */
 template<typename T>
 concept Numeric = std::integral<T> || Floating<T>;
+
+class NotImplemented: public std::logic_error {
+    public:
+    NotImplemented(): std::logic_error("Function not implemented") {};
+};
+
+template<Floating T>
+/// Returns a floating point between [0, 1]
+T zorand() {
+    return std::rand() / T(RAND_MAX);
+}
 
 template<typename T1, typename T2>
 requires (std::convertible_to<T1, double>) && (std::convertible_to<T2, double>)
@@ -78,6 +93,12 @@ inline bool within_diff(const T1& v1, const T2& v2, double maxdiff) {
 
 #define REQUIRE_DIFF(v1, v2, max) REQUIRE(within_diff((v1), (v2), (max)))
 
+template<Floating T>
+inline T linear_to_gamma(T linear_comp) {
+    if(linear_comp > 0) return std::sqrt(linear_comp);
+    return 0;
+}
+
 
 template<typename T>
 void swap(T& a, T& b) {
@@ -110,9 +131,5 @@ T clamp(T val, T lo, T hi) {
 
 double degtorad(double deg);
 
-class NotImplemented: public std::logic_error {
-    public:
-    NotImplemented(): std::logic_error("Function not implemented") {};
-};
 
 #endif

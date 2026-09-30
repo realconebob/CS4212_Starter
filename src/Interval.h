@@ -40,7 +40,7 @@ class Interval {
 
     static Interval<T> empty() {return Interval<T>(std::numeric_limits<T>::infinity(), -std::numeric_limits<T>::infinity());}
     static Interval<T> universe() {return Interval<T>(-std::numeric_limits<T>::infinity(), std::numeric_limits<T>::infinity());}
-    static Interval<T> camera() {return Interval<T>(std::numeric_limits<T>::epsilon() * 10, std::numeric_limits<T>::infinity());}
+    static Interval<T> camera() {return Interval<T>(0.001, std::numeric_limits<T>::infinity());}
 };
 
 #endif

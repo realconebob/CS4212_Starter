@@ -44,7 +44,12 @@ class PNGRenderer {
             for (std::size_t y = 0; y < imgData.get_height(); ++y) {
             for (std::size_t x = 0; x < imgData.get_width(); ++x) {
                 fbpix = framebuffer_(x, y) * 255.0;
-                imgData[y][x] = png::rgb_pixel(fbpix[0], fbpix[1], fbpix[2]);
+                T
+                    r = fbpix[0], //linear_to_gamma<T>(fbpix[0]),
+                    g = fbpix[1], //linear_to_gamma<T>(fbpix[1]),
+                    b = fbpix[2]; //linear_to_gamma<T>(fbpix[2]);
+
+                imgData[y][x] = png::rgb_pixel(r, g, b);
 	        }}
             imgData.write(path_);
 

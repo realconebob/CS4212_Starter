@@ -15,6 +15,7 @@
 #include <cmath>
 #include <cstddef>
 #include <iostream>
+#include <limits>
 
 #include "Helpers.h"
 
@@ -216,6 +217,20 @@ inline T anglbetw(const VecX<T, X>& a, const VecX<T, X>& b) {
 template<Floating T, std::size_t X>
 inline VecX<T, X> dirto(const VecX<T, X>& src, const VecX<T, X>& dst) {
     return unit(dst - src);
+}
+
+template<Floating T, std::size_t X>
+inline VecX<T, X> randunitv() {
+    forever {
+        // Create randomized vector
+        auto v = VecX<T, X>{};
+        for(int i = 0; i < X; i++) {
+            v[i] = (zorand<T>() * 2) - 1;
+        }
+
+        auto lsq = v.length_squared();
+        if(lsq > std::numeric_limits<T>::epsilon() * 10 && lsq <= 1) return v / std::sqrt(lsq);
+    }
 }
 
 #pragma endregion
