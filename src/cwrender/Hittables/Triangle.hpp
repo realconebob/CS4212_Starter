@@ -25,13 +25,15 @@ class Triangle3: public Hittable<Triangle3<T>, T, 3> {
     private:
     VecX<T, 3> a_, b_, c_;
     VecX<T, 3> e1_, e2_, normal_;
+    std::shared_ptr<MaterialAny<T, 3>> mat_;
 
     public:
     explicit Triangle3() {}
-    Triangle3(VecX<T, 3> a, VecX<T, 3> b, VecX<T, 3> c):
+    Triangle3(VecX<T, 3> a, VecX<T, 3> b, VecX<T, 3> c, std::shared_ptr<MaterialAny<T, 3>> mat):
         a_{a}, b_{b}, c_{c},
         e1_{b - a}, e2_{c - a},
-        normal_{unit(cross(e1_, e2_))}
+        normal_{unit(cross(e1_, e2_))},
+        mat_(mat)
         {}
 
     bool _intersect(const RayX<T, 3>& ray, HitRecord<T, 3>& record, const Interval<T>& range) const {
@@ -55,7 +57,7 @@ class Triangle3: public Hittable<Triangle3<T>, T, 3> {
         if(!range.surrounds(t)) return false;
 
         VecX<T, 3> point = ray.origin() + t * ray.dir();
-        this->update(record, point, t, ray, normal_);
+        this->update(record, point, t, ray, normal_, mat_);
         return true;
     }
 };

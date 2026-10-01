@@ -14,17 +14,16 @@
 
 #include "cwrender/Hittables/Triangle.hpp"
 
-#include <limits>
-
 namespace cwrender {
 
 template<Floating T>
 class Plane3: public Hittable<Plane3<T>, T, 3> {
     private:
     Triangle3<T> tris_[2];
+    std::shared_ptr<MaterialAny<T, 3>> mat_;
 
     public:
-    Plane3(const VecX<T, 3>& topleft, const VecX<T, 3>& bottomright): tris_{Triangle3<T>{}, Triangle3<T>{}} {
+    Plane3(const VecX<T, 3>& topleft, const VecX<T, 3>& bottomright, std::shared_ptr<MaterialAny<T, 3>> mat): tris_{Triangle3<T>{}, Triangle3<T>{}}, mat_(mat) {
         // Note: think about how to ensure z axis isn't leading to wackiness
 
         VecX<T, 3>
@@ -32,8 +31,8 @@ class Plane3: public Hittable<Plane3<T>, T, 3> {
             bottomleft = {topleft[0], bottomright[1], bottomright[2]}; // TODO: CHECK Z AXIS
 
         Triangle3<T>
-            t1 = Triangle3<T>(topleft, topright, bottomleft), // A -> B -> C: top-left, top-right, bottom-left
-            t2 = Triangle3<T>(bottomleft, topright, bottomright); // A -> B -> C: bottom-left, top-right, bottom-right
+            t1 = Triangle3<T>(topleft, topright, bottomleft, mat_), // A -> B -> C: top-left, top-right, bottom-left
+            t2 = Triangle3<T>(bottomleft, topright, bottomright, mat_); // A -> B -> C: bottom-left, top-right, bottom-right
 
         tris_[0] = t1;
         tris_[1] = t2;

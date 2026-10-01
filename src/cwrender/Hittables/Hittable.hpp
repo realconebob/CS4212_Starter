@@ -25,6 +25,7 @@ namespace cwrender {
 template<Floating T, std::size_t X> class MaterialAny;
 template<Floating T, std::size_t X> class Lambertian;
 template<typename Derived, Floating T, std::size_t X> class Hittable;
+template<Floating T, std::size_t X> class HittableAny;
 
 /**
  * @brief Record class describing how/if a ray hit some `Hittable` object
@@ -97,6 +98,8 @@ class Hittable {
     bool intersect(const RayX<T, X>& ray, HitRecord<T, X>& record, const Interval<T>& range) const requires (HittableImpl<D, T, X>) {
         return static_cast<const D*>(this)->_intersect(ray, record, range);
     };
+
+    HittableAny<T, X> any() {return HittableAny<T, X>(static_cast<const Derived&>(*this));}
 };
 
 

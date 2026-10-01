@@ -22,26 +22,26 @@
 namespace cwrender {
 
 template<Floating T, std::size_t X>
-class Lambertian {
-    private:
-    VecX<T, X> reflection_;
+class Lambertian: public Material<Lambertian<T, X>, T, X> {
+    public:
+    Lambertian(const VecX<T, X>& albedo = VecX<T, X>::Ones()) {
+        this->reflection_ = albedo;
+    }
 
+    [[nodiscard]] bool scatter(const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten, RayX<T, X>& scattered) const {
+        return _scatter(rayin, record, atten, scattered);
+    }
+
+    // There's a way to make this private but idc right now
     [[nodiscard]] bool _scatter(const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten, RayX<T, X>& scattered) const {
-        auto scatter_direction = record.normal + randomunitv<T, X>();
+        auto scatter_direction = record.normal() + randunitv<T, X>();
         if(scatter_direction.near_zero())
             scatter_direction = record.normal();
 
         scattered = RayX<T, X>{record.point(), scatter_direction};
-        atten = reflection_;
+        atten = this->reflection_;
         return true;
     }
-
-    public:
-    Lambertian(const VecX<T, X>& albedo = VecX<T, X>::Ones()): reflection_(albedo) {}
-
-        [[nodiscard]] bool scatter(const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten, RayX<T, X>& scattered) const {
-            return _scatter(rayin, record, atten, scattered);
-        }
 };
 
 }

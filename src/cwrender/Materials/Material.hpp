@@ -61,7 +61,7 @@ class Material {
 
     const VecX<T, X>& reflection() const {return reflection_;}
     VecX<T, X> absorption() const {return (VecX<T, X>::Ones() - reflection_);}
-    std::shared_ptr<MaterialAny<T, X>> sharedptr() {return std::make_shared<MaterialAny<T, X>>(std::move(this));} // Apparently this is not visible from implementing classes?
+    std::shared_ptr<MaterialAny<T, X>> sharedptr() {return std::make_shared<MaterialAny<T, X>>(std::move(static_cast<const Derived&>(*this)));}
 };
 
 template<Floating T, std::size_t X>

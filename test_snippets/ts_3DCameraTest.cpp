@@ -42,18 +42,16 @@ int main(int argc, char *argv[]) {
     auto camera = PC3D{};
     camera.iwidth = 750;
     camera.aspectratio = 1;
-    camera.vfov = 75;
+    camera.vfov = 30;
 
     auto fb = FB3D{(std::size_t)camera.get_iwidth(), (std::size_t)camera.get_iheight()};
     fb.clear();
 
-    auto mat = Lambertian<double, 3>().sharedptr();
+    auto mat = NormalMapShader<double, 3>().sharedptr();
     World3DD world {
-        Hittable3D{Sphere3DD(Vec3D(-1, 0, -2), 0.75, mat)},
-        // Hittable3D{Triangle3D(Vec3D(-0.5, 0, -3), Vec3D(1, 1, -3), Vec3D(1, -1, -3))},
-        Hittable3D{Sphere3DD(Vec3D(1, 0, -1), 0.5, mat)},
-        // Hittable3D{Plane3D{{-1, 1, -3}, {1, -1, -2}}},
-        // Hittable3D{Cube3D{{-0.5, 0.5, -2}, {0.5, -0.5, -1}}}
+        Sphere3DD(Vec3D(-2, 0, -20), 1, mat).any(),
+        Sphere3DD(Vec3D(1, 0, -10), 0.75, mat).any(),
+        // Plane3D{{-1, 1, -3}, {1, -1, -2}, mat}.any(),
     };
     auto rec = HitRecord3D{};
     auto range = Interval<double>::camera();
@@ -61,8 +59,6 @@ int main(int argc, char *argv[]) {
     camera.rendertobuffer(fb, [&camera, &world, &rec, &range](const Ray3D& r){
         return camera.raycolor(r, world, rec, range, 50);
     });
-
-    // Not sure why the spheres are rendering as ovals. That's a problem for later me to solve
 
     PNGRenderer<double>(fb, "camera3d-white.png").render();
     exit(0);

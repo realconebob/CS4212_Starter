@@ -18,7 +18,6 @@
 #include "cwrender/BaseTypes/Interval.hpp"
 #include "cwrender/BaseTypes/RayX.hpp"
 #include "cwrender/BaseTypes/VecX.hpp"
-#include "cwrender/Materials/Material.hpp"
 
 #include <cmath>
 #include <cstddef>
@@ -102,12 +101,15 @@ class PerspectiveCamera3 {
 
         if(world.intersect(ray, record, range)) {
             RayX<T, 3> scattered;
-            VecX<T, 3> atten;
+            VecX<T, 3> atten{};
             if(record.material()->scatter(ray, record, atten, scattered))
-                return atten * raycolor(ray, world, record, range, depth - 1);
+                return atten * raycolor(scattered, world, record, range, depth - 1);
 
-            auto dir = record.normal() + randunitv<T, 3>();
-            return 0.5 * raycolor(RayX<T, 3>(record.point(), dir), world, record, range, depth - 1);
+            // Setting this makes the normal map render correctly again, but I haven't tested it with the lambertian/phong shaders
+            return atten;
+
+            // auto dir = record.normal() + randunitv<T, 3>();
+            // return 0.5 * raycolor(RayX<T, 3>(record.point(), dir), world, record, range, depth - 1);
         }
 
         VecX<T, 3> udir = unit(ray.dir());
