@@ -47,9 +47,16 @@ class NotImplemented: public std::logic_error {
     NotImplemented(): std::logic_error("Function not implemented") {};
 };
 
+void initrand();
+
 template<Floating T>
-/// Returns a floating point between [0, 1]
+/**
+ * @brief Returns a random floating point
+ * @warning This is not a thread-safe function! Do not use shaders that call this if you're doing parallel rendering
+ * @retval (T)[0,1] A floating point of type `T` in the range [0,1]
+ */
 T zorand() {
+    initrand();
     return std::rand() / T(RAND_MAX);
 }
 
@@ -94,13 +101,6 @@ inline bool within_diff(const T1& v1, const T2& v2, double maxdiff) {
 
 #define REQUIRE_DIFF(v1, v2, max) REQUIRE(within_diff((v1), (v2), (max)))
 
-template<Floating T>
-inline T linear_to_gamma(T linear_comp) {
-    if(linear_comp > 0) return std::sqrt(linear_comp);
-    return 0;
-}
-
-
 template<typename T>
 void swap(T& a, T& b) {
     T temp = a;
@@ -129,6 +129,9 @@ T clamp(T val, T lo, T hi) {
     val = max(val, hi);
     return val;
 }
+template<typename T>
+requires std::totally_ordered<T>
+T clamp_(T val, T lo, T hi) {return clamp(val, lo, hi);}
 
 double degtorad(double deg);
 

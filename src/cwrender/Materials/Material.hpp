@@ -88,7 +88,7 @@ class MaterialAny {
 
     public:
     template<typename M>
-    requires (MaterialImpl<M, T, X>) && (Shadeable<std::decay_t<M>, T, X>) && (!std::same_as<std::decay_t<M>, MaterialAny>)
+    requires Shadeable<std::decay_t<M>, T, X> && (!std::same_as<std::decay_t<M>, MaterialAny>)
     MaterialAny(M material): self_(std::make_unique<Shader<M>>(std::move(material))) {}
 
     MaterialAny(const MaterialAny& o) : self_(o.self_->clone()) {}

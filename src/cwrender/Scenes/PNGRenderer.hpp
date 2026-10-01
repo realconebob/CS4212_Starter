@@ -35,23 +35,23 @@ class PNGRenderer {
         /**
          * @brief Render the framebuffer to the respectively named png
          */
-        void render() const {
+        void render(bool gamma_correction = false) const {
             std::size_t
                 w = framebuffer_.width(),
                 h = framebuffer_.height();
 
-            VecX<T, 3> fbpix;
+            VecX<T, 3> corrected, fbpix;
             png::image<png::rgb_pixel> imgData(w, h); // weird syntax
 
             for (std::size_t y = 0; y < imgData.get_height(); ++y) {
             for (std::size_t x = 0; x < imgData.get_width(); ++x) {
-                fbpix = framebuffer_(x, y) * 255.0;
-                T
-                    r = fbpix[0], //linear_to_gamma<T>(fbpix[0]),
-                    g = fbpix[1], //linear_to_gamma<T>(fbpix[1]),
-                    b = fbpix[2]; //linear_to_gamma<T>(fbpix[2]);
+                corrected = (gamma_correction)
+                    ? linear_to_srgb(framebuffer_(x, y))
+                    : framebuffer_(x, y);
 
-                imgData[y][x] = png::rgb_pixel(r, g, b);
+                fbpix = corrected * T(255.0);// + (T(0.5) * VecX<T, 3>::Ones());
+
+                imgData[y][x] = png::rgb_pixel(fbpix[0], fbpix[1], fbpix[2]);
 	        }}
             imgData.write(path_);
 

@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
     auto fb = FB3D{(std::size_t)camera.get_iwidth(), (std::size_t)camera.get_iheight()};
     fb.clear();
 
-    auto mat = NormalMapShader<double, 3>().sharedptr();
+    auto mat = Lambertian<double, 3>().sharedptr();
     World3DD world {
         Sphere3DD(Vec3D(-2, 0, -20), 1, mat).any(),
         Sphere3DD(Vec3D(1, 0, -10), 0.75, mat).any(),
@@ -60,6 +60,6 @@ int main(int argc, char *argv[]) {
         return camera.raycolor(r, world, rec, range, 50);
     });
 
-    PNGRenderer<double>(fb, "camera3d-white.png").render();
+    PNGRenderer<double>(fb, "camera3d-white.png").render(true);
     exit(0);
 }

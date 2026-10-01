@@ -100,6 +100,17 @@ class VecX {
             return false;
         }
 
+        VecX<T, X>& clamp(T lo, T hi) {
+            for(int i = 0; i < X; i++) vals[i] = clamp_<T>(vals[i], lo, hi);
+            return *this;
+        }
+
+        VecX<T, X> clamp(T lo, T hi) const {
+            T tmp[X] = {};
+            for(int i = 0; i < X; i++) tmp[i] = clamp_<T>(vals[i], lo, hi);
+            return VecX<T, X>(tmp);
+        }
+
         #pragma endregion
 };
 
@@ -245,6 +256,16 @@ inline VecX<T, X> randunitv() {
 template<Floating T>
 inline VecX<T, 3> reflect(const VecX<T, 3>& v, const VecX<T, 3>& n) {
     return v - 2 * dot(v,n) * n;
+}
+
+template<Floating T, std::size_t X>
+/// Converts linear into srgb
+VecX<T, X> linear_to_srgb(const VecX<T, X>& linear) {
+    auto tmp = linear.clamp(T(0), T(1));
+    for(int i = 0; i < X; i++)
+        tmp[i] = std::pow(tmp[i], T(1)/T(2.2));
+
+    return tmp;
 }
 
 #pragma endregion
