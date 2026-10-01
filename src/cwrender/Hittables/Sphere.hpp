@@ -12,11 +12,14 @@
 #ifndef CS4212_GRAPHICS_SPHERE__27838395618845__
 #define CS4212_GRAPHICS_SPHERE__27838395618845__
 
-#include "Hittable.h"
-#include "RayX.h"
-#include "VecX.h"
+#include "cwrender/Hittables/Hittable.hpp"
+#include "cwrender/BaseTypes/RayX.hpp"
+#include "cwrender/BaseTypes/VecX.hpp"
+
 #include <cmath>
 #include <memory>
+
+namespace cwrender {
 
 template<Floating T>
 class Sphere3D: public Hittable<Sphere3D<T>, T, 3> {
@@ -57,4 +60,5 @@ class Sphere3D: public Hittable<Sphere3D<T>, T, 3> {
     }
 };
 
+}
 #endif

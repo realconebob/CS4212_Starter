@@ -12,12 +12,14 @@
 #ifndef CS4212_GRAPHICS_VECX__1283605022981__
 #define CS4212_GRAPHICS_VECX__1283605022981__
 
+#include "cwrender/Helpers.hpp"
+
 #include <cmath>
 #include <cstddef>
 #include <iostream>
 #include <limits>
 
-#include "Helpers.h"
+namespace cwrender {
 
 template<Floating T, std::size_t X>
 requires(X >= 1)
@@ -246,5 +248,6 @@ inline VecX<T, 3> reflect(const VecX<T, 3>& v, const VecX<T, 3>& n) {
 }
 
 #pragma endregion
+}
 
 #endif

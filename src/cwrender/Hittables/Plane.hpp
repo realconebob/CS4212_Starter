@@ -12,9 +12,11 @@
 #ifndef CS4212_GRAPHICS_PLANE__21057231487604__
 #define CS4212_GRAPHICS_PLANE__21057231487604__
 
-#include "Triangle.h"
+#include "cwrender/Hittables/Triangle.hpp"
 
 #include <limits>
+
+namespace cwrender {
 
 template<Floating T>
 class Plane3: public Hittable<Plane3<T>, T, 3> {
@@ -47,4 +49,5 @@ class Plane3: public Hittable<Plane3<T>, T, 3> {
     }
 };
 
+}
 #endif

@@ -12,10 +12,13 @@
 #ifndef CS4212_GRAPHICS__INTERVAL__17666140626717__
 #define CS4212_GRAPHICS__INTERVAL__17666140626717__
 
-#include "Helpers.h"
+#include "cwrender/Helpers.hpp"
+
 #include <limits>
 #include <sstream>
 #include <stdexcept>
+
+namespace cwrender {
 
 template<Floating T>
 class Interval {
@@ -43,4 +46,5 @@ class Interval {
     static Interval<T> camera() {return Interval<T>(0.001, std::numeric_limits<T>::infinity());}
 };
 
+}
 #endif

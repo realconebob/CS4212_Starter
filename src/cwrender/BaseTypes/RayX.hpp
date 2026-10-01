@@ -12,8 +12,10 @@
 #ifndef CS4212_GRAPHICS_RAYX__147651356622894__
 #define CS4212_GRAPHICS_RAYX__147651356622894__
 
-#include "Helpers.h"
-#include "VecX.h"
+#include "cwrender/Helpers.hpp"
+#include "cwrender//BaseTypes/VecX.hpp"
+
+namespace cwrender {
 
 template<Floating T, std::size_t X>
 class RayX {
@@ -63,4 +65,5 @@ class RayX {
 using Ray3D = RayX<double, 3>;
 #pragma endregion
 
+}
 #endif

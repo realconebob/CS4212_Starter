@@ -33,7 +33,7 @@ foreach(uexec ${UTESTS})
 	PRIVATE
 	Catch2::Catch2WithMain
 	cs4212-util
-  internallib
+  cwrender
   )
 
   # add_test(NAME ${uexec} COMMAND $<TARGET_FILE:${uexec}>)

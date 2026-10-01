@@ -12,11 +12,13 @@
 #ifndef CS4212_GRAPHICS_CUBE__28344179127720__
 #define CS4212_GRAPHICS_CUBE__28344179127720__
 
-#include "Helpers.h"
-#include "Hittable.h"
-#include "Plane.h"
+#include "cwrender/Helpers.hpp"
+#include "cwrender/Hittables/Hittable.hpp"
+#include "cwrender/Hittables/Plane.hpp"
 
 #include <limits>
+
+namespace cwrender {
 
 template<Floating T>
 class Cube3: public Hittable<Cube3<T>, T, 3> {
@@ -38,4 +40,5 @@ class Cube3: public Hittable<Cube3<T>, T, 3> {
     }
 };
 
+}
 #endif

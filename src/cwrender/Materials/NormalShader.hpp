@@ -12,11 +12,14 @@
 #ifndef CS4212_GRAPHICS_NORMALMAP__24730147238262__
 #define CS4212_GRAPHICS_NORMALMAP__24730147238262__
 
-#include "Helpers.h"
-#include "Hittable.h"
-#include "RayX.h"
-#include "VecX.h"
+#include "cwrender/Helpers.hpp"
+#include "cwrender/Hittables/Hittable.hpp"
+#include "cwrender/BaseTypes/RayX.hpp"
+#include "cwrender/BaseTypes/VecX.hpp"
+
 #include <cstddef>
+
+namespace cwrender {
 
 template<Floating T, std::size_t X>
 class NormalMapShader {
@@ -26,4 +29,5 @@ class NormalMapShader {
     }
 };
 
+}
 #endif

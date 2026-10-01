@@ -12,13 +12,15 @@
 #ifndef CS4212_GRAPHICS__PNG_RENDERER__3008151373543__
 #define CS4212_GRAPHICS__PNG_RENDERER__3008151373543__
 
-#include "Helpers.h"
-#include "Framebuffer.h"
+#include "cwrender/Helpers.hpp"
+#include "cwrender/Scenes/Framebuffer.hpp"
 
 #include "png++/image.hpp"
 #include "png++/rgb_pixel.hpp"
 
 #include <string>
+
+namespace cwrender {
 
 template<Floating T>
 class PNGRenderer {
@@ -57,4 +59,5 @@ class PNGRenderer {
         }
 };
 
+}
 #endif

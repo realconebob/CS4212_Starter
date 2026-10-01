@@ -12,7 +12,6 @@
 #ifndef CS4212_GRAPHICS_HELPERS__14695208710861__
 #define CS4212_GRAPHICS_HELPERS__14695208710861__
 
-#include <cstddef>
 #include <cstdlib>
 #define DEBUG 1
 
@@ -22,6 +21,8 @@
 
 #include <concepts>
 #include <cmath>
+
+namespace cwrender {
 
 #define forever for(;;)
 
@@ -131,5 +132,5 @@ T clamp(T val, T lo, T hi) {
 
 double degtorad(double deg);
 
-
+}
 #endif

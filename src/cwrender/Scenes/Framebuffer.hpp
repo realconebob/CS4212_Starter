@@ -12,12 +12,14 @@
 #ifndef CS4212_GRAPHICS_FRAMEBUFFER__110961598615200__
 #define CS4212_GRAPHICS_FRAMEBUFFER__110961598615200__
 
-#include "Helpers.h"
-#include "VecX.h"
+#include "cwrender/Helpers.hpp"
+#include "cwrender/BaseTypes/VecX.hpp"
 
 #include <concepts>
 #include <cstring>
 #include <cstddef>
+
+namespace cwrender {
 
 template<Floating T, std::size_t X>
 class Framebuffer {
@@ -122,4 +124,5 @@ class Framebuffer {
         #pragma endregion
 };
 
+}
 #endif

@@ -1,9 +1,11 @@
+#include "cwrender/Helpers.hpp"
+#include "cwrender/BaseTypes/VecX.hpp"
+
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 #include <numbers>
 
-#include "Helpers.h"
-#include "VecX.h"
+using namespace cwrender;
 
 const static auto
     PI = std::numbers::pi,

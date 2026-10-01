@@ -6,7 +6,3 @@ add_library (cs4212-util
 target_compile_definitions(cs4212-util PUBLIC HAS_GLM)
 target_link_libraries(cs4212-util PRIVATE Boost::program_options)
 target_link_libraries(cs4212-util PUBLIC glm::glm)
-
-add_library (internallib
-  Helpers.cpp Helpers.h
-)

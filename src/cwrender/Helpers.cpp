@@ -9,10 +9,14 @@
  *
  */
 
-#include "Helpers.h"
+#include "cwrender/Helpers.hpp"
 #include <numbers>
+
+namespace cwrender {
 
 double degtorad(double deg) {
     // 2rad = 360 = 1 rev, x deg * (2rad / 360deg) = x rad
     return deg * (std::numbers::pi) / 180.0;
+}
+
 }

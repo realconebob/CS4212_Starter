@@ -12,14 +12,16 @@
 #ifndef CS4212_GRAPHICS_MATERIAL__3962847032450__
 #define CS4212_GRAPHICS_MATERIAL__3962847032450__
 
-#include "Helpers.h"
-#include "Hittable.h"
-#include "VecX.h"
+#include "cwrender/Helpers.hpp"
+#include "cwrender/Hittables/Hittable.hpp"
+#include "cwrender/BaseTypes/VecX.hpp"
 
 #include <cstddef>
 #include <memory>
 #include <utility>
 #include <concepts>
+
+namespace cwrender {
 
 template<typename Derived, typename T, std::size_t X>
 concept MaterialImpl = Floating<T> && requires(const Derived& d, const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten, RayX<T, X>& scattered) {
@@ -59,6 +61,7 @@ class Material {
 
     const VecX<T, X>& reflection() const {return reflection_;}
     VecX<T, X> absorption() const {return (VecX<T, X>::Ones() - reflection_);}
+    std::shared_ptr<MaterialAny<T, X>> sharedptr() {return std::make_shared<MaterialAny<T, X>>(std::move(this));} // Apparently this is not visible from implementing classes?
 };
 
 template<Floating T, std::size_t X>
@@ -96,4 +99,5 @@ class MaterialAny {
     }
 };
 
+}
 #endif

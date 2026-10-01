@@ -12,13 +12,15 @@
 #ifndef CS4212_GRAPHICS_HITTABLE__90832129712705__
 #define CS4212_GRAPHICS_HITTABLE__90832129712705__
 
-#include "RayX.h"
-#include "VecX.h"
-#include "Interval.h"
+#include "cwrender/BaseTypes/RayX.hpp"
+#include "cwrender/BaseTypes/VecX.hpp"
+#include "cwrender/BaseTypes/Interval.hpp"
 
 #include <cmath>
 #include <cstddef>
 #include <memory>
+
+namespace cwrender {
 
 template<Floating T, std::size_t X> class MaterialAny;
 template<Floating T, std::size_t X> class Lambertian;
@@ -137,4 +139,5 @@ public:
     bool intersect(const RayX<T, X>& ray, HitRecord<T, X>& record, const Interval<T>& range) const { return self_->intersect(ray, record, range); }
 };
 
+}
 #endif

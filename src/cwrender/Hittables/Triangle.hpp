@@ -12,10 +12,13 @@
 #ifndef CS4212_GRAPHICS_TRIANGLE__14195264447411__
 #define CS4212_GRAPHICS_TRIANGLE__14195264447411__
 
-#include "Helpers.h"
-#include "Hittable.h"
-#include "RayX.h"
+#include "cwrender/Helpers.hpp"
+#include "cwrender/Hittables/Hittable.hpp"
+#include "cwrender/BaseTypes/RayX.hpp"
+
 #include <limits>
+
+namespace cwrender {
 
 template<Floating T>
 class Triangle3: public Hittable<Triangle3<T>, T, 3> {
@@ -57,4 +60,5 @@ class Triangle3: public Hittable<Triangle3<T>, T, 3> {
     }
 };
 
+}
 #endif

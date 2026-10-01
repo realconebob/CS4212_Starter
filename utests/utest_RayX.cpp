@@ -1,9 +1,11 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
-#include "RayX.h"
-#include "Helpers.h"
-#include "VecX.h"
+#include "cwrender/Helpers.hpp"
+#include "cwrender/BaseTypes/RayX.hpp"
+#include "cwrender/BaseTypes/VecX.hpp"
+
+using namespace cwrender;
 
 static auto
     xunit = Ray3D{Vec3D{}, Vec3D{1, 0, 0}},

@@ -1,12 +1,12 @@
-
-#include "VecX.h"
-#include "Framebuffer.h"
-#include "PNGRenderer.h"
+#include "cwrender/BaseTypes/VecX.hpp"
+#include "cwrender/Scenes/Framebuffer.hpp"
+#include "cwrender/Scenes/PNGRenderer.hpp"
 
 #include "handleGraphicsArgs.h"
 
 #include <cstddef>
 
+using namespace cwrender;
 using Color3D = VecX<double, 3>;
 
 int main(int argc, char *argv[]) {

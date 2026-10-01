@@ -12,17 +12,19 @@
 #ifndef CS4212_GRAPHICS_CAMERA3D__78361307319100__
 #define CS4212_GRAPHICS_CAMERA3D__78361307319100__
 
-#include "Framebuffer.h"
-#include "Helpers.h"
-#include "Hittable.h"
-#include "Interval.h"
-#include "RayX.h"
-#include "VecX.h"
-#include "Material.h"
+#include "cwrender/Scenes/Framebuffer.hpp"
+#include "cwrender/Helpers.hpp"
+#include "cwrender/Hittables/Hittable.hpp"
+#include "cwrender/BaseTypes/Interval.hpp"
+#include "cwrender/BaseTypes/RayX.hpp"
+#include "cwrender/BaseTypes/VecX.hpp"
+#include "cwrender/Materials/Material.hpp"
 
 #include <cmath>
 #include <cstddef>
 #include <vector>
+
+namespace cwrender {
 
 template <typename F, typename T, std::size_t X>
 concept RayColorizer = std::is_invocable_r_v<VecX<T, X>, F, const RayX<T, X>&>;
@@ -130,4 +132,5 @@ class PerspectiveCamera3 {
     }
 };
 
+}
 #endif

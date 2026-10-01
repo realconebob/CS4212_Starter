@@ -12,11 +12,14 @@
 #ifndef CS4212_GRAPHICS_LAMBERTIAN__25048403216100__
 #define CS4212_GRAPHICS_LAMBERTIAN__25048403216100__
 
-#include "Hittable.h"
-#include "Material.h"
-#include "RayX.h"
-#include "VecX.h"
+#include "cwrender/Hittables/Hittable.hpp"
+#include "cwrender/Materials/Material.hpp"
+#include "cwrender/BaseTypes/RayX.hpp"
+#include "cwrender/BaseTypes/VecX.hpp"
+
 #include <cstddef>
+
+namespace cwrender {
 
 template<Floating T, std::size_t X>
 class Lambertian {
@@ -41,4 +44,5 @@ class Lambertian {
         }
 };
 
+}
 #endif

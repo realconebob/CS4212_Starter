@@ -12,10 +12,13 @@
 #ifndef CS4212_GRAPHICS_WORLD__7971888621546__
 #define CS4212_GRAPHICS_WORLD__7971888621546__
 
-#include "Hittable.h"
-#include "Interval.h"
+#include "cwrender/Hittables/Hittable.hpp"
+#include "cwrender/BaseTypes/Interval.hpp"
+
 #include <concepts>
 #include <vector>
+
+namespace cwrender {
 
 template<Floating T>
 class World3D: public Hittable<World3D<T>, T, 3> {
@@ -41,4 +44,5 @@ class World3D: public Hittable<World3D<T>, T, 3> {
     }
 };
 
+}
 #endif

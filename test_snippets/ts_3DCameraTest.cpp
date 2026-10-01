@@ -1,22 +1,28 @@
-#include "Framebuffer.h"
-#include "Interval.h"
-#include "NormalShader.h"
-#include "Plane.h"
-#include "handleGraphicsArgs.h"
+#include "cwrender/Scenes/Framebuffer.hpp"
+#include "cwrender/Scenes/PerspectiveCamera.hpp"
+#include "cwrender/Scenes/PNGRenderer.hpp"
 
-#include "PerspectiveCamera.h"
-#include "PNGRenderer.h"
-#include "VecX.h"
-#include "Sphere.h"
-#include "World.h"
-#include "Hittable.h"
-#include "Triangle.h"
-#include "Cube.h"
-#include "Material.h"
-#include "LambertianShader.h"
+#include "cwrender/BaseTypes/VecX.hpp"
+#include "cwrender/BaseTypes/Interval.hpp"
+
+#include "cwrender/Hittables/Sphere.hpp"
+#include "cwrender/Hittables/World.hpp"
+#include "cwrender/Hittables/Hittable.hpp"
+#include "cwrender/Hittables/Triangle.hpp"
+#include "cwrender/Hittables/Cube.hpp"
+#include "cwrender/Hittables/Plane.hpp"
+
+
+#include "cwrender/Materials/Material.hpp"
+#include "cwrender/Materials/LambertianShader.hpp"
+#include "cwrender/Materials/NormalShader.hpp"
+
+#include "handleGraphicsArgs.h"
 
 #include <cstddef>
 #include <memory>
+
+using namespace cwrender;
 
 using Color3D = VecX<double, 3>;
 using PC3D = PerspectiveCamera3<double>;
@@ -41,7 +47,7 @@ int main(int argc, char *argv[]) {
     auto fb = FB3D{(std::size_t)camera.get_iwidth(), (std::size_t)camera.get_iheight()};
     fb.clear();
 
-    auto mat = std::make_shared<MaterialAny<double, 3>>(Lambertian<double, 3>());
+    auto mat = Lambertian<double, 3>().sharedptr();
     World3DD world {
         Hittable3D{Sphere3DD(Vec3D(-1, 0, -2), 0.75, mat)},
         // Hittable3D{Triangle3D(Vec3D(-0.5, 0, -3), Vec3D(1, 1, -3), Vec3D(1, -1, -3))},
