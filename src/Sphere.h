@@ -16,16 +16,18 @@
 #include "RayX.h"
 #include "VecX.h"
 #include <cmath>
+#include <memory>
 
 template<Floating T>
 class Sphere3D: public Hittable<Sphere3D<T>, T, 3> {
     private:
     VecX<T, 3> origin_;
     T radius_;
+    std::shared_ptr<MaterialAny<T, 3>> mat_;
 
     public:
-    Sphere3D(const VecX<T, 3>& origin, T radius):
-        origin_{origin}, radius_{std::abs(radius)}
+    Sphere3D(const VecX<T, 3>& origin, T radius, std::shared_ptr<MaterialAny<T, 3>> material):
+        origin_{origin}, radius_{std::abs(radius)}, mat_(material)
         {}
 
     bool _intersect(const RayX<T, 3>& ray, HitRecord<T, 3>& record, const Interval<T>& range) const {
@@ -49,7 +51,7 @@ class Sphere3D: public Hittable<Sphere3D<T>, T, 3> {
         }
         auto p = ray.at(root);
         VecX<T, 3> out_normal = (p - origin_) / radius_;
-        this->update(record, p, root, ray, out_normal);
+        this->update(record, p, root, ray, out_normal, mat_);
 
         return true;
     }

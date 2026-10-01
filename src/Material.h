@@ -22,13 +22,13 @@
 #include <concepts>
 
 template<typename Derived, typename T, std::size_t X>
-concept MaterialImpl = Floating<T> && requires(const Derived& d, const HitRecord<T, X>& record) {
-    { d._shade(record) } -> std::convertible_to<VecX<T, X>>;
+concept MaterialImpl = Floating<T> && requires(const Derived& d, const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten, RayX<T, X>& scattered) {
+    { d._scatter(rayin, record, atten, scattered) } -> std::convertible_to<bool>;
 };
 
 template<typename M, typename T, std::size_t X>
-concept Shadeable = requires(const M& m, const HitRecord<T, X>& record) {
-    { m.raycolor(record) } -> std::convertible_to<VecX<T, X>>;
+concept Shadeable = requires(const M& m, const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten, RayX<T, X>& scattered) {
+    { m.scatter(rayin, record, atten, scattered) } -> std::convertible_to<bool>;
 };
 
 template<typename Derived, Floating T, std::size_t X>
@@ -52,9 +52,9 @@ class Material {
     ~Material() = default;
 
     public:
-    VecX<T, X> raycolor(const HitRecord<T, X>& record) const
+    bool scatter(const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten, RayX<T, X>& scattered) const
     requires (MaterialImpl<Derived, T, X>){
-        return static_cast<const Derived&>(*this)->_shade(record);
+        return static_cast<const Derived&>(*this)->_scatter(rayin, record, atten, scattered);
     }
 
     const VecX<T, X>& reflection() const {return reflection_;}
@@ -65,7 +65,7 @@ template<Floating T, std::size_t X>
 class MaterialAny {
     struct Concept {
         virtual ~Concept() = default;
-        virtual VecX<T, X> raycolor(const HitRecord<T, X>&) const = 0;
+        virtual bool scatter(const RayX<T, X>&, const HitRecord<T, X>&, VecX<T, X>&, RayX<T, X>&) const = 0;
         virtual std::unique_ptr<Concept> clone() const = 0;
     };
 
@@ -73,8 +73,8 @@ class MaterialAny {
     struct Shader: Concept {
         S obj;
         explicit Shader(S s) : obj(std::move(s)) {}
-        VecX<T, X> raycolor(const HitRecord<T, X>& record) const override {
-            return obj.raycolor(record);
+        bool scatter(const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten, RayX<T, X>& scattered) const override {
+            return obj.scatter(rayin, record, atten, scattered);
         }
         std::unique_ptr<Concept> clone() const override {
             return std::make_unique<Shader>(obj);
@@ -91,8 +91,8 @@ class MaterialAny {
     MaterialAny(const MaterialAny& o) : self_(o.self_->clone()) {}
     MaterialAny(MaterialAny&&) = default;
 
-    VecX<T, X> raycolor(const HitRecord<T, X>& record) const {
-        return self_->raycolor(record);
+    bool scatter(const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten, RayX<T, X>& scattered) const {
+        return self_->scatter(rayin, record, atten, scattered);
     }
 };
 

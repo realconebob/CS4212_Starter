@@ -20,6 +20,8 @@
 #include <cstddef>
 #include <memory>
 
+template<Floating T, std::size_t X> class MaterialAny;
+template<Floating T, std::size_t X> class Lambertian;
 template<typename Derived, Floating T, std::size_t X> class Hittable;
 
 /**
@@ -33,6 +35,7 @@ class HitRecord {
     private:
     VecX<T, X> point_, normal_;
     T t_;
+    std::shared_ptr<MaterialAny<T, X>> mat_; // spooky (MaterialAny instead of Material)
     bool front_face_;
 
     template<typename D, Floating U, std::size_t Y>
@@ -46,6 +49,7 @@ class HitRecord {
     const VecX<T, X>& point() const {return point_;}
     const VecX<T, X>& normal() const {return normal_;}
     T t() const {return t_;}
+    std::shared_ptr<MaterialAny<T, X>> material() {return mat_;}
     bool front_face() const {return front_face_;}
 };
 
@@ -78,11 +82,12 @@ class Hittable {
      * @param normal
      * @param t
      */
-    static void update(HitRecord<T, X>& record, const VecX<T, X>& point, T t, const RayX<T, X>& ray, const VecX<T, X>& out_normal) {
+    static void update(HitRecord<T, X>& record, const VecX<T, X>& point, T t, const RayX<T, X>& ray, const VecX<T, X>& out_normal, std::shared_ptr<MaterialAny<T, X>> material) {
         record.front_face_ = dot(ray.dir(), out_normal) < 0;
         record.normal_ = record.front_face_ ? out_normal : -out_normal;
         record.point_ = point;
         record.t_ = t;
+        record.mat_ = material;
     }
 
     public:

@@ -18,6 +18,7 @@
 #include "Interval.h"
 #include "RayX.h"
 #include "VecX.h"
+#include "Material.h"
 
 #include <cmath>
 #include <cstddef>
@@ -98,6 +99,11 @@ class PerspectiveCamera3 {
         if(depth <= 0) return VecX<T, 3>{};
 
         if(world.intersect(ray, record, range)) {
+            RayX<T, 3> scattered;
+            VecX<T, 3> atten;
+            if(record.material()->scatter(ray, record, atten, scattered))
+                return atten * raycolor(ray, world, record, range, depth - 1);
+
             auto dir = record.normal() + randunitv<T, 3>();
             return 0.5 * raycolor(RayX<T, 3>(record.point(), dir), world, record, range, depth - 1);
         }

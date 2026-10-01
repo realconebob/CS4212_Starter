@@ -12,8 +12,11 @@
 #include "Hittable.h"
 #include "Triangle.h"
 #include "Cube.h"
+#include "Material.h"
+#include "LambertianShader.h"
 
 #include <cstddef>
+#include <memory>
 
 using Color3D = VecX<double, 3>;
 using PC3D = PerspectiveCamera3<double>;
@@ -38,10 +41,11 @@ int main(int argc, char *argv[]) {
     auto fb = FB3D{(std::size_t)camera.get_iwidth(), (std::size_t)camera.get_iheight()};
     fb.clear();
 
+    auto mat = std::make_shared<MaterialAny<double, 3>>(Lambertian<double, 3>());
     World3DD world {
-        Hittable3D{Sphere3DD(Vec3D(-1, 0, -2), 0.75)},
+        Hittable3D{Sphere3DD(Vec3D(-1, 0, -2), 0.75, mat)},
         // Hittable3D{Triangle3D(Vec3D(-0.5, 0, -3), Vec3D(1, 1, -3), Vec3D(1, -1, -3))},
-        Hittable3D{Sphere3DD(Vec3D(1, 0, -1), 0.5)},
+        Hittable3D{Sphere3DD(Vec3D(1, 0, -1), 0.5, mat)},
         // Hittable3D{Plane3D{{-1, 1, -3}, {1, -1, -2}}},
         // Hittable3D{Cube3D{{-0.5, 0.5, -2}, {0.5, -0.5, -1}}}
     };

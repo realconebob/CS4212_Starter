@@ -91,6 +91,13 @@ class VecX {
             return sum;
         }
 
+        bool near_zero() const {
+            for(int i = 0; i < X; i++) {
+                if (std::abs(vals[i]) < std::numeric_limits<T>::epsilon() * 5) return true;
+            }
+            return false;
+        }
+
         #pragma endregion
 };
 
@@ -231,6 +238,11 @@ inline VecX<T, X> randunitv() {
         auto lsq = v.length_squared();
         if(lsq > std::numeric_limits<T>::epsilon() * 10 && lsq <= 1) return v / std::sqrt(lsq);
     }
+}
+
+template<Floating T>
+inline VecX<T, 3> reflect(const VecX<T, 3>& v, const VecX<T, 3>& n) {
+    return v - 2 * dot(v,n) * n;
 }
 
 #pragma endregion
