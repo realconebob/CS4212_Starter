@@ -23,8 +23,11 @@ namespace cwrender {
 
 template<Floating T, std::size_t X>
 class MetalShader: public Material<MetalShader<T, X>, T, X> {
+    private:
+    T fuzz_;
+
     public:
-    MetalShader(const VecX<T, X>& albedo = VecX<T, X>::Ones()) {
+    MetalShader(const VecX<T, X>& albedo = VecX<T, X>::Ones(), T fuzz = 0.0): fuzz_(fuzz) {
         this->reflection_ = albedo;
     }
 
@@ -35,9 +38,11 @@ class MetalShader: public Material<MetalShader<T, X>, T, X> {
     // There's a way to make this private but idc right now
     [[nodiscard]] bool _scatter(const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten, RayX<T, X>& scattered) const {
         VecX<T, X> reflected = reflect(rayin.dir(), record.normal());
+        reflected = unit(reflected) + (fuzz_ * randunitv<T, X>());
+
         scattered = RayX<T, X>(record.point(), reflected);
         atten = this->reflection_;
-        return true;
+        return (dot(scattered.dir(), record.normal()) > 0);;
     }
 };
 

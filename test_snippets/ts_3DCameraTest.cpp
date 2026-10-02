@@ -1,5 +1,5 @@
 #include "cwrender/BaseTypes/RayX.hpp"
-#include "cwrender/Materials/MetalShader.hpp"
+
 #include "cwrender/Scenes/Framebuffer.hpp"
 #include "cwrender/Scenes/PerspectiveCamera.hpp"
 #include "cwrender/Scenes/PNGRenderer.hpp"
@@ -14,15 +14,13 @@
 #include "cwrender/Hittables/Cube.hpp"
 #include "cwrender/Hittables/Plane.hpp"
 
-
-#include "cwrender/Materials/Material.hpp"
 #include "cwrender/Materials/LambertianShader.hpp"
 #include "cwrender/Materials/NormalShader.hpp"
+#include "cwrender/Materials/MetalShader.hpp"
 
 #include "handleGraphicsArgs.h"
 
 #include <cstddef>
-#include <functional>
 #include <memory>
 
 using namespace cwrender;
@@ -45,14 +43,14 @@ int main(int argc, char *argv[]) {
     auto camera = PC3D{};
     camera.iwidth = 5000;
     camera.aspectratio = 1;
-    camera.vfov = 30;
+    camera.vfov = 20;
 
     auto fb = FB3D{(std::size_t)camera.get_iwidth(), (std::size_t)camera.get_iheight()};
     fb.clear();
 
     auto normalmat = NormalMapShader<double, 3>().sharedptr();
     auto diffusemat = Lambertian<double, 3>(0.5 * Vec3D::Ones()).sharedptr();
-    auto metalmat = MetalShader<double, 3>().sharedptr();
+    auto metalmat = MetalShader<double, 3>({0.8, 0.6, 0.2}, 0.25).sharedptr();
     World3DD world {
         Sphere3DD(Vec3D(-2, 0, -20), 1, normalmat).any(),
         Sphere3DD(Vec3D(0, 0, -15), 0.5, metalmat).any(),

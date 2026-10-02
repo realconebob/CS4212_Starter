@@ -16,6 +16,7 @@
 
 #include <cmath>
 #include <cstddef>
+#include <functional>
 #include <iostream>
 #include <limits>
 #include <stdexcept>
@@ -262,7 +263,7 @@ inline VecX<T, 3> reflect(const VecX<T, 3>& v, const VecX<T, 3>& n) {
 
 template<Floating T, std::size_t X>
 /// Converts linear into srgb
-VecX<T, X> linear_to_srgb(const VecX<T, X>& linear) {
+inline VecX<T, X> linear_to_srgb(const VecX<T, X>& linear) {
     auto tmp = linear.clamp(T(0), T(1));
     for(int i = 0; i < X; i++)
         tmp[i] = std::pow(tmp[i], T(1)/T(2.2));
@@ -271,12 +272,17 @@ VecX<T, X> linear_to_srgb(const VecX<T, X>& linear) {
 }
 
 template<Floating T, std::size_t X>
-inline VecX<T, X> random_on_hemisphere(const VecX<T, X>& normal) {
-    VecX<T, X> on_unit_sphere = randunitv<T, X>();
-    if (dot(on_unit_sphere, normal) > 0.0) // In the same hemisphere as the normal
-        return on_unit_sphere;
-    else
-        return -on_unit_sphere;
+inline VecX<T, X> randunitdisc() {
+    VecX<T, X> p{};
+    // If I have to write this again I'll turn it into a proper function
+    std::function<T()> neg_one_to_one = [](){
+        return (zorand<T>() * 2) - 1;
+    };
+    forever {
+        p = {neg_one_to_one(), neg_one_to_one(), 0};
+        if(p.length_squared() < 1) return p;
+    }
+    throw std::logic_error("[VecX::randunitdisc] Somehow broke out of infinite loop");
 }
 
 #pragma endregion

@@ -47,21 +47,6 @@ class NotImplemented: public std::logic_error {
     NotImplemented(): std::logic_error("Function not implemented") {};
 };
 
-void initrand();
-
-template<Floating T>
-/**
- * @brief Returns a random floating point
- * @warning This is not a thread-safe function! Do not use shaders that call this if you're doing parallel rendering
- * @retval (T)[0,1] A floating point of type `T` in the range [0,1]
- */
-T zorand() {
-    initrand();
-    return std::rand() / T(RAND_MAX);
-}
-
-template<typename T1, typename T2>
-requires (std::convertible_to<T1, double>) && (std::convertible_to<T2, double>)
 /**
  * @brief Calculate the relative difference between two values
  *
@@ -69,6 +54,8 @@ requires (std::convertible_to<T1, double>) && (std::convertible_to<T2, double>)
  * @param v2 Value 2
  * @return double How far value 2 is to value 1, as a multiple. 10's relative distance to 5 is 1, as 5 + (1*5) = 10
  */
+template<typename T1, typename T2>
+requires (std::convertible_to<T1, double>) && (std::convertible_to<T2, double>)
 inline double relative_diff(const T1& v1, const T2& v2) {
     double
         dv1 = static_cast<double>(v1),
@@ -79,7 +66,6 @@ inline double relative_diff(const T1& v1, const T2& v2) {
         : 0.0;
 }
 
-template<Numeric T1, Numeric T2>
 /**
  * @brief Tests whether two floating numbers are within some distance to each other
  *
@@ -89,6 +75,7 @@ template<Numeric T1, Numeric T2>
  * @return true
  * @return false
  */
+template<Numeric T1, Numeric T2>
 inline bool within_diff(const T1& v1, const T2& v2, double maxdiff) {
     double res = relative_diff(v1, v2);
 
@@ -134,6 +121,19 @@ requires std::totally_ordered<T>
 T clamp_(T val, T lo, T hi) {return clamp(val, lo, hi);}
 
 double degtorad(double deg);
+
+void initrand();
+
+template<Floating T>
+/**
+ * @brief Returns a random floating point
+ * @warning This is not a thread-safe function! Do not use shaders that call this if you're doing parallel rendering
+ * @retval (T)[0,1] A floating point of type `T` in the range [0,1]
+ */
+T zorand() {
+    initrand();
+    return std::rand() / T(RAND_MAX);
+}
 
 }
 #endif
