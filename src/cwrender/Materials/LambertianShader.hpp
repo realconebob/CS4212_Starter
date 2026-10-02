@@ -35,8 +35,7 @@ class Lambertian: public Material<Lambertian<T, X>, T, X> {
     // There's a way to make this private but idc right now
     [[nodiscard]] bool _scatter(const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten, RayX<T, X>& scattered) const {
         auto scatter_direction = record.normal() + randunitv<T, X>();
-        if(scatter_direction.near_zero())
-            scatter_direction = record.normal();
+        if(scatter_direction.near_zero()) scatter_direction = record.normal();
 
         scattered = RayX<T, X>{record.point(), scatter_direction};
         atten = this->reflection_;

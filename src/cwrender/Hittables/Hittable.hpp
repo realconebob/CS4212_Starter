@@ -23,7 +23,6 @@
 namespace cwrender {
 
 template<Floating T, std::size_t X> class MaterialAny;
-template<Floating T, std::size_t X> class Lambertian;
 template<typename Derived, Floating T, std::size_t X> class Hittable;
 template<Floating T, std::size_t X> class HittableAny;
 
@@ -40,6 +39,7 @@ class HitRecord {
     T t_;
     std::shared_ptr<MaterialAny<T, X>> mat_; // spooky (MaterialAny instead of Material)
     bool front_face_;
+    bool override_atten_;
 
     template<typename D, Floating U, std::size_t Y>
     friend class Hittable;

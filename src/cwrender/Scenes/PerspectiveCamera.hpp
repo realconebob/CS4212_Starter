@@ -104,12 +104,7 @@ class PerspectiveCamera3 {
             VecX<T, 3> atten{};
             if(record.material()->scatter(ray, record, atten, scattered))
                 return atten * raycolor(scattered, world, record, range, depth - 1);
-
-            // Setting this makes the normal map render correctly again, but I haven't tested it with the lambertian/phong shaders
-            return atten;
-
-            // auto dir = record.normal() + randunitv<T, 3>();
-            // return 0.5 * raycolor(RayX<T, 3>(record.point(), dir), world, record, range, depth - 1);
+            return (record.material()->override_atten()) ? atten : VecX<T, 3>{};
         }
 
         VecX<T, 3> udir = unit(ray.dir());

@@ -1,7 +1,7 @@
 /**
- * @file NormalShader.h
+ * @file LambertianShader.h
  * @author Connor Walstrom (walst110@umn.edu)
- * @brief NormalMap Shader Implementation
+ * @brief Lambertian shader / material implementation
  * @version 0.1
  * @date 2026-09-30
  *
@@ -9,25 +9,23 @@
  *
  */
 
-#ifndef CS4212_GRAPHICS_NORMALMAP__24730147238262__
-#define CS4212_GRAPHICS_NORMALMAP__24730147238262__
+#ifndef CS4212_GRAPHICS_METAL__200783036924283__
+#define CS4212_GRAPHICS_METAL__200783036924283__
 
-#include "cwrender/Helpers.hpp"
 #include "cwrender/Hittables/Hittable.hpp"
+#include "cwrender/Materials/Material.hpp"
 #include "cwrender/BaseTypes/RayX.hpp"
 #include "cwrender/BaseTypes/VecX.hpp"
-#include "cwrender/Materials/Material.hpp"
 
 #include <cstddef>
 
 namespace cwrender {
 
 template<Floating T, std::size_t X>
-class NormalMapShader: public Material<NormalMapShader<T, X>, T, X> {
+class MetalShader: public Material<MetalShader<T, X>, T, X> {
     public:
-    NormalMapShader() {
-        this->reflection_ = VecX<T, X>::Ones(); // Not entirely necessary but whatever
-        this->override_atten_ = true;
+    MetalShader(const VecX<T, X>& albedo = VecX<T, X>::Ones()) {
+        this->reflection_ = albedo;
     }
 
     [[nodiscard]] bool scatter(const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten, RayX<T, X>& scattered) const {
@@ -36,8 +34,10 @@ class NormalMapShader: public Material<NormalMapShader<T, X>, T, X> {
 
     // There's a way to make this private but idc right now
     [[nodiscard]] bool _scatter(const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten, RayX<T, X>& scattered) const {
-        atten = 0.5 * (record.normal() + VecX<T, X>::Ones());
-        return false;
+        VecX<T, X> reflected = reflect(rayin.dir(), record.normal());
+        scattered = RayX<T, X>(record.point(), reflected);
+        atten = this->reflection_;
+        return true;
     }
 };
 

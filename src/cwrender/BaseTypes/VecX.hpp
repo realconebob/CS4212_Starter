@@ -18,6 +18,7 @@
 #include <cstddef>
 #include <iostream>
 #include <limits>
+#include <stdexcept>
 
 namespace cwrender {
 
@@ -251,6 +252,7 @@ inline VecX<T, X> randunitv() {
         auto lsq = v.length_squared();
         if(lsq > std::numeric_limits<T>::epsilon() * 10 && lsq <= 1) return v / std::sqrt(lsq);
     }
+    throw std::logic_error("[VecX::randunitv] Somehow broke out of infinite loop");
 }
 
 template<Floating T>
@@ -266,6 +268,15 @@ VecX<T, X> linear_to_srgb(const VecX<T, X>& linear) {
         tmp[i] = std::pow(tmp[i], T(1)/T(2.2));
 
     return tmp;
+}
+
+template<Floating T, std::size_t X>
+inline VecX<T, X> random_on_hemisphere(const VecX<T, X>& normal) {
+    VecX<T, X> on_unit_sphere = randunitv<T, X>();
+    if (dot(on_unit_sphere, normal) > 0.0) // In the same hemisphere as the normal
+        return on_unit_sphere;
+    else
+        return -on_unit_sphere;
 }
 
 #pragma endregion

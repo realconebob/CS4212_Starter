@@ -1,4 +1,5 @@
 #include "cwrender/BaseTypes/RayX.hpp"
+#include "cwrender/Materials/MetalShader.hpp"
 #include "cwrender/Scenes/Framebuffer.hpp"
 #include "cwrender/Scenes/PerspectiveCamera.hpp"
 #include "cwrender/Scenes/PNGRenderer.hpp"
@@ -42,39 +43,27 @@ int main(int argc, char *argv[]) {
     args.process(argc, argv);
 
     auto camera = PC3D{};
-    camera.iwidth = 750;
+    camera.iwidth = 5000;
     camera.aspectratio = 1;
     camera.vfov = 30;
 
     auto fb = FB3D{(std::size_t)camera.get_iwidth(), (std::size_t)camera.get_iheight()};
     fb.clear();
 
-    auto mat = Lambertian<double, 3>().sharedptr();
+    auto normalmat = NormalMapShader<double, 3>().sharedptr();
+    auto diffusemat = Lambertian<double, 3>(0.5 * Vec3D::Ones()).sharedptr();
+    auto metalmat = MetalShader<double, 3>().sharedptr();
     World3DD world {
-        Sphere3DD(Vec3D(-2, 0, -20), 1, mat).any(),
-        Sphere3DD(Vec3D(1, 0, -10), 0.75, mat).any(),
-        Plane3D{{-10, 0, -60}, {10, -10, -20}, mat}.any(),
+        Sphere3DD(Vec3D(-2, 0, -20), 1, normalmat).any(),
+        Sphere3DD(Vec3D(0, 0, -15), 0.5, metalmat).any(),
+        Sphere3DD(Vec3D(1, -0.75, -10), 0.75, diffusemat).any(),
+        Plane3D{{-100, 0, -60}, {100, -2, 0}, diffusemat}.any(),
     };
     auto rec = HitRecord3D{};
     auto range = Interval<double>::camera();
 
     camera.rendertobuffer(fb, [&camera, &world, &rec, &range](const Ray3D& r){
-        std::function<Vec3D (const Ray3D& r_, World3DD& world_, int depth)> fakerc;
-        fakerc = [&rec, &range, &fakerc](const Ray3D& r_, World3DD& world_, int depth) {
-            if(depth <= 0) return Vec3D{0, 0, 0};
-
-            if (world_.intersect(r_, rec, range)) {
-                Vec3D dir = rec.normal() + randunitv<double, 3>();
-                return 0.5 * fakerc(Ray3D{rec.point(), dir}, world_, depth - 1);
-            }
-
-            Vec3D ud = unit(r_.dir());
-            auto a = 0.5*(ud[1] + 1.0);
-            return (1.0-a)*Vec3D(1.0, 1.0, 1.0) + a*Vec3D(0.5, 0.7, 1.0);
-        };
-
-        // return camera.raycolor(r, world, rec, range, 50);
-        return fakerc(r, world, 10);
+        return camera.raycolor(r, world, rec, range, 50);
     });
 
     PNGRenderer<double>(fb, "camera3d-white.png").render(true);

@@ -33,8 +33,16 @@ concept Shadeable = requires(const M& m, const RayX<T, X>& rayin, const HitRecor
     { m.scatter(rayin, record, atten, scattered) } -> std::convertible_to<bool>;
 };
 
+
+template<Floating T, std::size_t X> class MaterialAny;
+
+
 template<typename Derived, Floating T, std::size_t X>
 class Material {
+    private:
+    template<Floating U, std::size_t V>
+    friend class MaterialAny;
+
     protected:
 
     /**
@@ -48,7 +56,13 @@ class Material {
     */
     VecX<T, X> reflection_;
 
-    Material(): reflection_{VecX<T, X>::Ones()} {}
+    /**
+     * @brief Whether or not to override a black color with the attenuation of the shader on raycolor
+     *
+     */
+    bool override_atten_;
+
+    Material(): reflection_{VecX<T, X>::Ones()}, override_atten_(false) {}
     Material(const Material&) = default;
     Material(Material&&) = default;
     ~Material() = default;
@@ -61,6 +75,7 @@ class Material {
 
     const VecX<T, X>& reflection() const {return reflection_;}
     VecX<T, X> absorption() const {return (VecX<T, X>::Ones() - reflection_);}
+    bool override_atten() const {return override_atten_;}
     std::shared_ptr<MaterialAny<T, X>> sharedptr() {return std::make_shared<MaterialAny<T, X>>(std::move(static_cast<const Derived&>(*this)));}
 };
 
@@ -69,6 +84,7 @@ class MaterialAny {
     struct Concept {
         virtual ~Concept() = default;
         virtual bool scatter(const RayX<T, X>&, const HitRecord<T, X>&, VecX<T, X>&, RayX<T, X>&) const = 0;
+        virtual bool override_atten() const = 0;
         virtual std::unique_ptr<Concept> clone() const = 0;
     };
 
@@ -79,6 +95,7 @@ class MaterialAny {
         bool scatter(const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten, RayX<T, X>& scattered) const override {
             return obj.scatter(rayin, record, atten, scattered);
         }
+        bool override_atten() const override {return obj.override_atten_;}
         std::unique_ptr<Concept> clone() const override {
             return std::make_unique<Shader>(obj);
         }
@@ -97,6 +114,7 @@ class MaterialAny {
     bool scatter(const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten, RayX<T, X>& scattered) const {
         return self_->scatter(rayin, record, atten, scattered);
     }
+    bool override_atten() const {return self_->override_atten();}
 };
 
 }
