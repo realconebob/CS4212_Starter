@@ -1,8 +1,8 @@
 target_sources(cwrender PRIVATE
     Cube.hpp
     Hittable.hpp
+    Hittables.hpp
     Plane.hpp
     Sphere.hpp
     Triangle.hpp
-    World.hpp
 )

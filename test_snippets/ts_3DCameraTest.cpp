@@ -8,16 +8,16 @@
 #include "cwrender/BaseTypes/Interval.hpp"
 
 #include "cwrender/Hittables/Sphere.hpp"
-#include "cwrender/Hittables/World.hpp"
 #include "cwrender/Hittables/Hittable.hpp"
 #include "cwrender/Hittables/Triangle.hpp"
 #include "cwrender/Hittables/Cube.hpp"
 #include "cwrender/Hittables/Plane.hpp"
 
-#include "cwrender/Materials/LambertianShader.hpp"
+#include "cwrender/Materials/DiffuseShader.hpp"
 #include "cwrender/Materials/NormalShader.hpp"
 #include "cwrender/Materials/MetalShader.hpp"
 
+#include "cwrender/Scenes/Scene.hpp"
 #include "handleGraphicsArgs.h"
 
 #include <cstddef>
@@ -29,7 +29,7 @@ using Color3D = VecX<double, 3>;
 using PC3D = PerspectiveCamera3<double>;
 using FB3D = Framebuffer<double, 3>;
 using Sphere3DD = Sphere3D<double>;
-using World3DD = World3D<double>;
+using Scene3D = Scene3<double>;
 using Hittable3D = HittableAny<double, 3>;
 using HitRecord3D = HitRecord<double, 3>;
 using Triangle3D = Triangle3<double>;
@@ -41,7 +41,7 @@ int main(int argc, char *argv[]) {
     args.process(argc, argv);
 
     auto camera = PC3D{};
-    camera.iwidth = 5000;
+    camera.iwidth = 2500;
     camera.aspectratio = 1;
     camera.vfov = 20;
 
@@ -49,13 +49,17 @@ int main(int argc, char *argv[]) {
     fb.clear();
 
     auto normalmat = NormalMapShader<double, 3>().sharedptr();
-    auto diffusemat = Lambertian<double, 3>(0.5 * Vec3D::Ones()).sharedptr();
-    auto metalmat = MetalShader<double, 3>({0.8, 0.6, 0.2}, 0.25).sharedptr();
-    World3DD world {
-        Sphere3DD(Vec3D(-2, 0, -20), 1, normalmat).any(),
-        Sphere3DD(Vec3D(0, 0, -15), 0.5, metalmat).any(),
-        Sphere3DD(Vec3D(1, -0.75, -10), 0.75, diffusemat).any(),
-        Plane3D{{-100, 0, -60}, {100, -2, 0}, diffusemat}.any(),
+    auto bluemat = DiffuseShader<double, 3>({0, 0, 1}).sharedptr();
+    auto whitemat = DiffuseShader<double, 3>(0.5 * Vec3D::Ones()).sharedptr();
+    auto metalmat = MetalShader<double, 3>({0.8, 0.6, 0.2}, 0.05).sharedptr();
+    Scene3D world {
+        {
+            Sphere3DD(Vec3D(-2, 0, -20), 1, normalmat).any(),
+            Sphere3DD(Vec3D(0, 0, -15), 0.5, metalmat).any(),
+            Sphere3DD(Vec3D(1, -0.75, -10), 0.75, bluemat).any(),
+            Plane3D{{-100, 0, -60}, {100, -2, 0}, whitemat}.any(),
+        },
+        {}
     };
     auto rec = HitRecord3D{};
     auto range = Interval<double>::camera();

@@ -14,7 +14,7 @@ o2:
 
 o3:
 	cmake -S . -B build-O3 -DCMAKE_BUILD_TYPE=Release \
-		-DCMAKE_CXX_FLAGS_RELEASE="-O3 -DNDEBUG" \
+		-DCMAKE_CXX_FLAGS_RELEASE="-O3 -march=native -DNDEBUG" \
 		-DENABLE_CLANG_TIDY=OFF \
 		-DCMAKE_TOOLCHAIN_FILE=/home/csugrads/walst110/vcpkg/scripts/buildsystems/vcpkg.cmake \
 		-DVCPKG_TARGET_TRIPLET=x64-linux

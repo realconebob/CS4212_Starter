@@ -2,7 +2,7 @@
 #include "cwrender/BaseTypes/RayX.hpp"
 #include "cwrender/Hittables/Hittable.hpp"
 #include "cwrender/Hittables/Sphere.hpp"
-#include "cwrender/Materials/LambertianShader.hpp"
+#include "cwrender/Materials/DiffuseShader.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
@@ -11,7 +11,7 @@ using namespace cwrender;
 
 
 auto record = HitRecord<double, 3>{};
-auto sphere = Sphere3D<double>{Vec3D{0, 0, 0}, 1, Lambertian<double, 3>().sharedptr()};
+auto sphere = Sphere3D<double>{Vec3D{0, 0, 0}, 1, DiffuseShader<double, 3>().sharedptr()};
 auto range = Interval<double>::universe();
 
 TEST_CASE("Sphere miss") {

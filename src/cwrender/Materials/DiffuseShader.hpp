@@ -1,7 +1,7 @@
 /**
- * @file LambertianShader.h
+ * @file DiffuseShader.h
  * @author Connor Walstrom (walst110@umn.edu)
- * @brief Lambertian shader / material implementation
+ * @brief Diffuse shader / material implementation
  * @version 0.1
  * @date 2026-09-30
  *
@@ -22,9 +22,9 @@
 namespace cwrender {
 
 template<Floating T, std::size_t X>
-class Lambertian: public Material<Lambertian<T, X>, T, X> {
+class DiffuseShader: public Material<DiffuseShader<T, X>, T, X> {
     public:
-    Lambertian(const VecX<T, X>& albedo = VecX<T, X>::Ones()) {
+    DiffuseShader(const VecX<T, X>& albedo = VecX<T, X>::Ones()) {
         this->reflection_ = albedo;
     }
 

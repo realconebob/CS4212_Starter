@@ -18,7 +18,6 @@
 #include "cwrender/Hittables/Triangle.hpp"
 #include "cwrender/Hittables/Plane.hpp"
 #include "cwrender/Hittables/Cube.hpp"
-#include "cwrender/Hittables/World.hpp"
 // IWYU pragma: end_exports
 
 #endif
