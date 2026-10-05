@@ -95,20 +95,6 @@ void swap(T& a, T& b) {
     b = temp;
 }
 
-// template<typename T>
-// requires std::totally_ordered<T>
-// T min(T val, T min) {
-//     val = (val < min) ? min : val;
-//     return val;
-// }
-
-// template<typename T>
-// requires std::totally_ordered<T>
-// T max(T val, T maxx) {
-//     val = (val > maxx) ? maxx : val;
-//     return val;
-// }
-
 template<typename T>
 requires std::totally_ordered<T>
 T max(T a, T b) {
@@ -125,10 +111,6 @@ T min(T a, T b) {
         : b;
 }
 
-// Holy shit my min and max were wrong this entire time
-// And now that they're fixed the whole thing is white
-
-
 template<typename T>
 requires std::totally_ordered<T>
 T clamp(T val, T lo, T hi) {
@@ -137,9 +119,6 @@ T clamp(T val, T lo, T hi) {
 template<typename T>
 requires std::totally_ordered<T>
 T clamp_(T val, T lo, T hi) {return clamp(val, lo, hi);}
-
-// Ok so my clamp was ALSO wrong but wrong such that it fixed the min/max problem?>>>>/???????????????????????
-// I miss being in the cities bro. We need a punching bag in the gym up here
 
 double degtorad(double deg);
 
@@ -154,6 +133,19 @@ template<Floating T>
 T zorand() {
     initrand();
     return std::rand() / T(RAND_MAX);
+}
+
+template<Floating T>
+/**
+ * @brief Returns a random floating point in the range of `[min, max]`
+ *
+ * @param min Bottom of range
+ * @param max Top of range
+ * @return (T)[0,1] A floating point of type `T` in the range `[min,max]`
+ */
+T zorandr(T min, T max) {
+    T res = zorand<T>();
+    return res * (max - min) + min;
 }
 
 }

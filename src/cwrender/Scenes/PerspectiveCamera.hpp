@@ -34,6 +34,7 @@ class PerspectiveCamera3 {
     public:
     #pragma region Set variables
     VecX<T, 3> lookfrom_, lookat_, up;
+    int samples_ = 50;
 
     T aspectratio, vfov;
     int iwidth;
@@ -97,6 +98,21 @@ class PerspectiveCamera3 {
     int get_iwidth() const {return iwidth;}
     int get_iheight() const {return iheight();}
 
+    RayX<T, 3> getray(int i, int j) const {
+        // Construct a camera ray originating from the origin and directed at randomly sampled
+        // point around the pixel location i, j.
+
+        auto offset = sample_square();
+        auto pixc = pix00() + ((i + offset[0]) * delta_u()) + ((j + offset[1]) * delta_v());
+        auto rdir = pixc - lookfrom_;
+        return RayX<T, 3>{lookfrom_, rdir};
+    }
+
+    VecX<T, 3> sample_square() const {
+        // Returns the vector to a random point in the [-.5,-.5]-[+.5,+.5] unit square.
+        return VecX<T, 3>(zorandr<T>(-0.5, 0.5), zorandr<T>(-0.5, 0.5), 0);
+    }
+
     VecX<T, 3> raycolor(const Ray3D& ray, const HittableAny<T, 3>& world, const std::vector<LightAny<T, 3>>& lights, HitRecord<T, 3>& record, const Interval<T>& range, int depth) {
         if(depth <= 0) return VecX<T, 3>{};
 
@@ -123,13 +139,14 @@ class PerspectiveCamera3 {
             du = delta_u(),
             dv = delta_v();
 
+        const T pss = T(1.0) / samples_;
         for(int j = 0; j < iheight(); j++) {
             for(int i = 0; i < iwidth; i++) {
-                pixc = pixtl + ((i * T(1.0)) * du) + ((j * T(1.0)) * dv);
-                rdir = pixc - lookfrom_;
-
-                r = RayX<T, 3>{lookfrom_, rdir};
-                fb(i, j) = colorizer(r);
+                auto color = VecX<T, 3>::Zeros();
+                for(int sample = 0; sample < samples_; sample++) {
+                    color += colorizer(getray(i, j));
+                }
+                fb(i, j) = color * pss;
             }
         }
     }

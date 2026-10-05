@@ -27,7 +27,7 @@ class LambertianShader: public Material<LambertianShader<T, X>, T, X> {
     public:
     LambertianShader(const VecX<T, X>& albedo = VecX<T, X>::Ones()) {
         this->reflection_ = albedo;
-        this->override_atten_ = true;
+        // this->override_atten_ = true;
     }
 
     [[nodiscard]] bool scatter(const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten, RayX<T, X>& scattered,const std::vector<LightAny<T, X>>& lights) const {
@@ -43,31 +43,19 @@ class LambertianShader: public Material<LambertianShader<T, X>, T, X> {
         // This needs to change based on the lights in the scene and where they're positioned. That means the lights in the scene, or at least the lights that affect this material, need to be passed to scatter
         atten = VecX<T, X>::Zeros();
         for(const LightAny<T, X>& light: lights) {
-            VecX<T, X> tolight = light.pos() - record.point();
-            T dist2 = dot(tolight, tolight);
-            T ndot = max<T>(T(0), dot<T, X>(record.normal(), unit(tolight)));
+            // VecX<T, X> tolight = light.pos() - record.point();
+            // T dist2 = dot(tolight, tolight);
+            // T ndot = max<T>(T(0), dot<T, X>(record.normal(), unit(tolight)));
 
-            if(ndot <= std::numeric_limits<T>::epsilon() * 10) ndot = 1;
-            if(dist2 <= std::numeric_limits<T>::epsilon() * 10) dist2 = 1;
+            // if(dist2 <= std::numeric_limits<T>::epsilon()) dist2 = std::numeric_limits<T>::epsilon();
 
-            // std::cerr << "pos " << light.pos()
-            //   << " | color " << light.color()
-            //   << " | intensity " << light.intensity()
-            //   << " | point " << record.point()
-            //   << " | normal " << record.normal()
-            //   << " | dist2 " << dist2 << " ndot " << ndot << "\n";
+            // atten += this->reflection_ * light.color() * light.intensity() * (ndot/dist2);
 
-            if (ndot > 0.1) {
-                std::cerr << "LIT point " << record.point()
-                    << " ndot " << ndot << " dist2 " << dist2
-                    << " refl " << this->reflection_ << "\n";
-            }
-
-            atten += this->reflection_ * light.color() * light.intensity() * (ndot/dist2);
+            atten += this->reflection_ * light.color() * light.intensity() * max<T>(0, dot(record.normal(), unit(light.pos() - record.point())));
         }
         atten = atten.clamp(0, 1);
 
-        return false;
+        return true;
     }
 };
 

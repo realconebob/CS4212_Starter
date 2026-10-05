@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
     args.process(argc, argv);
 
     auto camera = PC3D{};
-    camera.iwidth = 2500;
+    camera.iwidth = 2000;
     camera.aspectratio = 1;
     camera.vfov = 20;
 
@@ -62,11 +62,11 @@ int main(int argc, char *argv[]) {
             Sphere3DD(Vec3D(-2, 0, -20), 1, normalmat).any(),
             Sphere3DD(Vec3D(0, 0, -15), 0.5, metalmat).any(),
             Sphere3DD(Vec3D(1, -0.75, -10), 0.75, bluemat).any(),
-            // Sphere3DD(Vec3D(1, 1, -10), 0.3, lambertian).any(),
+            Sphere3DD(Vec3D(1, 1, -10), 0.3, lambertian).any(),
             Plane3D{{-100, -1, -60}, {100, -1, 0}, whitemat}.any(),
         },
         {
-            PointLight<double, 3>{{1, 1, -9}, {1, 0, 1}, {100, 100, 100}}.any()
+            PointLight<double, 3>{{-1, 1, -11}, {1, 0, 1}, {100, 100, 100}}.any()
         }
     };
     auto rec = HitRecord3D{};
