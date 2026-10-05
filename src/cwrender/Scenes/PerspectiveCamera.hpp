@@ -18,6 +18,7 @@
 #include "cwrender/BaseTypes/Interval.hpp"
 #include "cwrender/BaseTypes/RayX.hpp"
 #include "cwrender/BaseTypes/VecX.hpp"
+#include "cwrender/Scenes/Light.hpp"
 
 #include <cmath>
 #include <cstddef>
@@ -96,14 +97,14 @@ class PerspectiveCamera3 {
     int get_iwidth() const {return iwidth;}
     int get_iheight() const {return iheight();}
 
-    VecX<T, 3> raycolor(const Ray3D& ray, const HittableAny<T, 3>& world, HitRecord<T, 3>& record, const Interval<T>& range, int depth) {
+    VecX<T, 3> raycolor(const Ray3D& ray, const HittableAny<T, 3>& world, const std::vector<LightAny<T, 3>>& lights, HitRecord<T, 3>& record, const Interval<T>& range, int depth) {
         if(depth <= 0) return VecX<T, 3>{};
 
         if(world.intersect(ray, record, range)) {
             RayX<T, 3> scattered;
             VecX<T, 3> atten{};
-            if(record.material()->scatter(ray, record, atten, scattered))
-                return atten * raycolor(scattered, world, record, range, depth - 1);
+            if(record.material()->scatter(ray, record, atten, scattered, lights))
+                return atten * raycolor(scattered, world, lights, record, range, depth - 1);
             return (record.material()->override_atten()) ? atten : VecX<T, 3>{};
         }
 
@@ -117,9 +118,14 @@ class PerspectiveCamera3 {
         VecX<T, 3> pixc, rdir;
         RayX<T, 3> r;
 
+        const auto
+            pixtl = pix00(),
+            du = delta_u(),
+            dv = delta_v();
+
         for(int j = 0; j < iheight(); j++) {
             for(int i = 0; i < iwidth; i++) {
-                pixc = pix00() + ((i * 1.0) * delta_u()) + ((j * 1.0) * delta_v());
+                pixc = pixtl + ((i * T(1.0)) * du) + ((j * T(1.0)) * dv);
                 rdir = pixc - lookfrom_;
 
                 r = RayX<T, 3>{lookfrom_, rdir};

@@ -42,6 +42,7 @@ class Light {
     VecX<T, X> color() const {return color_;}
     VecX<T, X> intensity() const {return intensity_;}
     std::shared_ptr<LightAny<T, X>> sharedptr() {return std::make_shared<LightAny<T, X>>(std::move(static_cast<const D&>(*this)));}
+    LightAny<T, X> any() {return LightAny<T, X>(static_cast<const D&>(*this));}
 };
 
 template<Floating T, std::size_t X>

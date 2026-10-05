@@ -17,6 +17,7 @@
 #include "cwrender/Materials/DiffuseShader.hpp"
 #include "cwrender/Materials/NormalShader.hpp"
 #include "cwrender/Materials/MetalShader.hpp"
+#include "cwrender/Materials/LambertianShader.hpp"
 // IWYU pragma: end_exports
 
 #endif

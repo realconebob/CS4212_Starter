@@ -31,18 +31,18 @@ class MetalShader: public Material<MetalShader<T, X>, T, X> {
         this->reflection_ = albedo;
     }
 
-    [[nodiscard]] bool scatter(const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten, RayX<T, X>& scattered) const {
-        return _scatter(rayin, record, atten, scattered);
+    [[nodiscard]] bool scatter(const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten, RayX<T, X>& scattered, const std::vector<LightAny<T, X>>& lights) const {
+        return _scatter(rayin, record, atten, scattered, lights);
     }
 
     // There's a way to make this private but idc right now
-    [[nodiscard]] bool _scatter(const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten, RayX<T, X>& scattered) const {
+    [[nodiscard]] bool _scatter(const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten, RayX<T, X>& scattered, const std::vector<LightAny<T, X>>& lights) const {
         VecX<T, X> reflected = reflect(rayin.dir(), record.normal());
         reflected = unit(reflected) + (fuzz_ * randunitv<T, X>());
 
         scattered = RayX<T, X>(record.point(), reflected);
         atten = this->reflection_;
-        return (dot(scattered.dir(), record.normal()) > 0);;
+        return (dot(scattered.dir(), record.normal()) > 0);
     }
 };
 

@@ -4,4 +4,5 @@ target_sources(cwrender PRIVATE
     Materials.hpp
     NormalShader.hpp
     MetalShader.hpp
+    LambertianShader.hpp
 )

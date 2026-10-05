@@ -16,7 +16,9 @@
 #include "cwrender/Materials/DiffuseShader.hpp"
 #include "cwrender/Materials/NormalShader.hpp"
 #include "cwrender/Materials/MetalShader.hpp"
+#include "cwrender/Materials/LambertianShader.hpp"
 
+#include "cwrender/Scenes/PointLight.hpp"
 #include "cwrender/Scenes/Scene.hpp"
 #include "handleGraphicsArgs.h"
 
@@ -48,24 +50,30 @@ int main(int argc, char *argv[]) {
     auto fb = FB3D{(std::size_t)camera.get_iwidth(), (std::size_t)camera.get_iheight()};
     fb.clear();
 
-    auto normalmat = NormalMapShader<double, 3>().sharedptr();
-    auto bluemat = DiffuseShader<double, 3>({0, 0, 1}).sharedptr();
-    auto whitemat = DiffuseShader<double, 3>(0.5 * Vec3D::Ones()).sharedptr();
-    auto metalmat = MetalShader<double, 3>({0.8, 0.6, 0.2}, 0.05).sharedptr();
+    auto
+        normalmat = NormalMapShader<double, 3>().sharedptr(),
+        bluemat = DiffuseShader<double, 3>({0, 0, 1}).sharedptr(),
+        whitemat = DiffuseShader<double, 3>(0.5 * Vec3D::Ones()).sharedptr(),
+        metalmat = MetalShader<double, 3>({0.8, 0.6, 0.2}, 0.05).sharedptr(),
+        lambertian = LambertianShader<double, 3>({1, 1, 0}).sharedptr();
+
     Scene3D world {
         {
             Sphere3DD(Vec3D(-2, 0, -20), 1, normalmat).any(),
             Sphere3DD(Vec3D(0, 0, -15), 0.5, metalmat).any(),
             Sphere3DD(Vec3D(1, -0.75, -10), 0.75, bluemat).any(),
-            Plane3D{{-100, 0, -60}, {100, -2, 0}, whitemat}.any(),
+            Sphere3DD(Vec3D(1, 1, -10), 0.3, lambertian).any(),
+            Plane3D{{-100, -1, -60}, {100, -1, 0}, whitemat}.any(),
         },
-        {}
+        {
+            PointLight<double, 3>{{-1, 2, -5}, {1, 0, 1}, {100, 100, 100}}.any()
+        }
     };
     auto rec = HitRecord3D{};
     auto range = Interval<double>::camera();
 
     camera.rendertobuffer(fb, [&camera, &world, &rec, &range](const Ray3D& r){
-        return camera.raycolor(r, world, rec, range, 50);
+        return camera.raycolor(r, world, world.getlights(), rec, range, 50);
     });
 
     PNGRenderer<double>(fb, "camera3d-white.png").render(true);
