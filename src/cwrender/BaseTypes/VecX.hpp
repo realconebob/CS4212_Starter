@@ -49,6 +49,9 @@ class VecX {
             for(int i = 0; i < X; i++) ones[i] = T(1);
             return VecX<T, X>(ones);
         }
+        static VecX<T, X> Zeros() {
+            return VecX<T, X>::Ones() * T(0);
+        }
         #pragma endregion
 
         #pragma region Operators

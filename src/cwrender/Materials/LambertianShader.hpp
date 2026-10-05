@@ -18,6 +18,7 @@
 #include "cwrender/BaseTypes/VecX.hpp"
 
 #include <cstddef>
+#include <limits>
 
 namespace cwrender {
 
@@ -40,11 +41,27 @@ class LambertianShader: public Material<LambertianShader<T, X>, T, X> {
         scattered = RayX<T, X>{record.point(), scatter_direction};
 
         // This needs to change based on the lights in the scene and where they're positioned. That means the lights in the scene, or at least the lights that affect this material, need to be passed to scatter
-        atten = VecX<T, X>{};
+        atten = VecX<T, X>::Zeros();
         for(const LightAny<T, X>& light: lights) {
             VecX<T, X> tolight = light.pos() - record.point();
             T dist2 = dot(tolight, tolight);
             T ndot = max<T>(T(0), dot<T, X>(record.normal(), unit(tolight)));
+
+            if(ndot <= std::numeric_limits<T>::epsilon() * 10) ndot = 1;
+            if(dist2 <= std::numeric_limits<T>::epsilon() * 10) dist2 = 1;
+
+            // std::cerr << "pos " << light.pos()
+            //   << " | color " << light.color()
+            //   << " | intensity " << light.intensity()
+            //   << " | point " << record.point()
+            //   << " | normal " << record.normal()
+            //   << " | dist2 " << dist2 << " ndot " << ndot << "\n";
+
+            if (ndot > 0.1) {
+                std::cerr << "LIT point " << record.point()
+                    << " ndot " << ndot << " dist2 " << dist2
+                    << " refl " << this->reflection_ << "\n";
+            }
 
             atten += this->reflection_ * light.color() * light.intensity() * (ndot/dist2);
         }

@@ -40,7 +40,7 @@ class Scene3: public Hittable<Scene3<T>, T, 3> {
     void light_front(const LightAny<T, 3>& obj) {lights_.insert(lights_.begin(), obj);}
     void light_back(const LightAny<T, 3>& obj) {lights_.push_back(obj);}
 
-    const std::vector<LightAny<T, 3>>& getlights() {return lights_;}
+    const std::vector<LightAny<T, 3>>& getlights() const {return lights_;}
 
     bool _intersect(const RayX<T, 3>& ray, HitRecord<T, 3>& record, const Interval<T>& range) const {
         bool hit = false;
