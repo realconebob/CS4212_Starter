@@ -42,3 +42,5 @@ cmake-build-debug/
 *.app
 
 .DS_Store
+
+.VSCode*
