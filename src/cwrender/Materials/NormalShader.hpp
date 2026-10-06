@@ -37,7 +37,7 @@ class NormalMapShader: public Material<NormalMapShader<T, X>, T, X> {
     // There's a way to make this private but idc right now
     [[nodiscard]] bool _scatter(const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten, RayX<T, X>& scattered, const std::vector<LightAny<T, X>>& lights) const {
         atten = 0.5 * (record.normal() + VecX<T, X>::Ones());
-        return false;
+        return true;
     }
 };
 

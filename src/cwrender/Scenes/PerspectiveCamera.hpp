@@ -34,7 +34,7 @@ class PerspectiveCamera3 {
     public:
     #pragma region Set variables
     VecX<T, 3> lookfrom_, lookat_, up;
-    int samples_ = 50;
+    int samplegrid_ = 8;
 
     T aspectratio, vfov;
     int iwidth;
@@ -120,8 +120,11 @@ class PerspectiveCamera3 {
             RayX<T, 3> scattered;
             VecX<T, 3> atten{};
             if(record.material()->scatter(ray, record, atten, scattered, lights))
-                return atten * raycolor(scattered, world, lights, record, range, depth - 1);
-            return (record.material()->override_atten()) ? atten : VecX<T, 3>{};
+                return (record.material()->override_atten())
+                    ? atten
+                    : atten * raycolor(scattered, world, lights, record, range, depth - 1);
+
+            return VecX<T, 3>{};
         }
 
         VecX<T, 3> udir = unit(ray.dir());
@@ -139,13 +142,22 @@ class PerspectiveCamera3 {
             du = delta_u(),
             dv = delta_v();
 
-        const T pss = T(1.0) / samples_;
+        const T pss = T(1.0) / (samplegrid_*samplegrid_);
         for(int j = 0; j < iheight(); j++) {
             for(int i = 0; i < iwidth; i++) {
                 auto color = VecX<T, 3>::Zeros();
-                for(int sample = 0; sample < samples_; sample++) {
-                    color += colorizer(getray(i, j));
-                }
+                // Random sampling
+                // for(int sample = 0; sample < samples_; sample++) {
+                //     color += colorizer(getray(i, j));
+                // }
+                // fb(i, j) = color * pss;
+
+                // Jitter sampling
+                for(int a = 0; a < samplegrid_ - 1; a++) {
+                for(int b = 0; b < samplegrid_ - 1; b++) {
+                    r = getray(i + (a + zorandr<T>(-0.5, 0.5))/samplegrid_, j + (b + zorandr<T>(-0.5, 0.5))/samplegrid_);
+                    color += colorizer(r);
+                }}
                 fb(i, j) = color * pss;
             }
         }

@@ -49,7 +49,7 @@ class PNGRenderer {
                     ? linear_to_srgb(framebuffer_(x, y))
                     : framebuffer_(x, y);
 
-                fbpix = corrected * T(255.0);// + (T(0.5) * VecX<T, 3>::Ones());
+                fbpix = corrected.clamp(T(0), T(1)) * T(255.0);// + (T(0.5) * VecX<T, 3>::Ones());
 
                 imgData[y][x] = png::rgb_pixel(fbpix[0], fbpix[1], fbpix[2]);
 	        }}

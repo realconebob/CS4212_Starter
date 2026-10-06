@@ -27,7 +27,7 @@ class LambertianShader: public Material<LambertianShader<T, X>, T, X> {
     public:
     LambertianShader(const VecX<T, X>& albedo = VecX<T, X>::Ones()) {
         this->reflection_ = albedo;
-        // this->override_atten_ = true;
+        this->override_atten_ = true;
     }
 
     [[nodiscard]] bool scatter(const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten, RayX<T, X>& scattered,const std::vector<LightAny<T, X>>& lights) const {
@@ -42,19 +42,15 @@ class LambertianShader: public Material<LambertianShader<T, X>, T, X> {
 
         // This needs to change based on the lights in the scene and where they're positioned. That means the lights in the scene, or at least the lights that affect this material, need to be passed to scatter
         atten = VecX<T, X>::Zeros();
+        VecX<T, X> tolight;
+        T dp;
         for(const LightAny<T, X>& light: lights) {
-            // VecX<T, X> tolight = light.pos() - record.point();
-            // T dist2 = dot(tolight, tolight);
-            // T ndot = max<T>(T(0), dot<T, X>(record.normal(), unit(tolight)));
-
-            // if(dist2 <= std::numeric_limits<T>::epsilon()) dist2 = std::numeric_limits<T>::epsilon();
-
-            // atten += this->reflection_ * light.color() * light.intensity() * (ndot/dist2);
-
-            atten += this->reflection_ * light.color() * light.intensity() * max<T>(0, dot(record.normal(), unit(light.pos() - record.point())));
+            tolight = light.pos() - record.point();
+            dp = max<T>(T(0), dot(unit(record.normal()), unit(tolight)));
+            atten += light.color() * (light.intensity() * dp);
         }
-        atten = atten.clamp(0, 1);
 
+        atten = (atten * this->reflection_);
         return true;
     }
 };
