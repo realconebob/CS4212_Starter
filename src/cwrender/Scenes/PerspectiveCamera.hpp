@@ -22,6 +22,8 @@
 
 #include <cmath>
 #include <cstddef>
+#include <iostream>
+#include <ostream>
 #include <vector>
 
 namespace cwrender {
@@ -144,6 +146,7 @@ class PerspectiveCamera3 {
 
         const T pss = T(1.0) / (samplegrid_*samplegrid_);
         for(int j = 0; j < iheight(); j++) {
+            std::clog << "\rScanlines remaining: " << (iheight() - j) << " (" << int(j*100/iheight()) << "%)      "  << std::flush;
             for(int i = 0; i < iwidth; i++) {
                 auto color = VecX<T, 3>::Zeros();
                 // Random sampling
@@ -161,6 +164,7 @@ class PerspectiveCamera3 {
                 fb(i, j) = color * pss;
             }
         }
+        std::clog << "Done                                                                             \n" << std::flush;
     }
 };
 

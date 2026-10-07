@@ -21,6 +21,7 @@ set(UTESTS
   utest_VecX
   utest_RayX
   utest_SphereInter
+  utest_Helpers
 )
 
 #

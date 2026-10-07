@@ -43,10 +43,10 @@ int main(int argc, char *argv[]) {
     args.process(argc, argv);
 
     auto camera = PC3D{{-1, 1, -30}, {0, 0, -10}};
-    camera.iwidth = 5000;
+    camera.iwidth = 1000;
     camera.aspectratio = 1;
     camera.vfov = 20;
-    camera.samplegrid_ = 16;
+    camera.samplegrid_ = 8;
 
     auto fb = FB3D{(std::size_t)camera.get_iwidth(), (std::size_t)camera.get_iheight()};
     fb.clear();

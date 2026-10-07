@@ -16,9 +16,9 @@
 #include "cwrender/Materials/Material.hpp"
 #include "cwrender/BaseTypes/RayX.hpp"
 #include "cwrender/BaseTypes/VecX.hpp"
+#include "cwrender/Scenes/Light.hpp"
 
 #include <cstddef>
-#include <limits>
 
 namespace cwrender {
 
@@ -36,21 +36,15 @@ class LambertianShader: public Material<LambertianShader<T, X>, T, X> {
 
     // There's a way to make this private but idc right now
     [[nodiscard]] bool _scatter(const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten, RayX<T, X>& scattered, const std::vector<LightAny<T, X>>& lights) const {
-        auto scatter_direction = record.normal() + randunitv<T, X>();
-        if(scatter_direction.near_zero()) scatter_direction = record.normal();
-        scattered = RayX<T, X>{record.point(), scatter_direction};
-
-        // This needs to change based on the lights in the scene and where they're positioned. That means the lights in the scene, or at least the lights that affect this material, need to be passed to scatter
-        atten = VecX<T, X>::Zeros();
-        VecX<T, X> tolight;
-        T dp;
+        auto color = VecX<T, X>::Zeros();
         for(const LightAny<T, X>& light: lights) {
-            tolight = light.pos() - record.point();
-            dp = max<T>(T(0), dot(unit(record.normal()), unit(tolight)));
-            atten += light.color() * (light.intensity() * dp);
+            auto tmpnormal = (record.front_face()) ? record.normal() : -record.normal();
+            auto tolight = unit(light.pos() - record.point());
+            T dist2 = dot(tolight, tolight);
+            auto brightness = max<T>(0, dot(tolight, unit(tmpnormal)));
+            color += this->reflection_ * light.color() * (brightness / dist2);
         }
-
-        atten = (atten * this->reflection_);
+        atten = color;
         return true;
     }
 };

@@ -40,9 +40,9 @@ class Light {
     public:
     VecX<T, X> pos() const {return pos_;}
     VecX<T, X> color() const {return color_;}
-    VecX<T, X> intensity() const {return intensity_;}
-    std::shared_ptr<LightAny<T, X>> sharedptr() {return std::make_shared<LightAny<T, X>>(std::move(static_cast<const D&>(*this)));}
+
     LightAny<T, X> any() {return LightAny<T, X>(static_cast<const D&>(*this));}
+    std::shared_ptr<LightAny<T, X>> sharedptr() {return std::make_shared<LightAny<T, X>>(std::move(static_cast<const D&>(*this)));}
 };
 
 template<Floating T, std::size_t X>
@@ -51,7 +51,6 @@ class LightAny {
         virtual ~Concept() = default;
         virtual VecX<T, X> pos() const = 0;
         virtual VecX<T, X> color() const = 0;
-        virtual VecX<T, X> intensity() const = 0;
         virtual std::unique_ptr<Concept> clone() const = 0;
     };
 
@@ -62,7 +61,6 @@ class LightAny {
 
         VecX<T, X> pos() const override {return obj.pos();}
         VecX<T, X> color() const override {return obj.color();}
-        VecX<T, X> intensity() const override {return obj.intensity();}
         std::unique_ptr<Concept> clone() const override {return std::make_unique<Emitter>(obj);}
     };
 
@@ -77,7 +75,6 @@ class LightAny {
 
     VecX<T, X> pos() const {return self_->pos();}
     VecX<T, X> color() const {return self_->color();}
-    VecX<T, X> intensity() const {return self_->intensity();}
 };
 
 // I don't actually know if the light is going to do anything other than just provide information about itself. It very well might, and that's what all this is for, but it very well may not. If it doesn't then this is another rep
