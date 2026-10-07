@@ -1,5 +1,6 @@
 #include "cwrender/BaseTypes/RayX.hpp"
 
+#include "cwrender/Materials/BlinnPhongShader.hpp"
 #include "cwrender/Scenes/Framebuffer.hpp"
 #include "cwrender/Scenes/PerspectiveCamera.hpp"
 #include "cwrender/Scenes/PNGRenderer.hpp"
@@ -44,7 +45,7 @@ int main(int argc, char *argv[]) {
 
     auto camera = PC3D{{-1, 1, -30}, {0, 0, -10}};
     camera.iwidth = 1000;
-    camera.aspectratio = 1;
+    camera.aspectratio = 16.0/9;
     camera.vfov = 20;
     camera.samplegrid_ = 8;
 
@@ -56,7 +57,8 @@ int main(int argc, char *argv[]) {
         bluemat = DiffuseShader<double, 3>({0, 0, 1}).sharedptr(),
         whitemat = DiffuseShader<double, 3>(0.5 * Vec3D::Ones()).sharedptr(),
         metalmat = MetalShader<double, 3>({0.8, 0.6, 0.2}, 0.05).sharedptr(),
-        lambertian = LambertianShader<double, 3>({1, 1, 0}).sharedptr();
+        lambertian = LambertianShader<double, 3>({1, 1, 0}).sharedptr(),
+        bphong = BlinnPhongShader<double, 3>({10, 10, 10}, 70).sharedptr();
 
     Scene3D world {
         {
@@ -64,10 +66,12 @@ int main(int argc, char *argv[]) {
             Sphere3DD(Vec3D(0, 0, -15), 0.5, metalmat).any(),
             Sphere3DD(Vec3D(1, -0.75, -10), 0.75, bluemat).any(),
             Sphere3DD(Vec3D(1, 1, -10), 0.3, lambertian).any(),
+            Sphere3DD(Vec3D(-1, 1, -10), 0.3, bphong).any(),
             Plane3D{{-100, -1, -60}, {100, -1, 0}, whitemat}.any(),
         },
         {
-            PointLight<double, 3>{{-1, 1, -11}, {1, 0, 1}, {100, 100, 100}}.any()
+            PointLight<double, 3>{{0, 2, -11}, {1, 0, 1}, {100, 100, 100}}.any(),
+            PointLight<double, 3>{{0, 0, -11}, {1, 1, 1}, {100, 100, 100}}.any(),
         }
     };
     auto rec = HitRecord3D{};
