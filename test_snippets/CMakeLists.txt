@@ -27,3 +27,14 @@ target_link_libraries(tsnip_Camera3D
   PNG::PNG
   ZLIB::ZLIB
 )
+
+add_executable(tsnip_Oct13Lab
+  ts_oct13lab.cpp
+)
+target_link_libraries(tsnip_Oct13Lab
+  cs4212-util
+  cwrender
+  ${Boost_PROGRAM_OPTIONS_LIBRARIES}
+  PNG::PNG
+  ZLIB::ZLIB
+)

@@ -22,10 +22,9 @@ namespace cwrender {
 template<Floating T, std::size_t X>
 class PointLight: public Light<PointLight<T, X>, T, X> {
     public:
-    PointLight(VecX<T, X> pos, VecX<T, X> color, VecX<T, X> intensity) {
+    PointLight(VecX<T, X> pos, VecX<T, X> color) {
         this->pos_ = pos;
         this->color_ = color;
-        this->intensity_ = intensity;
     }
 };
 

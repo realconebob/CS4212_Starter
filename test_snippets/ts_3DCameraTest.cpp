@@ -70,8 +70,8 @@ int main(int argc, char *argv[]) {
             Plane3D{{-100, -1, -60}, {100, -1, 0}, whitemat}.any(),
         },
         {
-            PointLight<double, 3>{{0, 2, -11}, {1, 0, 1}, {100, 100, 100}}.any(),
-            PointLight<double, 3>{{0, 0, -11}, {1, 1, 1}, {100, 100, 100}}.any(),
+            PointLight<double, 3>{{0, 2, -11}, {100, 0, 100}}.any(),
+            PointLight<double, 3>{{0, 0, -11}, {100, 100, 100}}.any(),
         }
     };
     auto rec = HitRecord3D{};

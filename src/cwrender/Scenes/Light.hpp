@@ -30,9 +30,9 @@ class Light {
     friend class LightAny;
 
     protected:
-    VecX<T, X> pos_, color_, intensity_;
+    VecX<T, X> pos_, color_;
 
-    Light(): pos_{}, color_{}, intensity_{} {}
+    Light(): pos_{}, color_{} {}
     Light(const Light&) = default;
     Light(Light&&) = default;
     ~Light() = default;
