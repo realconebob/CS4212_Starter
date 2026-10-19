@@ -28,6 +28,7 @@ class Interval {
     Interval(): min(-std::numeric_limits<T>::infinity()), max(std::numeric_limits<T>::infinity()) {}
     Interval(T lo, T hi): min(lo), max(hi) {
         if (hi < lo) {
+            hi = 0; lo = 0;
             std::ostringstream err;
             err << "High bound (" << hi << ") is less than low bound (" << lo << ")";
             throw std::out_of_range(err.str());

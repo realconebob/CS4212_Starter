@@ -42,7 +42,7 @@ class Plane3: public Hittable<Plane3<T>, T, 3> {
         return Plane3<T>{{}, {}};
     }
 
-    bool _intersect(const RayX<T, 3>& ray, HitRecord<T, 3>& record, const Interval<T>& range) const {
+    bool intersect(const RayX<T, 3>& ray, HitRecord<T, 3>& record, const Interval<T>& range) const {
         for(int i = 0; i < 2; i++) if(tris_[i].intersect(ray, record, range)) return true;
         return false;
     }

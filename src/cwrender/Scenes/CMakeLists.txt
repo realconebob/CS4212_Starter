@@ -6,4 +6,5 @@ target_sources(cwrender PRIVATE
     PointLight.hpp
     Scenes.hpp
     Scene.hpp
+    BVT.hpp
 )
