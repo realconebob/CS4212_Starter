@@ -20,6 +20,7 @@
 #endif
 
 #include <concepts>
+#include <random>
 #include <cmath>
 
 namespace cwrender {
@@ -122,30 +123,33 @@ T clamp_(T val, T lo, T hi) {return clamp(val, lo, hi);}
 
 double degtorad(double deg);
 
-void initrand();
+inline std::mt19937_64& getrng() {
+    thread_local std::mt19937_64 engine{std::random_device{}()};
+    return engine;
+}
 
 template<Floating T>
 /**
  * @brief Returns a random floating point
  * @warning This is not a thread-safe function! Do not use shaders that call this if you're doing parallel rendering
- * @retval (T)[0,1] A floating point of type `T` in the range [0,1]
+ * @retval (T)[0,1) A floating point of type `T` in the range [0,1)
  */
 T zorand() {
-    initrand();
-    return std::rand() / T(RAND_MAX);
+    std::uniform_real_distribution<double> dist(0.0, 1.0);
+    return dist(getrng());
 }
 
 template<Floating T>
 /**
- * @brief Returns a random floating point in the range of `[min, max]`
+ * @brief Returns a random floating point in the range of `[min, max)`
  *
  * @param min Bottom of range
  * @param max Top of range
- * @return (T)[0,1] A floating point of type `T` in the range `[min,max]`
+ * @return (T)[0,1] A floating point of type `T` in the range `[min,max)`
  */
 T zorandr(T min, T max) {
-    T res = zorand<T>();
-    return res * (max - min) + min;
+    std::uniform_real_distribution<T> dist(min, max);
+    return dist(getrng());
 }
 
 }

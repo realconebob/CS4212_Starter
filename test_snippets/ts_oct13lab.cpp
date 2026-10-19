@@ -42,12 +42,12 @@ int main(void) {
         lamyell = LambertianShader<double, 3>{{.9, .8, .1}}.sharedptr(),
         mirror = MetalShader<double, 3>{{1, 1, 1}}.sharedptr(),
         normal = NormalMapShader<double, 3>().sharedptr(),
-        lamgreen = LambertianShader<double, 3>{{}}.sharedptr(),
+        lamgreen = LambertianShader<double, 3>{{.2, .8, .2}}.sharedptr(),
         blinred = BlinnPhongShader<double, 3>{{}, 64, {.8, .1, .1}}.sharedptr(),
-        blinblue = BlinnPhongShader<double, 3>{{}, 16, {.1, .2, .8}}.sharedptr(),
+        blinblue = BlinnPhongShader<double, 3>{{}, 160, {.1, .2, .8}}.sharedptr(),
         difteal = DiffuseShader<double, 3>({.2, .7, .7}).sharedptr(),
         blinorangle = BlinnPhongShader<double, 3>{{}, 32, {.95, .5, .1}}.sharedptr(),
-        lampurple = LambertianShader<double, 3>{{.6, .2, .8}}.sharedptr();
+        lampurple = LambertianShader<double, 3>{{.6, .2, .8}}.sharedptr(); 
 
     auto fb = FB3D(camera.get_iwidth(), camera.get_iheight());
     auto rec = Record3D();
@@ -57,7 +57,7 @@ int main(void) {
             // Triangles
             /* Ground1 */   Triangle3D({-50, 0, 50}, {50, 0, 50}, {50, 0, -50}, lamgrey),
             /* Ground2 */   Triangle3D({-50, 0, 50}, {50, 0, -50}, {-50, 0, -50}, lamgrey),
-            /* Wall1 */     Triangle3D({-4, 0, 6}, {4, 0, -6}, {4, 4, -6}, mirror),
+            /* Wall1 */     Triangle3D({-4, 0, -6}, {4, 0, -6}, {4, 4, -6}, mirror),
             /* Wall2 */     Triangle3D({-4, 0, -6}, {4, 4, -6}, {-4, 4, -6}, mirror),
             /* Floating */  Triangle3D({0.9, 1.4, -0.6}, {1.9, 1.4, -0.6}, {1.4, 2.2, -1.1}, lamyell),
 
@@ -75,8 +75,8 @@ int main(void) {
             /* Purple */    Sphere3D<double>({2.4, 0.8, 4.8}, 0.8, lampurple).any(),
         },
         {
-            PointLight3D{{-5, 8, 5}, {.7, .6, .45}},
-            PointLight3D{{6, 6, 2}, {.35, .45, .7}},
+            PointLight3D{{-5, 8, 5}, {7, 6, 45}},
+            PointLight3D{{6, 6, 2}, {35, 45, 7}},
         }
     };
 

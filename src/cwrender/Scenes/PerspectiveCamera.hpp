@@ -22,8 +22,6 @@
 
 #include <cmath>
 #include <cstddef>
-#include <iostream>
-#include <ostream>
 #include <vector>
 
 namespace cwrender {
@@ -100,14 +98,14 @@ class PerspectiveCamera3 {
     int get_iwidth() const {return iwidth;}
     int get_iheight() const {return iheight();}
 
-    RayX<T, 3> getray(int i, int j) const {
+    RayX<T, 3> getray(int i, int j, int a = 0, int b = 0, int n = 1) const {
         // Construct a camera ray originating from the origin and directed at randomly sampled
         // point around the pixel location i, j.
 
-        auto offset = sample_square();
-        auto pixc = pix00() + ((i + offset[0]) * delta_u()) + ((j + offset[1]) * delta_v());
-        auto rdir = pixc - lookfrom_;
-        return RayX<T, 3>{lookfrom_, rdir};
+        T offx = (a + zorandr<T>(0, 1)) / n - T(0.5);
+        T offy = (b + zorandr<T>(0, 1)) / n - T(0.5);
+        auto pixc = pix00() + ((i + offx) * delta_u()) + ((j + offy) * delta_v());
+        return RayX<T, 3>{lookfrom_, pixc - lookfrom_};
     }
 
     VecX<T, 3> sample_square() const {
@@ -118,17 +116,20 @@ class PerspectiveCamera3 {
     VecX<T, 3> raycolor(const Ray3D& ray, const HittableAny<T, 3>& world, const std::vector<LightAny<T, 3>>& lights, HitRecord<T, 3>& record, const Interval<T>& range, int depth) {
         if(depth <= 0) return VecX<T, 3>{};
 
-        if(world.intersect(ray, record, range)) {
+        thread_local HitRecord<T, 3> real_record{};
+
+        if(world.intersect(ray, real_record, range)) {
             RayX<T, 3> scattered;
             VecX<T, 3> atten{};
-            if(record.material()->scatter(ray, record, atten, scattered, lights))
-                return (record.material()->override_atten())
+            if(real_record.material()->scatter(ray, real_record, atten, scattered, lights))
+                return (real_record.material()->override_atten())
                     ? atten
-                    : atten * raycolor(scattered, world, lights, record, range, depth - 1);
+                    : atten * raycolor(scattered, world, lights, real_record, range, depth - 1);
 
             return VecX<T, 3>{};
         }
 
+        // This should get extracted out into a background color / colorizer
         VecX<T, 3> udir = unit(ray.dir());
         auto a = T(0.5) * (udir[1] + T(1.0));
         return (T(1.0) - a) * VecX<T, 3>::Ones() + a * VecX<T, 3>(0.5, 0.7, 1.0);
@@ -136,35 +137,25 @@ class PerspectiveCamera3 {
 
     template <RayColorizer<T, 3> Colorizer>
     void rendertobuffer(Framebuffer<T, 3>& fb, Colorizer colorizer) const {
-        VecX<T, 3> pixc, rdir;
-        RayX<T, 3> r;
-
         const auto
             pixtl = pix00(),
             du = delta_u(),
             dv = delta_v();
 
         const T pss = T(1.0) / (samplegrid_*samplegrid_);
+
+        #pragma omp parallel for schedule(dynamic)
         for(int j = 0; j < iheight(); j++) {
-            std::clog << "\rScanlines remaining: " << (iheight() - j) << " (" << int(j*100/iheight()) << "%)      "  << std::flush;
             for(int i = 0; i < iwidth; i++) {
                 auto color = VecX<T, 3>::Zeros();
-                // Random sampling
-                // for(int sample = 0; sample < samples_; sample++) {
-                //     color += colorizer(getray(i, j));
-                // }
-                // fb(i, j) = color * pss;
-
-                // Jitter sampling
-                for(int a = 0; a < samplegrid_ - 1; a++) {
-                for(int b = 0; b < samplegrid_ - 1; b++) {
-                    r = getray(i + (a + zorandr<T>(-0.5, 0.5))/samplegrid_, j + (b + zorandr<T>(-0.5, 0.5))/samplegrid_);
+                for(int a = 0; a < samplegrid_; a++) {
+                for(int b = 0; b < samplegrid_; b++) {
+                    const auto r = getray(i, j, a, b, samplegrid_);
                     color += colorizer(r);
                 }}
                 fb(i, j) = color * pss;
             }
         }
-        std::clog << "Done                                                                             \n" << std::flush;
     }
 };
 

@@ -83,6 +83,7 @@ find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(glm CONFIG REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
+find_package(OpenMP REQUIRED)
 
 # not using Vulkan at the moment
 # find_package(Vulkan)

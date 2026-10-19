@@ -4,7 +4,9 @@ BUILD_FOLDERS := buildVCPkg build-O2 build-O3
 MKFILE_PATH := ~/vcpkg/scripts/buildsystems/vcpkg.cmake
 
 default:
-	cmake --preset=default -DBUILD_DOCS=ON
+	cmake --preset=default \
+		-DBUILD_DOCS=ON \
+		-DCMAKE_CXX_FLAGS="-fopenmp -fsanitize=thread -g"
 	cmake --build buildVCPkg -j
 
 o2:
@@ -24,9 +26,9 @@ o3:
 	cmake --build build-O3 -j
 
 all:
-	$(MAKE) default
-	$(MAKE) o2
-	$(MAKE) o3
+	$(MAKE) default -j
+	$(MAKE) o2 -j
+	$(MAKE) o3 -j
 
 clean:
 	rm -rvf ${BUILD_FOLDERS}

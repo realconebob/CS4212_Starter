@@ -35,6 +35,7 @@ foreach(uexec ${UTESTS})
 	Catch2::Catch2WithMain
 	cs4212-util
   cwrender
+  OpenMP::OpenMP_CXX
   )
 
   # add_test(NAME ${uexec} COMMAND $<TARGET_FILE:${uexec}>)

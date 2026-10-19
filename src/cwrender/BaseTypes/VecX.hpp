@@ -266,10 +266,10 @@ inline VecX<T, 3> reflect(const VecX<T, 3>& v, const VecX<T, 3>& n) {
 
 template<Floating T, std::size_t X>
 /// Converts linear into srgb
-inline VecX<T, X> linear_to_srgb(const VecX<T, X>& linear) {
+inline VecX<T, X> linear_to_srgb(const VecX<T, X>& linear, T correction_amount = 2.2) {
     auto tmp = linear.clamp(T(0), T(1));
     for(int i = 0; i < X; i++)
-        tmp[i] = std::pow(tmp[i], T(1)/T(2.2));
+        tmp[i] = std::pow(tmp[i], T(1)/T(correction_amount));
 
     return tmp;
 }

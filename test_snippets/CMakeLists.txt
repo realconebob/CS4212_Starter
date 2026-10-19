@@ -15,6 +15,7 @@ target_link_libraries(tsnip_PNGRenderer
   ${Boost_PROGRAM_OPTIONS_LIBRARIES}
   PNG::PNG
   ZLIB::ZLIB
+  OpenMP::OpenMP_CXX
 )
 
 add_executable(tsnip_Camera3D
@@ -26,6 +27,7 @@ target_link_libraries(tsnip_Camera3D
   ${Boost_PROGRAM_OPTIONS_LIBRARIES}
   PNG::PNG
   ZLIB::ZLIB
+  OpenMP::OpenMP_CXX
 )
 
 add_executable(tsnip_Oct13Lab
@@ -37,4 +39,5 @@ target_link_libraries(tsnip_Oct13Lab
   ${Boost_PROGRAM_OPTIONS_LIBRARIES}
   PNG::PNG
   ZLIB::ZLIB
+  OpenMP::OpenMP_CXX
 )

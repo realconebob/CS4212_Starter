@@ -35,7 +35,7 @@ class PNGRenderer {
         /**
          * @brief Render the framebuffer to the respectively named png
          */
-        void render(bool gamma_correction = false) const {
+        void render(bool gamma_correction = false, T correction_amount = 2.2) const {
             std::size_t
                 w = framebuffer_.width(),
                 h = framebuffer_.height();
@@ -46,7 +46,7 @@ class PNGRenderer {
             for (std::size_t y = 0; y < imgData.get_height(); ++y) {
             for (std::size_t x = 0; x < imgData.get_width(); ++x) {
                 corrected = (gamma_correction)
-                    ? linear_to_srgb(framebuffer_(x, y))
+                    ? linear_to_srgb(framebuffer_(x, y), correction_amount)
                     : framebuffer_(x, y);
 
                 fbpix = corrected.clamp(T(0), T(1)) * T(255.0);// + (T(0.5) * VecX<T, 3>::Ones());
