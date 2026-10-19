@@ -33,7 +33,7 @@ class Sphere3D: public Hittable<Sphere3D<T>, T, 3> {
         origin_{origin}, radius_{std::abs(radius)}, mat_(material)
         {}
 
-    bool _intersect(const RayX<T, 3>& ray, HitRecord<T, 3>& record, const Interval<T>& range) const {
+    bool intersect_impl(const RayX<T, 3>& ray, HitRecord<T, 3>& record, const Interval<T>& range) const {
         VecX<T, 3> oc = origin_ - ray.origin();
 
         T

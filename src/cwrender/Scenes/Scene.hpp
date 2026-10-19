@@ -43,7 +43,7 @@ class Scene: public Hittable<Scene<T, X>, T, X> {
 
     const std::vector<LightAny<T, X>>& getlights() const {return lights_;}
 
-    bool _intersect(const RayX<T, X>& ray, HitRecord<T, 3>& record, const Interval<T>& range) const {
+    bool intersect_impl(const RayX<T, X>& ray, HitRecord<T, 3>& record, const Interval<T>& range) const {
         bool hit = false;
         T closest = range.max;
         for (const auto& obj: hittables_) {
@@ -56,7 +56,7 @@ class Scene: public Hittable<Scene<T, X>, T, X> {
     }
 
     bool intersect(const RayX<T, X>& ray, HitRecord<T, 3>& record, const Interval<T>& range) const {
-        return _intersect(ray, record, range);
+        return intersect_impl(ray, record, range);
     }
 };
 

@@ -36,7 +36,7 @@ class Triangle3: public Hittable<Triangle3<T>, T, 3> {
         mat_(mat)
         {}
 
-    bool _intersect(const RayX<T, 3>& ray, HitRecord<T, 3>& record, const Interval<T>& range) const {
+    bool intersect_impl(const RayX<T, 3>& ray, HitRecord<T, 3>& record, const Interval<T>& range) const {
         // Got this from claude because the slides were not clear on how to do this
         constexpr T eps = std::numeric_limits<T>::epsilon() * 10;
 

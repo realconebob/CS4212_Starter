@@ -34,7 +34,7 @@ class Cube3: public Hittable<Cube3<T>, T, 3> {
         throw NotImplemented();
     }
 
-    bool _intersect(const RayX<T, 3>& ray, HitRecord<T, 3>& record, const Interval<T>& range) const {
+    bool intersect_impl(const RayX<T, 3>& ray, HitRecord<T, 3>& record, const Interval<T>& range) const {
         for(int i = 0; i < 2; i++) if(planes_[i].intersect(ray, record, range)) return true;
         return false;
     }
