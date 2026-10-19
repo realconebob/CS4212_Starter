@@ -1,5 +1,4 @@
 #include "cwrender/BaseTypes/Interval.hpp"
-#include "cwrender/Helpers.hpp"
 #include "cwrender/Hittables/Hittable.hpp"
 #include "cwrender/Hittables/Sphere.hpp"
 #include "cwrender/Hittables/Triangle.hpp"
@@ -30,12 +29,12 @@ int main(void) {
     auto camera = PC3D{};
     camera.iwidth = 500;
     camera.aspectratio = 1;
-    camera.samplegrid_ = 10;
+    camera.samplegrid = 10;
 
-    camera.lookfrom_ = {0, 3, 3};
-    camera.lookat_ = {0, -0.4, -1};
-    camera.vfov = 90;
-    // Set focal len and plane widths later, once they're done
+    camera.lookfrom = {0, 3, 3};
+    camera.lookat = {0, -0.4, -1};
+    camera.set_focal(0.4, 0.5);
+    // Set plane widths later, once they're done
 
     auto
         lamgrey = LambertianShader<double, 3>{{.6, .6, .6}}.sharedptr(),
@@ -47,7 +46,7 @@ int main(void) {
         blinblue = BlinnPhongShader<double, 3>{{}, 160, {.1, .2, .8}}.sharedptr(),
         difteal = DiffuseShader<double, 3>({.2, .7, .7}).sharedptr(),
         blinorangle = BlinnPhongShader<double, 3>{{}, 32, {.95, .5, .1}}.sharedptr(),
-        lampurple = LambertianShader<double, 3>{{.6, .2, .8}}.sharedptr(); 
+        lampurple = LambertianShader<double, 3>{{.6, .2, .8}}.sharedptr();
 
     auto fb = FB3D(camera.get_iwidth(), camera.get_iheight());
     auto rec = Record3D();

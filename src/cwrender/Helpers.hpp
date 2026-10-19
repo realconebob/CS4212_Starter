@@ -122,6 +122,7 @@ requires std::totally_ordered<T>
 T clamp_(T val, T lo, T hi) {return clamp(val, lo, hi);}
 
 double degtorad(double deg);
+double radtodeg(double rad);
 
 inline std::mt19937_64& getrng() {
     thread_local std::mt19937_64 engine{std::random_device{}()};

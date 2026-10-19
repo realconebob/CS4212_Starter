@@ -34,4 +34,9 @@ double degtorad(double deg) {
     return deg * (std::numbers::pi) / 180.0;
 }
 
+double radtodeg(double rad) {
+    // 2rad = 360 = 1 rev, x deg * (2rad / 360deg) = x rad
+    return rad * (180.0) / std::numbers::pi;
+}
+
 }
