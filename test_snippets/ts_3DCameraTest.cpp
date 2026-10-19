@@ -32,7 +32,7 @@ using Color3D = VecX<double, 3>;
 using PC3D = PerspectiveCamera3<double>;
 using FB3D = Framebuffer<double, 3>;
 using Sphere3DD = Sphere3D<double>;
-using Scene3D = Scene3<double>;
+using Scene3D = Scene<double, 3>;
 using Hittable3D = HittableAny<double, 3>;
 using HitRecord3D = HitRecord<double, 3>;
 using Triangle3D = Triangle3<double>;
@@ -78,7 +78,7 @@ int main(int argc, char *argv[]) {
     auto range = Interval<double>::camera();
 
     camera.rendertobuffer(fb, [&camera, &world, &rec, &range](const Ray3D& r){
-        return camera.raycolor(r, world, world.getlights(), rec, range, 50);
+        return camera.raycolor(r, world, world, rec, range, 50);
     });
 
     PNGRenderer<double>(fb, "camera3d-white.png").render(true);

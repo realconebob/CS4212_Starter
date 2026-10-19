@@ -19,6 +19,7 @@
 #include "cwrender/BaseTypes/RayX.hpp"
 #include "cwrender/BaseTypes/VecX.hpp"
 #include "cwrender/Scenes/Light.hpp"
+#include "cwrender/Scenes/Scene.hpp"
 
 #include <cmath>
 #include <cstddef>
@@ -123,7 +124,7 @@ class PerspectiveCamera3 {
         return VecX<T, 3>(zorandr<T>(-0.5, 0.5), zorandr<T>(-0.5, 0.5), 0);
     }
 
-    VecX<T, 3> raycolor(const Ray3D& ray, const HittableAny<T, 3>& world, const std::vector<LightAny<T, 3>>& lights, HitRecord<T, 3>& record, const Interval<T>& range, int depth) {
+    VecX<T, 3> raycolor(const Ray3D& ray, const HittableAny<T, 3>& world, const Scene<T, 3>& scene, HitRecord<T, 3>& record, const Interval<T>& range, int depth) {
         if(depth <= 0) return VecX<T, 3>{};
 
         thread_local HitRecord<T, 3> real_record{};
@@ -131,10 +132,10 @@ class PerspectiveCamera3 {
         if(world.intersect(ray, real_record, range)) {
             RayX<T, 3> scattered;
             VecX<T, 3> atten{};
-            if(real_record.material()->scatter(ray, real_record, atten, scattered, lights))
+            if(real_record.material()->scatter(ray, real_record, atten, scattered, scene))
                 return (real_record.material()->override_atten())
                     ? atten
-                    : atten * raycolor(scattered, world, lights, real_record, range, depth - 1);
+                    : atten * raycolor(scattered, world, scene, real_record, range, depth - 1);
 
             return VecX<T, 3>{};
         }

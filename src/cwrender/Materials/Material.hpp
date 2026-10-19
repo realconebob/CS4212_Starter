@@ -16,6 +16,7 @@
 #include "cwrender/Hittables/Hittable.hpp"
 #include "cwrender/BaseTypes/VecX.hpp"
 #include "cwrender/Scenes/Light.hpp"
+#include "cwrender/Scenes/Scene.hpp"
 
 #include <cstddef>
 #include <memory>
@@ -26,13 +27,13 @@
 namespace cwrender {
 
 template<typename Derived, typename T, std::size_t X>
-concept MaterialImpl = Floating<T> && requires(const Derived& d, const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten, RayX<T, X>& scattered, const std::vector<LightAny<T, X>>& lights) {
-    { d._scatter(rayin, record, atten, scattered, lights) } -> std::convertible_to<bool>;
+concept MaterialImpl = Floating<T> && requires(const Derived& d, const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten, RayX<T, X>& scattered, const Scene<T, X>& scene) {
+    { d._scatter(rayin, record, atten, scattered, scene) } -> std::convertible_to<bool>;
 };
 
 template<typename M, typename T, std::size_t X>
-concept Shadeable = requires(const M& m, const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten, RayX<T, X>& scattered, const std::vector<LightAny<T, X>>& lights) {
-    { m.scatter(rayin, record, atten, scattered, lights) } -> std::convertible_to<bool>;
+concept Shadeable = requires(const M& m, const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten, RayX<T, X>& scattered, const Scene<T, X>& scene) {
+    { m.scatter(rayin, record, atten, scattered, scene) } -> std::convertible_to<bool>;
 };
 
 
@@ -70,9 +71,9 @@ class Material {
     ~Material() = default;
 
     public:
-    bool scatter(const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten, RayX<T, X>& scattered, const std::vector<LightAny<T, X>>& lights) const
+    bool scatter(const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten, RayX<T, X>& scattered, const Scene<T, X>& scene) const
     requires (MaterialImpl<Derived, T, X>){
-        return static_cast<const Derived&>(*this)->_scatter(rayin, record, atten, scattered, lights);
+        return static_cast<const Derived&>(*this)->_scatter(rayin, record, atten, scattered, scene);
     }
 
     const VecX<T, X>& reflection() const {return reflection_;}
@@ -88,7 +89,7 @@ template<Floating T, std::size_t X>
 class MaterialAny {
     struct Concept {
         virtual ~Concept() = default;
-        virtual bool scatter(const RayX<T, X>&, const HitRecord<T, X>&, VecX<T, X>&, RayX<T, X>&, const std::vector<LightAny<T, X>>&) const = 0;
+        virtual bool scatter(const RayX<T, X>&, const HitRecord<T, X>&, VecX<T, X>&, RayX<T, X>&, const Scene<T, X>&) const = 0;
         virtual bool override_atten() const = 0;
         virtual std::unique_ptr<Concept> clone() const = 0;
     };
@@ -97,8 +98,8 @@ class MaterialAny {
     struct Shader: Concept {
         S obj;
         explicit Shader(S s) : obj(std::move(s)) {}
-        bool scatter(const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten, RayX<T, X>& scattered, const std::vector<LightAny<T, X>>& lights) const override {
-            return obj.scatter(rayin, record, atten, scattered, lights);
+        bool scatter(const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten, RayX<T, X>& scattered, const Scene<T, X>& scene) const override {
+            return obj.scatter(rayin, record, atten, scattered, scene);
         }
         bool override_atten() const override {return obj.override_atten_;}
         std::unique_ptr<Concept> clone() const override {
@@ -116,8 +117,8 @@ class MaterialAny {
     MaterialAny(const MaterialAny& o) : self_(o.self_->clone()) {}
     MaterialAny(MaterialAny&&) = default;
 
-    bool scatter(const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten, RayX<T, X>& scattered, const std::vector<LightAny<T, X>>& lights) const {
-        return self_->scatter(rayin, record, atten, scattered, lights);
+    bool scatter(const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten, RayX<T, X>& scattered, const Scene<T, X>& scene) const {
+        return self_->scatter(rayin, record, atten, scattered, scene);
     }
     bool override_atten() const {return self_->override_atten();}
 };

@@ -17,7 +17,7 @@ using namespace cwrender;
 
 using PC3D = PerspectiveCamera3<double>;
 using FB3D = Framebuffer<double, 3>;
-using Scene3D = Scene3<double>;
+using Scene3D = Scene<double, 3>;
 using PNGRendererD = PNGRenderer<double>;
 
 using Record3D = HitRecord<double, 3>;
@@ -80,7 +80,7 @@ int main(void) {
     };
 
     camera.rendertobuffer(fb, [&camera, &world, &rec, &range](const Ray3D& r){
-        return camera.raycolor(r, world, world.getlights(), rec, range, 5);
+        return camera.raycolor(r, world, world, rec, range, 5);
     });
     PNGRendererD(fb, "Oct13Lab.png").render(true);
 

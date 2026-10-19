@@ -30,18 +30,21 @@ class LambertianShader: public Material<LambertianShader<T, X>, T, X> {
         this->override_atten_ = true;
     }
 
-    [[nodiscard]] bool scatter(const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten, RayX<T, X>& scattered,const std::vector<LightAny<T, X>>& lights) const {
-        return _scatter(rayin, record, atten, scattered, lights);
+    [[nodiscard]] bool scatter(const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten, RayX<T, X>& scattered, const Scene<T, X>& scene) const {
+        return _scatter(rayin, record, atten, scattered, scene);
     }
 
     // There's a way to make this private but idc right now
-    [[nodiscard]] bool _scatter(const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten, RayX<T, X>& scattered, const std::vector<LightAny<T, X>>& lights) const {
+    [[nodiscard]] bool _scatter(const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten, RayX<T, X>& scattered, const Scene<T, X>& scene) const {
         auto color = VecX<T, X>::Zeros();
-        for(const LightAny<T, X>& light: lights) {
+        for(const LightAny<T, X>& light: scene.getlights()) {
             auto tmpnormal = (record.front_face()) ? record.normal() : -record.normal();
             auto tolight = light.pos() - record.point();
             T dist2 = tolight.length_squared();
             tolight = unit(tolight);
+
+            HitRecord<T, X> newrec{};
+            if(scene.intersect({record.point() + T(1e-4) * tmpnormal, tolight}, newrec, Interval<T>{T(1e-4), tolight.length()})) continue;
 
             auto brightness = max<T>(0, dot(tolight, unit(tmpnormal)));
             color += this->reflection_ * light.color() * (brightness / dist2);

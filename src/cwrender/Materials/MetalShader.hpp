@@ -31,12 +31,12 @@ class MetalShader: public Material<MetalShader<T, X>, T, X> {
         this->reflection_ = albedo;
     }
 
-    [[nodiscard]] bool scatter(const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten, RayX<T, X>& scattered, const std::vector<LightAny<T, X>>& lights) const {
-        return _scatter(rayin, record, atten, scattered, lights);
+    [[nodiscard]] bool scatter(const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten, RayX<T, X>& scattered, const Scene<T, X>& scene) const {
+        return _scatter(rayin, record, atten, scattered, scene);
     }
 
     // There's a way to make this private but idc right now
-    [[nodiscard]] bool _scatter(const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten, RayX<T, X>& scattered, const std::vector<LightAny<T, X>>& lights) const {
+    [[nodiscard]] bool _scatter(const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten, RayX<T, X>& scattered, const Scene<T, X>& scene) const {
         VecX<T, X> reflected = reflect(rayin.dir(), record.normal());
         reflected = unit(reflected) + (fuzz_ * randunitv<T, X>());
 

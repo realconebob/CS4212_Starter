@@ -16,33 +16,34 @@
 #include "cwrender/BaseTypes/Interval.hpp"
 #include "cwrender/Scenes/Light.hpp"
 
+#include <cstddef>
 #include <initializer_list>
 #include <vector>
 
 namespace cwrender {
 
-template<Floating T>
-class Scene3: public Hittable<Scene3<T>, T, 3> {
+template<Floating T, std::size_t X>
+class Scene: public Hittable<Scene<T, X>, T, X> {
     private:
     std::vector<LightAny<T, 3>> lights_;
 
     // This will be replaced with a BST eventually
-    std::vector<HittableAny<T, 3>> hittables_;
+    std::vector<HittableAny<T, X>> hittables_;
 
     public:
-    Scene3(): hittables_{}, lights_{} {}
+    Scene(): hittables_{}, lights_{} {}
 
-    Scene3(std::initializer_list<HittableAny<T, 3>> hittables, std::initializer_list<LightAny<T, 3>> lights): hittables_(hittables), lights_(lights) {}
+    Scene(std::initializer_list<HittableAny<T, X>> hittables, std::initializer_list<LightAny<T, X>> lights): hittables_(hittables), lights_(lights) {}
 
-    void hittable_front(const HittableAny<T, 3>& obj) {hittables_.insert(hittables_.begin(), obj);}
-    void hittable_back(const HittableAny<T, 3>& obj) {hittables_.push_back(obj);}
+    void hittable_front(const HittableAny<T, X>& obj) {hittables_.insert(hittables_.begin(), obj);}
+    void hittable_back(const HittableAny<T, X>& obj) {hittables_.push_back(obj);}
 
-    void light_front(const LightAny<T, 3>& obj) {lights_.insert(lights_.begin(), obj);}
-    void light_back(const LightAny<T, 3>& obj) {lights_.push_back(obj);}
+    void light_front(const LightAny<T, X>& obj) {lights_.insert(lights_.begin(), obj);}
+    void light_back(const LightAny<T, X>& obj) {lights_.push_back(obj);}
 
-    const std::vector<LightAny<T, 3>>& getlights() const {return lights_;}
+    const std::vector<LightAny<T, X>>& getlights() const {return lights_;}
 
-    bool _intersect(const RayX<T, 3>& ray, HitRecord<T, 3>& record, const Interval<T>& range) const {
+    bool _intersect(const RayX<T, X>& ray, HitRecord<T, 3>& record, const Interval<T>& range) const {
         bool hit = false;
         T closest = range.max;
         for (const auto& obj: hittables_) {
@@ -52,6 +53,10 @@ class Scene3: public Hittable<Scene3<T>, T, 3> {
             }
         }
         return hit;
+    }
+
+    bool intersect(const RayX<T, X>& ray, HitRecord<T, 3>& record, const Interval<T>& range) const {
+        return _intersect(ray, record, range);
     }
 };
 
