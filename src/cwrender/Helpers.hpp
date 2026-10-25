@@ -46,6 +46,7 @@ concept Numeric = std::integral<T> || Floating<T>;
 class NotImplemented: public std::logic_error {
     public:
     NotImplemented(): std::logic_error("Function not implemented") {};
+    NotImplemented(const char* str): std::logic_error(str) {};
 };
 
 /**

@@ -18,7 +18,6 @@
 #include "cwrender/BaseTypes/Interval.hpp"
 #include "cwrender/BaseTypes/RayX.hpp"
 #include "cwrender/BaseTypes/VecX.hpp"
-#include "cwrender/Scenes/Light.hpp"
 #include "cwrender/Scenes/Scene.hpp"
 
 #include <cmath>

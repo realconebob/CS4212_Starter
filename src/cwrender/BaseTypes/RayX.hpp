@@ -13,7 +13,7 @@
 #define CS4212_GRAPHICS_RAYX__147651356622894__
 
 #include "cwrender/Helpers.hpp"
-#include "cwrender//BaseTypes/VecX.hpp"
+#include "cwrender/BaseTypes/VecX.hpp"
 
 namespace cwrender {
 
