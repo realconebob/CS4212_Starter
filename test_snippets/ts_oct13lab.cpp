@@ -84,5 +84,5 @@ int main(void) {
     });
     PNGRendererD(fb, "Oct13Lab.png").render(true);
 
-    return 0;
+    exit(0);
 }

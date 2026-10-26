@@ -4,40 +4,21 @@
 # utest directory to correctly include the relative reference to the
 # src files.
 #
-include_directories(${CMAKE_SOURCE_DIR}/src)
+# include_directories(${CMAKE_SOURCE_DIR}/src)
 
-add_executable(tsnip_PNGRenderer
-  ts_PNGRenderer.cpp
-)
-target_link_libraries(tsnip_PNGRenderer
-  cs4212-util
-  cwrender
-  ${Boost_PROGRAM_OPTIONS_LIBRARIES}
-  PNG::PNG
-  ZLIB::ZLIB
-  OpenMP::OpenMP_CXX
-)
+file(GLOB_RECURSE TS_SOURCES CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/ts_*.cpp)
 
-add_executable(tsnip_Camera3D
-  ts_3DCameraTest.cpp
-)
-target_link_libraries(tsnip_Camera3D
-  cs4212-util
-  cwrender
-  ${Boost_PROGRAM_OPTIONS_LIBRARIES}
-  PNG::PNG
-  ZLIB::ZLIB
-  OpenMP::OpenMP_CXX
-)
-
-add_executable(tsnip_Oct13Lab
-  ts_oct13lab.cpp
-)
-target_link_libraries(tsnip_Oct13Lab
-  cs4212-util
-  cwrender
-  ${Boost_PROGRAM_OPTIONS_LIBRARIES}
-  PNG::PNG
-  ZLIB::ZLIB
-  OpenMP::OpenMP_CXX
-)
+foreach(src IN LISTS TS_SOURCES)
+  get_filename_component(tsexec ${src} NAME_WE)
+  add_executable(${tsexec} ${src})
+  target_link_libraries(${tsexec}
+    PRIVATE
+    cs4212-util
+    cwrender
+    ${Boost_PROGRAM_OPTIONS_LIBRARIES}
+    PNG::PNG
+    ZLIB::ZLIB
+    OpenMP::OpenMP_CXX
+  )
+  add_test(NAME ${tsexec} COMMAND ${tsexec})
+endforeach()

@@ -103,9 +103,6 @@ add_subdirectory(examples)
 #
 # Create your rendering library here....
 
-## Test snippets
-add_subdirectory(test_snippets)
-
 #
 # OpenGL Example
 #
@@ -122,3 +119,6 @@ add_subdirectory(OpenGL)
 #
 enable_testing()
 add_subdirectory(utests)
+
+## Test snippets
+add_subdirectory(test_snippets)

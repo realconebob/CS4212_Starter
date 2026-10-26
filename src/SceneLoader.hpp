@@ -11,7 +11,10 @@
 #include <string>
 
 using namespace cwrender;
-using Scene3D = cwrender::Scene<double, 3>;
+using Scene3D = Scene<double, 3>;
+
+// Why the hell did changing how my test cases are built fix import issues with this not being built properly
+// What is going on
 
 class SceneLoader : public ISceneLoader {
     private:

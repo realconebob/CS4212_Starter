@@ -16,29 +16,40 @@ include(Catch)
 # ${UTESTS} to be the set of unit test executables. Then, in the next
 # step, we iterate over all the elements within the ${UTESTS} set to
 # compile into an executable.
-#
-set(UTESTS
-  utest_VecX
-  utest_RayX
-  utest_SphereInter
-  utest_Helpers
-)
 
 #
 # For each of the executables named in ${UTESTS}, compile them into a
 # boost unit test for use by the CMake CTest system.
 #
-foreach(uexec ${UTESTS})
-  add_executable(${uexec} ${uexec}.cpp)
-  target_link_libraries(${uexec}
-	PRIVATE
-	Catch2::Catch2WithMain
-	cs4212-util
-  cwrender
-  OpenMP::OpenMP_CXX
+# foreach(uexec ${UTESTS})
+#   add_executable(${uexec} ${uexec}.cpp)
+#   target_link_libraries(${uexec}
+# 	PRIVATE
+# 	Catch2::Catch2WithMain
+# 	cs4212-util
+#   cwrender
+#   OpenMP::OpenMP_CXX
+#   )
+
+#   # add_test(NAME ${uexec} COMMAND $<TARGET_FILE:${uexec}>)
+#   catch_discover_tests(${uexec})
+# endforeach(uexec)
+
+file(GLOB_RECURSE UT_SOURCES CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/ut_*.cpp)
+
+foreach(src IN LISTS UT_SOURCES)
+  get_filename_component(utexec ${src} NAME_WE)
+  add_executable(${utexec} ${src})
+  target_link_libraries(${utexec}
+    PRIVATE
+    Catch2::Catch2WithMain
+    cs4212-util
+    cwrender
+    ${Boost_PROGRAM_OPTIONS_LIBRARIES}
+    PNG::PNG
+    ZLIB::ZLIB
+    OpenMP::OpenMP_CXX
   )
-
-  # add_test(NAME ${uexec} COMMAND $<TARGET_FILE:${uexec}>)
-  catch_discover_tests(${uexec})
-endforeach(uexec)
-
+  add_test(NAME ${utexec} COMMAND $<TARGET_FILE:${utexec}>)
+  catch_discover_tests(${utexec})
+endforeach()
