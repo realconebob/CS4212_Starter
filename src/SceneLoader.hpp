@@ -3,6 +3,7 @@
 #include "cwrender/Helpers.hpp"
 #include "cwrender/BaseTypes/BaseTypes.hpp"
 #include "cwrender/Hittables/Hittables.hpp"
+#include "cwrender/Hittables/Plane.hpp"
 #include "cwrender/Materials/Materials.hpp"
 #include "cwrender/Scenes/Scenes.hpp"
 
@@ -179,8 +180,11 @@ private:
             return BlinnPhongShader<double, 3>{toVec(d.specular.data), double(d.phongExp), toVec(d.diffuse.data)}.any();
 
         // "Mirror" has no albedo field in the file: perfect white reflector, roughness -> fuzz
-        if (t == "Mirror")
+        if (t == "Mirror" || t == "Metal")
             return MetalShader<double, 3>{Vec3::Ones(), double(d.roughness)}.any();
+
+        if (t == "Normal")
+            return NormalMapShader<double, 3>{}.any();
 
         // Glaze, Dielectric, BlinnPhongMirrored, CoolToWarm, Emitter, unknown
         unsupported("shader type '" + t + "' (shader '" + d.name + "')");
@@ -217,6 +221,10 @@ private:
         else if (s.type == "triangle") {
             m_scene.hittable_back(Triangle3<double>{
                 xformPoint(s, s.v0), xformPoint(s, s.v1), xformPoint(s, s.v2), mat}.any());
+        }
+        else if (s.type == "plane") {
+            m_scene.hittable_back(Plane3<double>{
+                xformPoint(s, s.v0), xformPoint(s, s.v1), mat}.any());
         }
         else {
             // "box" (CUBE not implemented), "mesh" (no mesh loader), "instance"

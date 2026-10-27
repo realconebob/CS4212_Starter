@@ -36,7 +36,7 @@ void from_json(const json &j, ISceneLoader::vec &p) {
         throw json::type_error::create(
             302,
             "Expected a string or 3-element array for vec, got " +
-            std::string(j.type_name()),
+            std::string(j.type_name()) + ": " + j.dump(),
 &j);
     }
 }
@@ -69,12 +69,11 @@ void SceneParser_JSON::parseJSONData(const json &json_data) {
     // level
     const json &json_context = json_data.contains("scene") ? json_data["scene"] : json_data;
 
-    if (json_context.contains("sceneParameters")) {
-        const json &sceneParam = json_context["sceneParameters"];
-
+    if (json_context.contains("sceneParameters") || json_context.contains("_bgColor")) {
+        const json &sp = json_context.contains("sceneParameters") ? json_context["sceneParameters"] : json_context;
         ISceneLoader::SceneParams sParams;
-        sParams.bgColor = sceneParam.value("bgColor", ISceneLoader::vec{0.0f, 0.0f, 0.0f});
-        sParams.envMapFile = sceneParam.value("envMapVertCross", "");
+        sParams.bgColor = sp.value("bgColor", sp.value("_bgColor", ISceneLoader::vec{0, 0, 0}));
+        sParams.envMapFile = sp.value("envMapVertCross", "");
         loader->setSceneParams(sParams);
     }
 
@@ -151,6 +150,16 @@ void SceneParser_JSON::parseCamera(const json &camera) {
 void SceneParser_JSON::parseLight(const json &light) {
     std::string type = light.value("type", light.value("_type", "point"));
 
+    if (type == "shape" && light.contains("shape")) {
+        // Emissive sphere light: treat as a point light at its centre.
+        // Only faithful for tiny radii (yours is 0.001).
+        const json &s = light["shape"];
+        loader->addPointLight(
+            s.value("center", ISceneLoader::vec{0, 0, 0}),
+        light.at("intensity").get<ISceneLoader::vec>());
+        return;
+}
+
     ISceneLoader::vec position, radiantEnergy;
     position = light["position"];
     radiantEnergy = light["intensity"];
@@ -223,6 +232,11 @@ void SceneParser_JSON::parseShader(const json &shader) {
     }
 
     else if (shaderDesc.type == "Mirror") {
+        shaderDesc.roughness = shader.value("roughness", 0.0f);
+    }
+
+    else if (shaderDesc.type == "Metal") {
+        shaderDesc.diffuse = extractShaderProperty(shader, "diffuse");
         shaderDesc.roughness = shader.value("roughness", 0.0f);
     }
 
@@ -347,6 +361,12 @@ void SceneParser_JSON::parseShape(const json &shape) {
         shapeDesc.minPt = shape.value("minPt", ISceneLoader::vec{-1, -1, -1});
         shapeDesc.maxPt = shape.value("maxPt", ISceneLoader::vec{1, 1, 1});
     } else if
+        (shapeDesc.type == "plane") {
+
+        shapeDesc.minPt = shape.value("minPt", ISceneLoader::vec{-1, -1, -1});
+        shapeDesc.maxPt = shape.value("maxPt", ISceneLoader::vec{1, 1, 1});
+    }
+    else if
         (shapeDesc.type == "mesh") {
 
         std::string meshFileName = shape.value("file", "");
