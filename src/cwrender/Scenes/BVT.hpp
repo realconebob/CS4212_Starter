@@ -15,7 +15,6 @@
 #include "cwrender/Hittables/Hittable.hpp"
 #include <cstddef>
 
-using namespace cwrender;
 namespace cwrender {
 
 template<Floating T, std::size_t X>

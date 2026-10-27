@@ -17,8 +17,6 @@
 #include <cstddef>
 #include <memory>
 
-using namespace cwrender;
-
 namespace cwrender {
 
 template<Floating T, std::size_t X> class LightAny;

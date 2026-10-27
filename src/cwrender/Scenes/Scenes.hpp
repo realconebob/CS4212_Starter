@@ -13,9 +13,14 @@
 #define CS4212_GRAPHICS_SCENES__105309989195__
 
 // IWYU pragma: begin_exports
+#include "cwrender/Scenes/BVT.hpp"
 #include "cwrender/Scenes/Framebuffer.hpp"
+#include "cwrender/Scenes/Light.hpp"
+#include "cwrender/Scenes/LightFact.hpp"
 #include "cwrender/Scenes/PerspectiveCamera.hpp"
 #include "cwrender/Scenes/PNGRenderer.hpp"
+#include "cwrender/Scenes/PointLight.hpp"
+#include "cwrender/Scenes/Scene.hpp"
 // IWYU pragma: end_exports
 
 #endif

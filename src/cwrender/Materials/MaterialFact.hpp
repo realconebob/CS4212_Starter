@@ -29,47 +29,53 @@ template<Floating T, std::size_t X>
 class MaterialFact {
     public:
     enum TYPE {
+        UNDEF,
         PHONG,
         DIFFUSE,
         LAMBERTIAN,
         METAL,
         NORMAL,
+        TOOBIG,
     };
 
-    MaterialAny<T, X> build(TYPE type, const std::unordered_map<const char*, const char*>& data) {
-        const VecX<T, X>& albedo = VecX<T, X>::Ones();
-        T shiny;
-        T fuzz = T(0.0);
-
+    static MaterialAny<T, X> build(TYPE type, const std::unordered_map<std::string, std::string>& data) {
         switch (type) {
             default: throw std::invalid_argument("<MaterialFact::build>: Given invalid material type");
 
             case PHONG:
-            // Populate from map
-            VecX<T, X> spec_reflection;
-            shiny;
-            albedo;
-            return BlinnPhongShader<T, X>{spec_reflection, shiny, albedo}.any();
+            return [&data](){
+                // Populate from map
+                VecX<T, X> spec_reflection;
+                T shiny;
+                VecX<T, X> albedo = VecX<T, X>::Ones();
 
+                return BlinnPhongShader<T, X>{spec_reflection, shiny, albedo}.any();
+            }();
 
             case DIFFUSE:
-            // Populate from map
-            albedo;
-            return DiffuseShader<T, X>{albedo}.any();
+            return [&data](){
+                // Populate from map
+                VecX<T, X> albedo = VecX<T, X>::Ones();
 
+                return DiffuseShader<T, X>{albedo}.any();
+            }();
 
             case LAMBERTIAN:
-            // Populate from map
-            albedo;
-            return LambertianShader<T, X>{albedo}.any();
+            return [&data](){
+                // Populate from map
+                VecX<T, X> albedo = VecX<T, X>::Ones();
 
+                return LambertianShader<T, X>{albedo}.any();
+            }();
 
             case METAL:
-            // Populate from map
-            albedo;
-            fuzz;
-            return MetalShader<T, X>{albedo, fuzz}.any();
+            return [&data](){
+                // Populate from map
+                VecX<T, X> albedo = VecX<T, X>::Ones();
+                T fuzz = T(0);
 
+                return MetalShader<T, X>{albedo, fuzz}.any();
+            }();
 
             case NORMAL:
             return NormalMapShader<T, X>{}.any();

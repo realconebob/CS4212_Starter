@@ -24,19 +24,22 @@ template<Floating T, std::size_t X>
 class LightFactory {
     public:
     enum TYPE {
+        UNDEF,
         POINT,
+        TOOBIG,
     };
 
-    LightAny<T, X> build(TYPE type, const std::unordered_map<const char*, const char*>& data) {
-        VecX<T, X> pos, color;
+    static LightAny<T, X> build(TYPE type, const std::unordered_map<std::string, std::string>& data) {
         switch (type) {
             default: throw std::invalid_argument("<LightFactory::build>: Given invalid light type");
 
             case POINT:
-            // Populate from map
-            pos;
-            color;
-            return PointLight<T, X>{pos, color}.any();
+            return [&data](){
+                // Populate from map
+                VecX<T, X> pos, color;
+
+                return PointLight<T, X>{pos, color}.any();
+            }();
         }
 
         throw std::logic_error("<LightFactory::build>: Broke out of switch statement");

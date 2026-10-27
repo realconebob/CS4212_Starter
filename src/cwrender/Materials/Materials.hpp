@@ -14,10 +14,12 @@
 
 // IWYU pragma: begin_exports
 #include "cwrender/Materials/Material.hpp"
+#include "cwrender/Materials/MaterialFact.hpp"
+#include "cwrender/Materials/BlinnPhongShader.hpp"
 #include "cwrender/Materials/DiffuseShader.hpp"
-#include "cwrender/Materials/NormalShader.hpp"
-#include "cwrender/Materials/MetalShader.hpp"
 #include "cwrender/Materials/LambertianShader.hpp"
+#include "cwrender/Materials/MetalShader.hpp"
+#include "cwrender/Materials/NormalShader.hpp"
 // IWYU pragma: end_exports
 
 #endif

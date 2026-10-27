@@ -13,9 +13,9 @@
 #define CS4212_GRAPHICS__BASETYPES__24287474830216__
 
 // IWYU pragma: begin_exports
-#include "cwrender/BaseTypes/VecX.hpp"
-#include "cwrender/BaseTypes/RayX.hpp"
 #include "cwrender/BaseTypes/Interval.hpp"
+#include "cwrender/BaseTypes/RayX.hpp"
+#include "cwrender/BaseTypes/VecX.hpp"
 // IWYU pragma: end_exports
 
 #endif

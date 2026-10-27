@@ -3,8 +3,9 @@
 #include "SceneLoader.hpp"
 #include "cwrender/Scenes/Scene.hpp"
 
+using namespace cwrender;
 TEST_CASE("SEE IF COMPILES") {
-    auto scene = cwrender::Scene<double, 3>{};
+    auto scene = Scene<double, 3>{};
     auto loader = SceneLoader{scene};
     loader.reserveCameras(5);
 };
