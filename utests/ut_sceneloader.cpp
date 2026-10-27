@@ -6,4 +6,5 @@
 TEST_CASE("SEE IF COMPILES") {
     auto scene = cwrender::Scene<double, 3>{};
     auto loader = SceneLoader{scene};
+    loader.reserveCameras(5);
 };

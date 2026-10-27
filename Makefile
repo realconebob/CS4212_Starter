@@ -1,6 +1,6 @@
 .PHONY: default o3 all t test ft fast-test c clean
 
-BUILD_FOLDERS := buildVCPkg build-O2 build-O3
+BUILD_FOLDERS := buildVCPkg buildO3
 MKFILE_PATH := ~/vcpkg/scripts/buildsystems/vcpkg.cmake
 
 default:
