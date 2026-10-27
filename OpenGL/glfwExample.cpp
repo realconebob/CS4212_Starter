@@ -35,11 +35,11 @@ int main(void)
     int winWidth = 1000;
     float aspectRatio = 1.0; // 16.0 / 9.0; // winWidth / (float)winHeight;
     int winHeight = winWidth / aspectRatio;
-    
+
     GLFWwindow* window = glfwCreateWindow(winWidth, winHeight, "GLFW Example", NULL, NULL);
     if (!window) {
         std::cerr << "GLFW did not create a window!" << std::endl;
-        
+
         glfwTerminate();
         return -1;
     }
@@ -80,7 +80,58 @@ int main(void)
     std::cout << "GL_MAJOR_VERSION: " << major_version << std::endl;
 
     double timeDiff = 0.0, startFrameTime = 0.0, endFrameTime = 0.0;
-    
+
+    /** Create the storage necessary for the first triangle */
+    // create a Vertex Array Buffer to hold our triangle data
+    GLuint m_triangleVBO[2]{};
+    glGenBuffers(1, m_triangleVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, m_triangleVBO[0]);
+
+    // this is the actual triangle data that will be copied to
+    // the GPU memory
+    std::vector< float > host_VertexBuffer{
+        -0.5f, -0.5f, 0.0f, // V0
+        0.5f, -0.5f, 0.0f,  // V1
+        0.0f, 0.5f, 0.0f    // V2
+    };
+
+    int numBytes = host_VertexBuffer.size() * sizeof(float);
+
+    // copy the numBytes from host_VertexBuffer t the GPU and store in
+    // the currently bound VBO
+    glBufferData(GL_ARRAY_BUFFER, numBytes, host_VertexBuffer.data(), GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    // once copied, we no longer need the data on the host
+    host_VertexBuffer.clear();
+
+    /** Create Vertex Array Objects */
+    // create a vertex array object that will map the attributes in
+    // our vertex buffer to different location attributes for our
+    // shaders
+    GLuint m_VAO;
+    glGenVertexArrays(1, &m_VAO);
+    glBindVertexArray(m_VAO);
+
+    // VAO details here - we only have 1 attribute or location
+    // (Position of the vertex)
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), 0);
+
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void*)(3*sizeof(GLfloat)));
+
+    glBindBuffer(GL_ARRAY_BUFFER, m_triangleVBO[0]);
+    glBindVertexArray(0);
+
+    /** Make a shader */
+    // Create a shader using my GLSLObject class
+    sivelab::GLSLObject shader;
+    shader.addShader( "./OpenGL/vertexShader_color.glsl", sivelab::GLSLObject::VERTEX_SHADER );
+    shader.addShader( "./OpenGL/fragmentShader_color.glsl", sivelab::GLSLObject::FRAGMENT_SHADER );
+    // Run the example program from the project source or it won't find these shaders
+    shader.createProgram();
+
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
@@ -93,6 +144,11 @@ int main(void)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         /* Render your objects here */
+        shader.activate();
+        glBindVertexArray(m_VAO);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glBindVertexArray(0);
+        shader.deactivate();
 
         // Swap the front and back buffers
         glfwSwapBuffers(window);
@@ -107,7 +163,7 @@ int main(void)
             glfwSetWindowShouldClose(window, 1);
         }
     }
-  
+
     glfwTerminate();
     return 0;
 }
