@@ -13,6 +13,7 @@
 #define CS4212_GRAPHICS_HITTABLES__18821737016760__
 
 // IWYU pragma: begin_exports
+#include "cwrender/Hittables/BoundingBox.hpp"
 #include "cwrender/Hittables/Cube.hpp"
 #include "cwrender/Hittables/Hittable.hpp"
 #include "cwrender/Hittables/HittableFact.hpp"

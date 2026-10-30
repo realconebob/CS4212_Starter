@@ -60,6 +60,16 @@ class Triangle3: public Hittable<Triangle3<T>, T, 3> {
         this->update(record, point, t, ray, normal_, mat_);
         return true;
     }
+
+    BoundingBox<T, 3> bounds_impl() const {
+        VecX<T, 3>
+            min = VecX<T, 3>::Minimum(a_, b_),
+            max = VecX<T, 3>::Maximum(a_, b_);
+        min = VecX<T, 3>::Minimum(min, c_);
+        max = VecX<T, 3>::Maximum(max, c_);
+
+        return BoundingBox<T, 3>{min, max};
+    }
 };
 
 }

@@ -1,10 +1,11 @@
 target_sources(cwrender PRIVATE
+    BVT.hpp
     Framebuffer.hpp
     Light.hpp
-    PerspectiveCamera.hpp
     PNGRenderer.hpp
+    Scene.hpp
+    LightFact.hpp
+    PerspectiveCamera.hpp
     PointLight.hpp
     Scenes.hpp
-    Scene.hpp
-    BVT.hpp
 )

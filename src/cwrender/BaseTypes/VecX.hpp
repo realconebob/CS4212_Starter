@@ -17,6 +17,7 @@
 #include <cmath>
 #include <cstddef>
 #include <functional>
+#include <initializer_list>
 #include <iostream>
 #include <limits>
 #include <stdexcept>
@@ -28,19 +29,19 @@ requires(X >= 1)
 class VecX {
     public:
         #pragma region Variables
-        T vals[X];
+        T vals_[X] = {0};
         #pragma endregion
 
         #pragma region Construtors
-        VecX(): vals{} {}
+        VecX(): vals_{0} {}
 
         template<typename... Args>
         requires (sizeof...(Args) == X) && (std::convertible_to<Args, T> && ...) // Note: change == to <= if filling out everything becomes annoying. Array init rules mean the first x elements will be copied, and anything after will just be zero
-        VecX(Args... args): vals{static_cast<T>(args)...} {}
+        VecX(Args... args): vals_{static_cast<T>(args)...} {}
 
         explicit VecX(T (&args)[X]) {
             for(int i = 0; i < X; i++) {
-                vals[i] = args[i];
+                vals_[i] = args[i];
             }
         }
 
@@ -52,28 +53,43 @@ class VecX {
         static VecX<T, X> Zeros() {
             return VecX<T, X>::Ones() * T(0);
         }
+
+        static VecX<T, X> Minimum(const VecX<T, X>& a, const VecX<T, X>& b) {
+            T vals[X] = {0};
+            for(std::size_t i = 0; i < X; i++) {
+                vals[i] = min(a[i], b[i]);
+            }
+            return VecX<T, X>(vals);
+        }
+        static VecX<T, X> Maximum(const VecX<T, X>& a, const VecX<T, X>& b) {
+            T vals[X] = {0};
+            for(std::size_t i = 0; i < X; i++) {
+                vals[i] = max(a[i], b[i]);
+            }
+            return VecX<T, X>(vals);
+        }
         #pragma endregion
 
         #pragma region Operators
         VecX operator -() const {
             T copy[X] = {};
-            for(int i = 0; i < X; i++) copy[i] = -vals[i];
+            for(int i = 0; i < X; i++) copy[i] = -vals_[i];
             return VecX(copy);
         }
 
-        T  operator [](int i) const {return vals[i];}
-        T& operator [](int i) {return vals[i];}
+        T  operator [](int i) const {return vals_[i];}
+        T& operator [](int i) {return vals_[i];}
 
         VecX& operator +=(const VecX& v) {
             for(int i = 0; i < X; i++) {
-                vals[i] += v.vals[i];
+                vals_[i] += v.vals_[i];
             }
             return *this;
         }
 
         VecX& operator *=(T m) {
             for(int i = 0; i < X; i++) {
-                vals[i] *= m;
+                vals_[i] *= m;
             }
             return *this;
         }
@@ -93,26 +109,26 @@ class VecX {
         T length_squared() const {
             T sum = 0;
             for(int i = 0; i < X; i++) {
-                sum += vals[i] * vals[i];
+                sum += vals_[i] * vals_[i];
             }
             return sum;
         }
 
         bool near_zero() const {
             for(int i = 0; i < X; i++) {
-                if (std::abs(vals[i]) < std::numeric_limits<T>::epsilon() * 5) return true;
+                if (std::abs(vals_[i]) < std::numeric_limits<T>::epsilon() * 5) return true;
             }
             return false;
         }
 
         VecX<T, X>& clamp(T lo, T hi) {
-            for(int i = 0; i < X; i++) vals[i] = clamp_<T>(vals[i], lo, hi);
+            for(int i = 0; i < X; i++) vals_[i] = clamp_<T>(vals_[i], lo, hi);
             return *this;
         }
 
         VecX<T, X> clamp(T lo, T hi) const {
             T tmp[X] = {};
-            for(int i = 0; i < X; i++) tmp[i] = clamp_<T>(vals[i], lo, hi);
+            for(int i = 0; i < X; i++) tmp[i] = clamp_<T>(vals_[i], lo, hi);
             return VecX<T, X>(tmp);
         }
 
@@ -138,7 +154,7 @@ template<Floating T, std::size_t X>
 inline std::ostream& operator<<(std::ostream& out, const VecX<T, X>& v) {
         out << '(';
         for(int i = 0; i < X; i++) {
-            out << v.vals[i];
+            out << v.vals_[i];
             if(i + 1 < X) out << ' ';
         }
         return out << ')';
@@ -154,10 +170,46 @@ inline VecX<T, X> operator+(const VecX<T, X>& a, const VecX<T, X>& b) {
 }
 
 template<Floating T, std::size_t X>
+inline VecX<T, X> operator+(const T& a, const VecX<T, X>& b) {
+    T res[X] = {};
+    for(int i = 0; i < X; i++) {
+        res[i] = a + b[i];
+    }
+    return VecX<T, X>(res);
+}
+
+template<Floating T, std::size_t X>
+inline VecX<T, X> operator+(const VecX<T, X>& a, const T& b) {
+    T res[X] = {};
+    for(int i = 0; i < X; i++) {
+        res[i] = a[i] + b;
+    }
+    return VecX<T, X>(res);
+}
+
+template<Floating T, std::size_t X>
 inline VecX<T, X> operator-(const VecX<T, X>& a, const VecX<T, X>& b) {
     T res[X] = {};
     for(int i = 0; i < X; i++) {
         res[i] = a[i] - b[i];
+    }
+    return VecX<T, X>(res);
+}
+
+template<Floating T, std::size_t X>
+inline VecX<T, X> operator-(const T& a, const VecX<T, X>& b) {
+    T res[X] = {};
+    for(int i = 0; i < X; i++) {
+        res[i] = a - b[i];
+    }
+    return VecX<T, X>(res);
+}
+
+template<Floating T, std::size_t X>
+inline VecX<T, X> operator-(const VecX<T, X>& a, const T& b) {
+    T res[X] = {};
+    for(int i = 0; i < X; i++) {
+        res[i] = a[i] - b;
     }
     return VecX<T, X>(res);
 }

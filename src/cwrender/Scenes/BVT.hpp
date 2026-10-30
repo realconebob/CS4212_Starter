@@ -25,7 +25,7 @@ class BoundingVolumeHierarchy {
         BVTNode* left;
         BVTNode* right;
 
-        bool intersect() {
+        bool intersect_impl(const RayX<T, 3>& ray, HitRecord<T, 3>& record, const Interval<T>& range) const {
             bool lefthit = (!left && left->intersect());
             bool rghthit = (!right && right->intersect());
 
@@ -34,6 +34,10 @@ class BoundingVolumeHierarchy {
             if(rghthit) {} // Do something for right
 
             return false;
+        }
+
+        BoundingBox<T, X> bounds_impl() const {
+            throw NotImplemented("TODO: There is actually a correct way to do this but I forgor");
         }
     };
 

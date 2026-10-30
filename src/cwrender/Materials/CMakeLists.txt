@@ -1,8 +1,10 @@
 target_sources(cwrender PRIVATE
+    BlinnPhongShader.hpp
     DiffuseShader.hpp
-    Material.hpp
+    MaterialFact.hpp
     Materials.hpp
     NormalShader.hpp
-    MetalShader.hpp
     LambertianShader.hpp
+    Material.hpp
+    MetalShader.hpp
 )

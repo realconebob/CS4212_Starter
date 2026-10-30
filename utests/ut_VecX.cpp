@@ -56,21 +56,21 @@ TEST_CASE( "Generic Vector (VecX<double, 3>) Negation" ) {
 }
 
 TEST_CASE( "Generic Vector (VecX<double, 3>) +=" ) {
-    REQUIRE_DIFF((Vec3D(v1.vals) += v2)[0], 1.1, epsilon);
-    REQUIRE_DIFF((Vec3D(v2.vals) += v3)[1], 22.0, epsilon);
-    REQUIRE_DIFF((Vec3D(v3.vals) += v1)[2], 30.3, epsilon);
+    REQUIRE_DIFF((Vec3D(v1.vals_) += v2)[0], 1.1, epsilon);
+    REQUIRE_DIFF((Vec3D(v2.vals_) += v3)[1], 22.0, epsilon);
+    REQUIRE_DIFF((Vec3D(v3.vals_) += v1)[2], 30.3, epsilon);
 }
 
 TEST_CASE( "Generic Vector (VecX<double, 3>) Scalar *=" ) {
-    REQUIRE_DIFF((Vec3D(v1.vals) *= 2)[0], 0.2, epsilon);
-    REQUIRE_DIFF((Vec3D(v2.vals) *= 2)[1], 4.0, epsilon);
-    REQUIRE_DIFF((Vec3D(v3.vals) *= 2)[2], 60.0, epsilon);
+    REQUIRE_DIFF((Vec3D(v1.vals_) *= 2)[0], 0.2, epsilon);
+    REQUIRE_DIFF((Vec3D(v2.vals_) *= 2)[1], 4.0, epsilon);
+    REQUIRE_DIFF((Vec3D(v3.vals_) *= 2)[2], 60.0, epsilon);
 }
 
 TEST_CASE( "Generic Vector (VecX<double, 3>) Scalar /=" ) {
-    REQUIRE_DIFF((Vec3D(v1.vals) /= 2)[0], 0.05, epsilon);
-    REQUIRE_DIFF((Vec3D(v2.vals) /= 2)[1], 1.0, epsilon);
-    REQUIRE_DIFF((Vec3D(v3.vals) /= 2)[2], 15.0, epsilon);
+    REQUIRE_DIFF((Vec3D(v1.vals_) /= 2)[0], 0.05, epsilon);
+    REQUIRE_DIFF((Vec3D(v2.vals_) /= 2)[1], 1.0, epsilon);
+    REQUIRE_DIFF((Vec3D(v3.vals_) /= 2)[2], 15.0, epsilon);
 }
 
 TEST_CASE( "Generic Vector (VecX<double, 3>) Length Squared" ) {

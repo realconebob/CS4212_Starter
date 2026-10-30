@@ -12,7 +12,8 @@
 #ifndef CS4212_GRAPHICS_SCENE__7971888621546__
 #define CS4212_GRAPHICS_SCENE__7971888621546__
 
-#include "cwrender/Hittables/Hittable.hpp"
+#include "cwrender/Helpers.hpp"
+#include "cwrender/Hittables/Hittables.hpp"
 #include "cwrender/BaseTypes/Interval.hpp"
 #include "cwrender/Scenes/Light.hpp"
 
@@ -55,8 +56,8 @@ class Scene: public Hittable<Scene<T, X>, T, X> {
         return hit;
     }
 
-    bool intersect(const RayX<T, X>& ray, HitRecord<T, 3>& record, const Interval<T>& range) const {
-        return intersect_impl(ray, record, range);
+    BoundingBox<T, X> bounds_impl() const {
+        throw NotImplemented();
     }
 };
 

@@ -12,6 +12,8 @@
 #ifndef CS4212_GRAPHICS_PLANE__21057231487604__
 #define CS4212_GRAPHICS_PLANE__21057231487604__
 
+#include "cwrender/Helpers.hpp"
+#include "cwrender/Hittables/Hittable.hpp"
 #include "cwrender/Hittables/Triangle.hpp"
 
 namespace cwrender {
@@ -23,6 +25,7 @@ class Plane3: public Hittable<Plane3<T>, T, 3> {
     std::shared_ptr<MaterialAny<T, 3>> mat_;
 
     public:
+    /// TODO: This really should be bottom-left and top-right, given that this exists in 3d space not screen space
     Plane3(const VecX<T, 3>& topleft, const VecX<T, 3>& bottomright, std::shared_ptr<MaterialAny<T, 3>> mat): tris_{Triangle3<T>{}, Triangle3<T>{}}, mat_(mat) {
         // Note: think about how to ensure z axis isn't leading to wackiness
 
@@ -45,6 +48,10 @@ class Plane3: public Hittable<Plane3<T>, T, 3> {
     bool intersect_impl(const RayX<T, 3>& ray, HitRecord<T, 3>& record, const Interval<T>& range) const {
         for(int i = 0; i < 2; i++) if(tris_[i].intersect(ray, record, range)) return true;
         return false;
+    }
+
+    BoundingBox<T, 3> bounds_impl() const {
+        throw NotImplemented("TODO: Compare the bounds of the bounding boxes of either plane to get the new bounds");
     }
 };
 

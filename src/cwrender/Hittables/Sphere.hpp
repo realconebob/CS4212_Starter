@@ -58,6 +58,10 @@ class Sphere3D: public Hittable<Sphere3D<T>, T, 3> {
 
         return true;
     }
+
+    BoundingBox<T, 3> bounds_impl() const {
+        return BoundingBox<T, 3>(origin_ - radius_, origin_ + radius_);
+    }
 };
 
 }

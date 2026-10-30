@@ -25,6 +25,7 @@ namespace cwrender {
 template<Floating T, std::size_t X> class MaterialAny;
 template<typename Derived, Floating T, std::size_t X> class Hittable;
 template<Floating T, std::size_t X> class HittableAny;
+template<Floating T, std::size_t X> class BoundingBox;
 
 /**
  * @brief Record class describing how/if a ray hit some `Hittable` object
@@ -66,6 +67,7 @@ class HitRecord {
 template<typename Derived, typename T, std::size_t X>
 concept HittableImpl = Floating<T> && requires(const Derived& d, const RayX<T, X>& ray, HitRecord<T, X>& record, const Interval<T>& range) {
     { d.intersect_impl(ray, record, range) } -> std::convertible_to<bool>;
+    { d.bounds_impl() } -> std::convertible_to<BoundingBox<T, X>>;
 };
 
 /**
@@ -109,6 +111,10 @@ class Hittable {
         return self_cast().intersect_impl(ray, record, range);
     }
 
+    BoundingBox<T, X> bounds() const {
+        return self_cast().bounds_impl();
+    }
+
     HittableAny<T, X> any() const {return HittableAny<T, X>(self_cast());}
 };
 
@@ -122,6 +128,7 @@ class HittableAny {
     struct Concept {
         virtual ~Concept() = default;
         virtual bool intersect(const RayX<T, X>&, HitRecord<T, X>&, const Interval<T>&) const = 0;
+        virtual BoundingBox<T, X> bounds() const = 0;
     };
 
     /// Wrapper / adapter. "Stores" original type through template, but is "erased" to a Concept when stored in self_
@@ -132,6 +139,7 @@ class HittableAny {
         bool intersect(const RayX<T, X>& ray, HitRecord<T, X>& record, const Interval<T>& range) const override {
             return obj_.intersect_impl(ray, record, range); // dispatches into the CRTP call, still static from here down
         }
+        BoundingBox<T, X> bounds() const override {return obj_.bounds_impl();}
 
         H obj_;
     };
@@ -144,6 +152,7 @@ public:
     HittableAny(H h): self_(std::make_shared<const Model<H>>(std::move(h))) {}
 
     bool intersect(const RayX<T, X>& ray, HitRecord<T, X>& record, const Interval<T>& range) const { return self_->intersect(ray, record, range); }
+    BoundingBox<T, X> bounds() const {return self_->bounds();}
 };
 
 }
