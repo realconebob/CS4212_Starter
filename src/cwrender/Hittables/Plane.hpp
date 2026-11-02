@@ -15,6 +15,7 @@
 #include "cwrender/Helpers.hpp"
 #include "cwrender/Hittables/Hittable.hpp"
 #include "cwrender/Hittables/Triangle.hpp"
+#include <algorithm>
 
 namespace cwrender {
 
@@ -51,7 +52,7 @@ class Plane3: public Hittable<Plane3<T>, T, 3> {
     }
 
     BoundingBox<T, 3> bounds_impl() const {
-        throw NotImplemented("TODO: Compare the bounds of the bounding boxes of either plane to get the new bounds");
+        return BoundingBox<T, 3>{tris_[0].bounds(), tris_[1].bounds()};
     }
 };
 

@@ -36,7 +36,7 @@ class Interval {
     }
 
     Interval operator-() const {return Interval<T>{-max, -min};}
-    Interval& operator-() {swap(-min, -max); return *this;}
+    Interval& operator-() {std::swap(-min, -max); return *this;}
 
     T size() const {return max - min;}
     bool contains(T x) const {return min <= x && x <= max;}

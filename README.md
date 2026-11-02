@@ -35,6 +35,30 @@ Test snippets are essentially small example programs. They'll end up in `./<path
 
 ```bash
 make o3
-cd build-O3/test_snippets/
+cd buildO3/test_snippets/
 ./{desired_test_snippet}
 ```
+
+## Running All Tests
+
+If you want to run all tests at once, unit test and test snippet, there are 2 make commands for you:
+
+```bash
+make t  # tests without compiler optimizations enabled
+make ft # tests with compiler optimizations enabled
+```
+
+Both of these options will build the necessary version and then run the test suite. You should see something like this:
+
+```text
+$ make ft
+Test project /path/to/source/dir/buildO3
+      Start  1: Relative Diff
+ 1/34 Test  #1: Relative Diff .............................................   Passed    0.01 sec
+      Start  2: Max, Min, Clamp
+ 2/34 Test  #2: Max, Min, Clamp ...........................................   Passed    0.01 sec
+      Start  3: Degrees to Radians
+ 3/34 Test  #3: Degrees to Radians ........................................   Passed    0.00 sec
+```
+
+From here, you can inspect the outputs of the test snippets by going to `{buildVCPkg,buildO3}/test_snippets/`

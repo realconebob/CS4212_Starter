@@ -79,8 +79,9 @@ int main(void) {
         }
     };
 
-    camera.rendertobuffer(fb, [&camera, &world, &rec, &range](const Ray3D& r){
-        return camera.raycolor(r, world, world, rec, range, 5);
+    HittableAny<double, 3> world_h{world};
+    camera.rendertobuffer(fb, [&camera, &world, &world_h, &rec, &range](const Ray3D& r){
+        return camera.raycolor(r, world_h, world, rec, range, 5);
     });
     PNGRendererD(fb, "Oct13Lab.png").render(true);
 

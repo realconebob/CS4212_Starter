@@ -36,8 +36,9 @@ int main(int argc, char *argv[]) {
     fb.clear();
 
     HitRecord3D rec;
-    camera.rendertobuffer(fb, [&rec, &world, &camera](const Ray3D& r) {
-        return camera.raycolor(r, world, world, rec, Interval<double>::camera(), 50);   // rec/range as in your main
+    HittableAny<double, 3> world_h{world};
+    camera.rendertobuffer(fb, [&rec, &world, &world_h, &camera](const Ray3D& r) {
+        return camera.raycolor(r, world_h, world, rec, Interval<double>::camera(), 50);   // rec/range as in your main
     });
 
     PNGRenderer<double>(fb, "out.png").render(true);

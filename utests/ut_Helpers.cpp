@@ -13,22 +13,6 @@ TEST_CASE("Relative Diff") {
     REQUIRE(within_diff(relative_diff(5, 0), 1, epsilon));
 }
 
-TEST_CASE("Swap") {
-    auto a = 10, b = 5;
-    REQUIRE(a == 10);
-    REQUIRE(b == 5);
-
-    swap(a, b);
-    REQUIRE(b == 10);
-    REQUIRE(a == 5);
-
-    auto c = 15;
-    swap(b, c);
-    REQUIRE(a == 5);
-    REQUIRE(b == 15);
-    REQUIRE(c == 10);
-}
-
 TEST_CASE("Max, Min, Clamp") {
     auto a = 10, b = 15, c = 20;
     REQUIRE(min(a, b) == 10);

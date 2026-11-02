@@ -77,8 +77,9 @@ int main(int argc, char *argv[]) {
     auto rec = HitRecord3D{};
     auto range = Interval<double>::camera();
 
-    camera.rendertobuffer(fb, [&camera, &world, &rec, &range](const Ray3D& r){
-        return camera.raycolor(r, world, world, rec, range, 50);
+    HittableAny<double, 3> world_h{world};
+    camera.rendertobuffer(fb, [&camera, &world, &world_h, &rec, &range](const Ray3D& r){
+        return camera.raycolor(r, world_h, world, rec, range, 50);
     });
 
     PNGRenderer<double>(fb, "camera3d-white.png").render(true);
