@@ -91,9 +91,9 @@ int main(void)
     // the GPU memory
     std::vector<float> host_VertexBuffer{
         // pos                  // color
-        -0.5f, -0.5f, 0.0f,     1.0f, 0.0f, 0.0f,
-         0.5f, -0.5f, 0.0f,     0.0f, 1.0f, 0.0f,
-         0.0f,  0.5f, 0.0f,     0.0f, 0.0f, 1.0f
+        -0.5f, -0.75f, 0.0f,     1.0f, 0.0f, 0.0f,
+         0.5f, -0.75f, 0.0f,     0.0f, 1.0f, 0.0f,
+         0.85f,  0.75f, 0.0f,     0.0f, 0.0f, 1.0f
     };
 
     int numBytes = host_VertexBuffer.size() * sizeof(float);

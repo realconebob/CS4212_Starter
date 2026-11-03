@@ -23,18 +23,12 @@ namespace cwrender {
 template<Floating T>
 class Cube3: public Hittable<Cube3<T>, T, 3> {
     private:
+    template<typename d, Floating t, std::size_t x> friend class Hittable;
+    template<Floating t, std::size_t x> friend class HittableAny;
+
     Plane3<T> planes_[6];
     VecX<T, 3> topleft_, bottomright_;
 
-    public:
-    Cube3(VecX<T, 3> topleft, VecX<T, 3> bottomright):
-        topleft_(topleft), bottomright_(bottomright),
-        planes_{ // This is gross
-            Plane3<T>::empty(), Plane3<T>::empty(), Plane3<T>::empty(),
-            Plane3<T>::empty(), Plane3<T>::empty(), Plane3<T>::empty()
-        } {
-        throw NotImplemented();
-    }
 
     bool intersect_impl(const RayX<T, 3>& ray, HitRecord<T, 3>& record, const Interval<T>& range) const {
         for(int i = 0; i < 6; i++) if(planes_[i].intersect(ray, record, range)) return true;
@@ -44,6 +38,16 @@ class Cube3: public Hittable<Cube3<T>, T, 3> {
     /// TODO: Update this after fixing planes being slightly backwards
     BoundingBox<T, 3> bounds() const {
         return BoundingBox<T, 3>{topleft_, bottomright_};
+    }
+
+    public:
+    Cube3(VecX<T, 3> topleft, VecX<T, 3> bottomright):
+        topleft_(topleft), bottomright_(bottomright),
+        planes_{ // This is gross
+            Plane3<T>::empty(), Plane3<T>::empty(), Plane3<T>::empty(),
+            Plane3<T>::empty(), Plane3<T>::empty(), Plane3<T>::empty()
+        } {
+        throw NotImplemented();
     }
 };
 

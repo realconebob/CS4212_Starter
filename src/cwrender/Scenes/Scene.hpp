@@ -27,11 +27,19 @@ namespace cwrender {
 template<Floating T, std::size_t X>
 class Scene: public Hittable<Scene<T, X>, T, X> {
     private:
+    BoundingVolumeHierarchy<T, X> hittables_;
     std::vector<LightAny<T, 3>> lights_;
 
-    // This will be replaced with a BST eventually
-    // std::vector<HittableAny<T, X>> hittables_;
-    BoundingVolumeHierarchy<T, X> hittables_;
+    template<typename d, Floating t, std::size_t x> friend class Hittable;
+    template<Floating t, std::size_t x> friend class HittableAny;
+
+    bool intersect_impl(const RayX<T, X>& ray, HitRecord<T, 3>& record, const Interval<T>& range) const {
+        return hittables_.intersect(ray, record, range);
+    }
+
+    BoundingBox<T, X> bounds_impl() const {
+        throw NotImplemented();
+    }
 
     public:
     Scene(): hittables_{}, lights_{} {}
@@ -48,23 +56,6 @@ class Scene: public Hittable<Scene<T, X>, T, X> {
     void light_back(const LightAny<T, X>& obj) {lights_.push_back(obj);}
 
     const std::vector<LightAny<T, X>>& getlights() const {return lights_;}
-
-    bool intersect_impl(const RayX<T, X>& ray, HitRecord<T, 3>& record, const Interval<T>& range) const {
-        // bool hit = false;
-        // T closest = range.max;
-        // for (const auto& obj: hittables_) {
-        //     if (obj.intersect(ray, record, Interval<T>(range.min, closest))) {
-        //         hit = true;
-        //         closest = record.t();
-        //     }
-        // }
-        // return hit;
-        return hittables_.intersect(ray, record, range);
-    }
-
-    BoundingBox<T, X> bounds_impl() const {
-        throw NotImplemented();
-    }
 };
 
 }

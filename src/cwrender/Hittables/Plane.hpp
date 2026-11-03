@@ -22,8 +22,21 @@ namespace cwrender {
 template<Floating T>
 class Plane3: public Hittable<Plane3<T>, T, 3> {
     private:
+    template<typename d, Floating t, std::size_t x> friend class Hittable;
+    template<Floating t, std::size_t x> friend class HittableAny;
+
     Triangle3<T> tris_[2];
     std::shared_ptr<MaterialAny<T, 3>> mat_;
+
+
+    bool intersect_impl(const RayX<T, 3>& ray, HitRecord<T, 3>& record, const Interval<T>& range) const {
+        for(int i = 0; i < 2; i++) if(tris_[i].intersect(ray, record, range)) return true;
+        return false;
+    }
+
+    BoundingBox<T, 3> bounds_impl() const {
+        return BoundingBox<T, 3>{tris_[0].bounds(), tris_[1].bounds()};
+    }
 
     public:
     /// TODO: This really should be bottom-left and top-right, given that this exists in 3d space not screen space
@@ -44,15 +57,6 @@ class Plane3: public Hittable<Plane3<T>, T, 3> {
 
     static Plane3<T> empty() {
         return Plane3<T>{{}, {}};
-    }
-
-    bool intersect_impl(const RayX<T, 3>& ray, HitRecord<T, 3>& record, const Interval<T>& range) const {
-        for(int i = 0; i < 2; i++) if(tris_[i].intersect(ray, record, range)) return true;
-        return false;
-    }
-
-    BoundingBox<T, 3> bounds_impl() const {
-        return BoundingBox<T, 3>{tris_[0].bounds(), tris_[1].bounds()};
     }
 };
 

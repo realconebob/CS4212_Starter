@@ -24,14 +24,12 @@ namespace cwrender {
 template<Floating T>
 class Sphere3D: public Hittable<Sphere3D<T>, T, 3> {
     private:
+    template<typename d, Floating t, std::size_t x> friend class Hittable;
+    template<Floating t, std::size_t x> friend class HittableAny;
+
     VecX<T, 3> origin_;
     T radius_;
     std::shared_ptr<MaterialAny<T, 3>> mat_;
-
-    public:
-    Sphere3D(const VecX<T, 3>& origin, T radius, std::shared_ptr<MaterialAny<T, 3>> material):
-        origin_{origin}, radius_{std::abs(radius)}, mat_(material)
-        {}
 
     bool intersect_impl(const RayX<T, 3>& ray, HitRecord<T, 3>& record, const Interval<T>& range) const {
         VecX<T, 3> oc = origin_ - ray.origin();
@@ -62,6 +60,11 @@ class Sphere3D: public Hittable<Sphere3D<T>, T, 3> {
     BoundingBox<T, 3> bounds_impl() const {
         return BoundingBox<T, 3>(origin_ - radius_, origin_ + radius_);
     }
+
+    public:
+    Sphere3D(const VecX<T, 3>& origin, T radius, std::shared_ptr<MaterialAny<T, 3>> material):
+        origin_{origin}, radius_{std::abs(radius)}, mat_(material)
+        {}
 };
 
 }

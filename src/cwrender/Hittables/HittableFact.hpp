@@ -27,6 +27,9 @@ namespace cwrender {
 
 template<Floating T, std::size_t X>
 class HittableFactory {
+    template<typename d, Floating t, std::size_t x> friend class Hittable;
+    template<Floating t, std::size_t x> friend class HittableAny;
+
     public:
     enum TYPE {
         UNDEF,

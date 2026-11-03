@@ -21,22 +21,13 @@ namespace cwrender {
 template<Floating T, std::size_t X>
 class BoundingBox: public Hittable<BoundingBox<T, X>, T, X> {
     private:
+    template<typename d, Floating t, std::size_t x> friend class Hittable;
+    template<Floating t, std::size_t x> friend class HittableAny;
+
     VecX<T, X>
         minpoint_ = VecX<T, X>::Zeros(),
         maxpoint_ = VecX<T, X>::Zeros();
 
-    public:
-    explicit BoundingBox() {}
-    explicit BoundingBox(VecX<T, X> min, VecX<T, X> max):
-        minpoint_(min), maxpoint_(max)
-        {}
-
-    BoundingBox(const BoundingBox<T, X>& a, const BoundingBox<T, X>& b) {
-        for (std::size_t i = 0; i < X; i++) {
-            minpoint_[i] = std::min(a.minpoint_[i], b.minpoint_[i]);
-            maxpoint_[i] = std::max(a.maxpoint_[i], b.maxpoint_[i]);
-        }
-    }
 
     bool intersect_impl(const RayX<T, X>& ray, HitRecord<T, X>& record, const Interval<T>& range) const {
         T near = range.min, far = range.max;
@@ -57,6 +48,19 @@ class BoundingBox: public Hittable<BoundingBox<T, X>, T, X> {
 
     BoundingBox<T, X> bounds_impl() const {
         return *this;
+    }
+
+    public:
+    explicit BoundingBox() {}
+    explicit BoundingBox(VecX<T, X> min, VecX<T, X> max):
+        minpoint_(min), maxpoint_(max)
+        {}
+
+    BoundingBox(const BoundingBox<T, X>& a, const BoundingBox<T, X>& b) {
+        for (std::size_t i = 0; i < X; i++) {
+            minpoint_[i] = std::min(a.minpoint_[i], b.minpoint_[i]);
+            maxpoint_[i] = std::max(a.maxpoint_[i], b.maxpoint_[i]);
+        }
     }
 
     const VecX<T, X>& min() const {return minpoint_;}
