@@ -61,7 +61,7 @@ int main(void)
 
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
-    glClearColor(0.0, 0.7, 1.0, 1.0);
+    glClearColor(0.125, 0.125, 0.125, 1.0);
 
     int fb_width, fb_height;
     glfwGetFramebufferSize(window, &fb_width, &fb_height);
@@ -89,10 +89,11 @@ int main(void)
 
     // this is the actual triangle data that will be copied to
     // the GPU memory
-    std::vector< float > host_VertexBuffer{
-        -0.5f, -0.5f, 0.0f, // V0
-        0.5f, -0.5f, 0.0f,  // V1
-        0.0f, 0.5f, 0.0f    // V2
+    std::vector<float> host_VertexBuffer{
+        // pos                  // color
+        -0.5f, -0.5f, 0.0f,     1.0f, 0.0f, 0.0f,
+         0.5f, -0.5f, 0.0f,     0.0f, 1.0f, 0.0f,
+         0.0f,  0.5f, 0.0f,     0.0f, 0.0f, 1.0f
     };
 
     int numBytes = host_VertexBuffer.size() * sizeof(float);
@@ -113,16 +114,18 @@ int main(void)
     glGenVertexArrays(1, &m_VAO);
     glBindVertexArray(m_VAO);
 
+    glBindBuffer(GL_ARRAY_BUFFER, m_triangleVBO[0]);
+
     // VAO details here - we only have 1 attribute or location
     // (Position of the vertex)
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), 0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void*)0);
 
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void*)(3*sizeof(GLfloat)));
 
-    glBindBuffer(GL_ARRAY_BUFFER, m_triangleVBO[0]);
     glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     /** Make a shader */
     // Create a shader using my GLSLObject class
