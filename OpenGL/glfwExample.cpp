@@ -73,7 +73,12 @@ int main(void)
     // The ortho parameters, in order: left, right, bottom, top, zNear, zFar
     float halfWidth = 15.0 / 2.0;
     float halfHeight = halfWidth / aspectRatio;
-    glm::mat4 projectionMatrix = glm::ortho(-halfWidth, halfWidth, -halfHeight, halfHeight, -10.0f, 10.0f);
+
+    float left = -halfWidth, right = halfWidth;
+    float top = halfHeight, bottom = -halfHeight;
+    float near = 5.0f, far = -5.0f;
+
+    glm::mat4 M_ortho = glm::ortho(left, right, bottom, top, near, far);
 
     GLint major_version;
     glGetIntegerv(GL_MAJOR_VERSION, &major_version);
@@ -91,9 +96,9 @@ int main(void)
     // the GPU memory
     std::vector<float> host_VertexBuffer{
         // pos                  // color
-        -0.5f, -0.75f, 0.0f,     1.0f, 0.0f, 0.0f,
-         0.5f, -0.75f, 0.0f,     0.0f, 1.0f, 0.0f,
-         0.85f,  0.75f, 0.0f,     0.0f, 0.0f, 1.0f
+        -3.0f, -3.0f, 0.0f,     1.0f, 0.0f, 0.0f,
+         3.0f, -3.0f, 0.0f,     1.0f, 1.0f, 0.0f,
+         1.5f,  3.0f, 0.0f,     1.0f, 0.0f, 1.0f
     };
 
     int numBytes = host_VertexBuffer.size() * sizeof(float);
@@ -130,10 +135,18 @@ int main(void)
     /** Make a shader */
     // Create a shader using my GLSLObject class
     sivelab::GLSLObject shader;
-    shader.addShader( "./OpenGL/vertexShader_color.glsl", sivelab::GLSLObject::VERTEX_SHADER );
-    shader.addShader( "./OpenGL/fragmentShader_color.glsl", sivelab::GLSLObject::FRAGMENT_SHADER );
+    shader.addShader( "./OpenGL/shaders/vertexShader_withMatrixTransformation.glsl", sivelab::GLSLObject::VERTEX_SHADER );
+    shader.addShader( "./OpenGL/shaders/fragmentShader_color.glsl", sivelab::GLSLObject::FRAGMENT_SHADER );
     // Run the example program from the project source or it won't find these shaders
     shader.createProgram();
+
+    //// Make the uniform matrix work
+    GLuint projMatrixID, viewMatrixID;
+    projMatrixID = shader.createUniform( "projMatrix" );
+    viewMatrixID = shader.createUniform( "viewMatrix" );
+
+    glm::vec3 m_pos(0,0,0), m_viewDir(0,0,-1);
+    glm::vec3 m_U(1,0,0), m_V(0,1,0), m_W(0,0,1);
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
@@ -146,8 +159,15 @@ int main(void)
         // background color)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        glm::mat4 M_view = glm::lookAt( m_pos, m_pos - m_W, m_V );
+
         /* Render your objects here */
         shader.activate();
+
+        // copy from the host to the device the view matrix and the projection matrix
+        glUniformMatrix4fv(projMatrixID, 1, GL_FALSE, glm::value_ptr( M_ortho ));
+        glUniformMatrix4fv(viewMatrixID, 1, GL_FALSE, glm::value_ptr( M_view ));
+
         glBindVertexArray(m_VAO);
         glDrawArrays(GL_TRIANGLES, 0, 3);
         glBindVertexArray(0);
@@ -158,6 +178,31 @@ int main(void)
 
         /* Poll for and process events */
         glfwPollEvents();
+
+        float moveRatePerFrame = 0.05;
+
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+            m_pos = m_pos + -m_V * moveRatePerFrame;
+        }
+        else if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+            m_pos = m_pos + m_U * moveRatePerFrame;
+        }
+        else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+            m_pos = m_pos + m_V * moveRatePerFrame;
+        }
+        else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+            m_pos = m_pos - m_U * moveRatePerFrame;
+        }
+        else if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
+            m_pos = m_pos - m_W * moveRatePerFrame;
+        }
+        else if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
+            m_pos = m_pos + m_W * moveRatePerFrame;
+        }
+
+        if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS) {
+        std::cout << "fps: " << 1.0 / timeDiff << std::endl;
+        }
 
         if (glfwGetKey( window, GLFW_KEY_T ) == GLFW_PRESS) {
             std::cout << "fps: " << 1.0/timeDiff << std::endl;
