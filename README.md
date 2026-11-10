@@ -8,9 +8,11 @@ Just type `make` in the project root
 
 ```bash
 make # builds with default config to buildVCPkg
-make o3 # builds with optimizations enabled to build-O3
+make o3 # builds with optimizations enabled to buildO3
 make all # builds every configuration of the project
-make clean # removes current build folders
+make {c,clean} # removes current build folders
+make {t,test} # builds default config and runs tests
+make {ft,fast-test} # builds with optimizations and runs tests
 ```
 
 ## Running Tests
@@ -62,3 +64,21 @@ Test project /path/to/source/dir/buildO3
 ```
 
 From here, you can inspect the outputs of the test snippets by going to `{buildVCPkg,buildO3}/test_snippets/`
+
+## Running the OpenGL example
+
+The OpenGL example is written such that your CWD is used to find the shaders. Your CWD must be the project source for it to work
+
+```bash
+# Build the project
+make all
+
+# Run the example
+./build{VCPkg,O3}/OpenGL/glfwExample
+```
+
+Or, just use the included script
+
+```bash
+./runopengl.bash
+```

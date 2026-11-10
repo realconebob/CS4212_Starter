@@ -153,7 +153,7 @@ int main(void)
     viewMatrixID = shader.createUniform( "viewMatrix" );
     modelMatrixID = shader.createUniform("modelMatrix");
 
-    glm::vec3 m_pos(0,0,10), m_viewDir(0,0,-1);
+    glm::vec3 m_pos(0,0,25), m_viewDir(0,0,-1);
     glm::vec3 m_U(1,0,0), m_V(0,1,0), m_W(0,0,1);
 
     /* Loop until the user closes the window */
@@ -189,7 +189,7 @@ int main(void)
         /* Poll for and process events */
         glfwPollEvents();
 
-        float moveRatePerFrame = 1.0f;
+        float moveRatePerFrame = 2.0f;
         float deltaMovePerFrame = moveRatePerFrame * timeDiff;
 
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {m_pos = m_pos - m_V * deltaMovePerFrame;}
@@ -198,8 +198,6 @@ int main(void)
         if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {m_pos = m_pos - m_U * deltaMovePerFrame;}
         if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {m_pos = m_pos - m_W * deltaMovePerFrame;}
         if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {m_pos = m_pos + m_W * deltaMovePerFrame;}
-
-
 
         if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS) {
         std::cout << "fps: " << 1.0 / timeDiff << std::endl;
