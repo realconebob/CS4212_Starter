@@ -80,7 +80,7 @@ int main(void)
 
     float left = -halfWidth, right = halfWidth;
     float top = halfHeight, bottom = -halfHeight;
-    float near = -5.0f, far = 5.0f;
+    float near = 0.1f, far = 100.0f;
 
     glm::mat4 M_ortho = glm::ortho(left, right, bottom, top, near, far);
 
@@ -148,11 +148,12 @@ int main(void)
     shader.createProgram();
 
     //// Make the uniform matrix work
-    GLuint projMatrixID, viewMatrixID;
+    GLuint projMatrixID, viewMatrixID, modelMatrixID;
     projMatrixID = shader.createUniform( "projMatrix" );
     viewMatrixID = shader.createUniform( "viewMatrix" );
+    modelMatrixID = shader.createUniform("modelMatrix");
 
-    glm::vec3 m_pos(0,0,0), m_viewDir(0,0,-1);
+    glm::vec3 m_pos(0,0,10), m_viewDir(0,0,-1);
     glm::vec3 m_U(1,0,0), m_V(0,1,0), m_W(0,0,1);
 
     /* Loop until the user closes the window */
@@ -167,13 +168,15 @@ int main(void)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glm::mat4 M_view = glm::lookAt( m_pos, m_pos - m_W, m_V );
+        glm::mat4 M_model = glm::rotate(glm::mat4(1.0f),(float)glfwGetTime(),glm::vec3(0, 1, 0));
 
         /* Render your objects here */
         shader.activate();
 
         // copy from the host to the device the view matrix and the projection matrix
-        glUniformMatrix4fv(projMatrixID, 1, GL_FALSE, glm::value_ptr( M_ortho ));
+        glUniformMatrix4fv(projMatrixID, 1, GL_FALSE, glm::value_ptr( M_persp ));
         glUniformMatrix4fv(viewMatrixID, 1, GL_FALSE, glm::value_ptr( M_view ));
+        glUniformMatrix4fv(modelMatrixID, 1, GL_FALSE, glm::value_ptr(M_model));
 
         glBindVertexArray(m_VAO);
         glDrawArrays(GL_TRIANGLES, 0, 3);
@@ -186,14 +189,17 @@ int main(void)
         /* Poll for and process events */
         glfwPollEvents();
 
-        float moveRatePerFrame = 0.05;
+        float moveRatePerFrame = 1.0f;
+        float deltaMovePerFrame = moveRatePerFrame * timeDiff;
 
-        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {m_pos = m_pos - m_V * moveRatePerFrame;}
-        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {m_pos = m_pos + m_U * moveRatePerFrame;}
-        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {m_pos = m_pos + m_V * moveRatePerFrame;}
-        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {m_pos = m_pos - m_U * moveRatePerFrame;}
-        if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {m_pos = m_pos - m_W * moveRatePerFrame;}
-        if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {m_pos = m_pos + m_W * moveRatePerFrame;}
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {m_pos = m_pos - m_V * deltaMovePerFrame;}
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {m_pos = m_pos + m_U * deltaMovePerFrame;}
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {m_pos = m_pos + m_V * deltaMovePerFrame;}
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {m_pos = m_pos - m_U * deltaMovePerFrame;}
+        if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {m_pos = m_pos - m_W * deltaMovePerFrame;}
+        if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {m_pos = m_pos + m_W * deltaMovePerFrame;}
+
+
 
         if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS) {
         std::cout << "fps: " << 1.0 / timeDiff << std::endl;
