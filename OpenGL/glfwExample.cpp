@@ -1,4 +1,8 @@
+#include "cwrender/Helpers.hpp"
+
 #include <cstdlib>
+#include <glm/ext/matrix_clip_space.hpp>
+#include <glm/trigonometric.hpp>
 #include <iostream>
 #include <vector>
 
@@ -76,9 +80,12 @@ int main(void)
 
     float left = -halfWidth, right = halfWidth;
     float top = halfHeight, bottom = -halfHeight;
-    float near = 5.0f, far = -5.0f;
+    float near = -5.0f, far = 5.0f;
 
     glm::mat4 M_ortho = glm::ortho(left, right, bottom, top, near, far);
+
+    // Create linear projection matrix as well
+    glm::mat4 M_persp = glm::perspective(glm::radians(20.0f), aspectRatio, near, far);
 
     GLint major_version;
     glGetIntegerv(GL_MAJOR_VERSION, &major_version);
@@ -181,32 +188,17 @@ int main(void)
 
         float moveRatePerFrame = 0.05;
 
-        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-            m_pos = m_pos + -m_V * moveRatePerFrame;
-        }
-        else if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-            m_pos = m_pos + m_U * moveRatePerFrame;
-        }
-        else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-            m_pos = m_pos + m_V * moveRatePerFrame;
-        }
-        else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-            m_pos = m_pos - m_U * moveRatePerFrame;
-        }
-        else if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
-            m_pos = m_pos - m_W * moveRatePerFrame;
-        }
-        else if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
-            m_pos = m_pos + m_W * moveRatePerFrame;
-        }
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {m_pos = m_pos - m_V * moveRatePerFrame;}
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {m_pos = m_pos + m_U * moveRatePerFrame;}
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {m_pos = m_pos + m_V * moveRatePerFrame;}
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {m_pos = m_pos - m_U * moveRatePerFrame;}
+        if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {m_pos = m_pos - m_W * moveRatePerFrame;}
+        if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {m_pos = m_pos + m_W * moveRatePerFrame;}
 
         if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS) {
         std::cout << "fps: " << 1.0 / timeDiff << std::endl;
         }
 
-        if (glfwGetKey( window, GLFW_KEY_T ) == GLFW_PRESS) {
-            std::cout << "fps: " << 1.0/timeDiff << std::endl;
-        }
         if (glfwGetKey( window, GLFW_KEY_ESCAPE ) == GLFW_PRESS) {
             glfwSetWindowShouldClose(window, 1);
         }
