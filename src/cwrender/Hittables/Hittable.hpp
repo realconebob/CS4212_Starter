@@ -43,9 +43,6 @@ class HitRecord {
     bool front_face_{};
     bool override_atten_{};
 
-    void update(const VecX<T, X>& point, T t, const RayX<T, X>& ray, const VecX<T, X>& out_normal);
-    void set_mat(const Material<T, X> * const material);
-
     public:
     HitRecord(VecX<T, X> point = {}, VecX<T, X> normal = {}, T t = NAN, bool front = true):
         point_{point}, normal_{normal}, t_(t), front_face_(front)
@@ -56,6 +53,10 @@ class HitRecord {
     T t() const {return t_;}
     const Material<T, X>* material() const {return mat_;}
     bool front_face() const {return front_face_;}
+
+    // fuck it encapsulation is for chumps
+    void update(const VecX<T, X>& point, T t, const RayX<T, X>& ray, const VecX<T, X>& out_normal);
+    void set_mat(const Material<T, X> * const material);
 };
 
 /**
@@ -87,11 +88,11 @@ template<Floating T, std::size_t X>
 class Hittable {
     protected:
     Hittable() = default;
+    Hittable& operator=(const Hittable&) = default;
+    Hittable(const Hittable&) = default;
+    Hittable(Hittable&&) = default;
 
     public:
-    Hittable& operator=(const Hittable&) = delete;
-    Hittable(const Hittable&) = delete;
-    Hittable(Hittable&&) = delete;
     virtual ~Hittable() = default;
 
     virtual bool intersect(const RayX<T, X>& ray, HitRecord<T, X>& record, const Interval<T>& range) const = 0;

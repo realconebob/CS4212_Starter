@@ -38,9 +38,9 @@ class BlinnPhongShader: public Material<T, X> {
     [[nodiscard]] bool scatter(const Scene<T, X>& scene, const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten_out, RayX<T, X>& scattered_out) const override {
         auto viewing = unit(rayin.origin() - record.point());
         auto color = VecX<T, X>::Zeros();
-        for(const Light<T, X>& light: scene.getlights()) {
+        for(const std::unique_ptr<Light<T, X>>& light: scene.getlights()) {
             auto tmpnormal = (record.front_face()) ? record.normal() : -record.normal();
-            VecX<T, X> tolight = light.pos() - record.point();
+            VecX<T, X> tolight = light.get()->pos() - record.point();
             T dist2 = tolight.length_squared();
             tolight = unit(tolight);
 
@@ -50,7 +50,7 @@ class BlinnPhongShader: public Material<T, X> {
             HitRecord<T, X> newrec{};
             if(scene.intersect({record.point() + T(1e-4) * tmpnormal, tolight}, newrec, Interval<T>{T(1e-4), tolight.length()})) continue;
 
-            auto radiance = light.color() / dist2;
+            auto radiance = light.get()->color() / dist2;
             T spec = std::pow(max<T>(0, dot(tmpnormal, unit(tolight + viewing))), shiny_);
 
 

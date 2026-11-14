@@ -1,3 +1,5 @@
+/// TODO: I should just rewrite this entire damn thing
+
 #pragma once
 
 #include "cwrender/Helpers.hpp"
@@ -116,7 +118,7 @@ public:
         if (!m_params.envMapFile.empty()) unsupported("environment maps");
 
         for (const auto &l : m_pointLights)
-            m_scene.light_back(PointLight<double, 3>{l.pos, l.color}.any());
+            m_scene.add(PointLight<double, 3>{l.pos, l.color});
 
         for (const auto &s : m_shapes)
             addHittable(s);
@@ -173,22 +175,22 @@ private:
 
         // TODO: confirm "Diffuse" should map to Lambertian rather than DiffuseShader
         if (t == "Lambertian" || t == "Diffuse")
-            return LambertianShader<double, 3>{toVec(d.diffuse.data)}.any();
+            return LambertianShader<double, 3>{toVec(d.diffuse.data)};
 
         // Phong and BlinnPhong both land on BlinnPhongShader
         if (t == "BlinnPhong" || t == "Phong")
-            return BlinnPhongShader<double, 3>{toVec(d.specular.data), double(d.phongExp), toVec(d.diffuse.data)}.any();
+            return BlinnPhongShader<double, 3>{toVec(d.specular.data), double(d.phongExp), toVec(d.diffuse.data)};
 
         // "Mirror" has no albedo field in the file: perfect white reflector, roughness -> fuzz
         if (t == "Mirror" || t == "Metal")
-            return MetalShader<double, 3>{Vec3::Ones(), double(d.roughness)}.any();
+            return MetalShader<double, 3>{Vec3::Ones(), double(d.roughness)};
 
         if (t == "Normal")
-            return NormalMapShader<double, 3>{}.any();
+            return NormalMapShader<double, 3>{};
 
         // Glaze, Dielectric, BlinnPhongMirrored, CoolToWarm, Emitter, unknown
         unsupported("shader type '" + t + "' (shader '" + d.name + "')");
-        return LambertianShader<double, 3>{Vec3(0.5, 0.5, 0.5)}.any(); // non-strict fallback
+        return LambertianShader<double, 3>{Vec3(0.5, 0.5, 0.5)}; // non-strict fallback
     }
 
     // --------------------------------------------------------------- shapes
@@ -197,7 +199,7 @@ private:
         if (!s.hasXForm) return toVec(v);
         glm::vec4 p = s.localXForm * glm::vec4(v.x, v.y, v.z, 1.0f);
         return Vec3(p.x, p.y, p.z);
-    }
+    };
 
     void addHittable(const ShapeDesc &s) {
         MatPtr mat = material(s.shaderNameReference);
@@ -216,15 +218,15 @@ private:
                     unsupported("non-uniform scale on sphere '" + s.name + "'");
                 radius *= sx;
             }
-            m_scene.hittable_back(Sphere3D<double>{center, radius, mat}.any());
+            m_scene.add(Sphere3<double>{center, radius, mat});
         }
         else if (s.type == "triangle") {
-            m_scene.hittable_back(Triangle3<double>{
-                xformPoint(s, s.v0), xformPoint(s, s.v1), xformPoint(s, s.v2), mat}.any());
+            m_scene.add(Triangle3<double>{
+                xformPoint(s, s.v0), xformPoint(s, s.v1), xformPoint(s, s.v2), mat});
         }
         else if (s.type == "plane") {
-            m_scene.hittable_back(Plane3<double>{
-                xformPoint(s, s.v0), xformPoint(s, s.v1), mat}.any());
+            m_scene.add(Renderable<double, 3>{Plane3<double>{
+                xformPoint(s, s.v0), xformPoint(s, s.v1)}, mat});
         }
         else {
             // "box" (CUBE not implemented), "mesh" (no mesh loader), "instance"

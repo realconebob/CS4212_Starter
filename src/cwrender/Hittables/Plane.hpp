@@ -25,7 +25,6 @@ class Plane3: public Hittable<T, 3> {
     template<Floating t, std::size_t x> friend class Hittable;
 
     Triangle3<T> tris_[2]{0};
-    std::unique_ptr<BoundingBox<T, 3>> bb_;
 
     public:
     Plane3(const VecX<T, 3>& bottomleft, const VecX<T, 3>& topright): tris_{Triangle3<T>{}, Triangle3<T>{}} {
@@ -51,11 +50,7 @@ class Plane3: public Hittable<T, 3> {
     }
 
     BoundingBox<T, 3> bounds() const override {
-        if(!bb_) {
-            bb_ = std::make_unique<BoundingBox<T, 3>>(BoundingBox<T, 3>{tris_[0].bounds(), tris_[1].bounds()});
-        }
-        return *bb_;
-        // Once I've got everything working this'll be replaced with a const-reference
+        return BoundingBox<T, 3>{tris_[0].bounds(), tris_[1].bounds()};
     }
 };
 

@@ -12,9 +12,9 @@ using namespace cwrender;
 using Color3D = VecX<double, 3>;
 using PC3D = PerspectiveCamera3<double>;
 using FB3D = Framebuffer<double, 3>;
-using Sphere3DD = Sphere3D<double>;
+using Sphere3DD = Sphere3<double>;
 using Scene3D = Scene<double, 3>;
-using Hittable3D = HittableAny<double, 3>;
+using Hittable3D = Hittable<double, 3>;
 using HitRecord3D = HitRecord<double, 3>;
 using Triangle3D = Triangle3<double>;
 using Plane3D = Plane3<double>;
@@ -35,10 +35,8 @@ int main(int argc, char *argv[]) {
     auto fb = FB3D{(std::size_t)camera.get_iwidth(), (std::size_t)camera.get_iheight()};
     fb.clear();
 
-    HitRecord3D rec;
-    HittableAny<double, 3> world_h{world};
-    camera.rendertobuffer(fb, [&rec, &world, &world_h, &camera](const Ray3D& r) {
-        return camera.raycolor(r, world_h, world, rec, Interval<double>::camera(), 50);   // rec/range as in your main
+    camera.rendertobuffer(fb, [&world, &camera](const RayX<double, 3>& r) {
+        return camera.raycolor(world, r, Interval<double>::camera(), 50);
     });
 
     PNGRenderer<double>(fb, "out.png").render(true);

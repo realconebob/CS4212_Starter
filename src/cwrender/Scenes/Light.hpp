@@ -24,9 +24,9 @@ class Light {
     VecX<T, X> pos_{}, color_{};
 
     Light() = default;
-    Light& operator=(const Light&) = delete;
-    Light(const Light&) = delete;
-    Light(Light&&) = delete;
+    Light& operator=(const Light&) = default;
+    Light(const Light&) = default;
+    Light(Light&&) = default;
 
     public:
     virtual ~Light() = default;

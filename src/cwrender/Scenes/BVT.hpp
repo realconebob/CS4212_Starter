@@ -17,7 +17,6 @@
 #include <algorithm>
 #include <cstddef>
 #include <memory>
-#include <optional>
 
 namespace cwrender {
 
@@ -27,7 +26,7 @@ class BoundingVolumeHierarchy: public Hittable<T, X> {
     struct Node {
         BoundingBox<T, X> box;
         std::shared_ptr<Node> left, right;
-        std::optional<Renderable<T, X>> shape; // only set on leaves
+        const Renderable<T, X>* shape = nullptr; // only set on leaves
 
         bool hit(const RayX<T, X>& ray, HitRecord<T, X>& record, const Interval<T>& range) const {
             if (!box.intersect(ray, record, range)) return false;
@@ -45,7 +44,7 @@ class BoundingVolumeHierarchy: public Hittable<T, X> {
 
     std::shared_ptr<Node> root_;
 
-    std::shared_ptr<Node> build(std::vector<Hittable<T, X>>& objs, std::size_t lo, std::size_t hi) {
+    std::shared_ptr<Node> build(std::vector<Renderable<T, X>>& objs, std::size_t lo, std::size_t hi) {
         auto node = std::make_shared<Node>();
 
         // Bounds of everything in [lo, hi)
@@ -55,7 +54,7 @@ class BoundingVolumeHierarchy: public Hittable<T, X> {
         node->box = box;
 
         if (hi - lo == 1) {
-            node->shape = objs[lo];
+            node->shape = &objs[lo];
             return node;
         }
 
@@ -84,12 +83,11 @@ class BoundingVolumeHierarchy: public Hittable<T, X> {
 
     public:
     explicit BoundingVolumeHierarchy() {}
-    explicit BoundingVolumeHierarchy(std::vector<Renderable<T, X>> objs) {
-        if (!objs.empty()) root_ = build(objs, 0, objs.size());
+    explicit BoundingVolumeHierarchy(std::vector<Renderable<T, X>> objs): objects_(std::move(objs)) {
+        if (!objects_.empty()) root_ = build(objects_, 0, objects_.size());
     }
 
-    void add_front(const Renderable<T, X>& obj) {objects_.insert(objects_.begin(), obj);}
-    void add_back(const Renderable<T, X>& obj) {objects_.push_back(obj);}
+    void add_back(Renderable<T, X> obj) {objects_.push_back(std::move(obj));}
 
     bool build_from_internal_list() {
         auto res = !objects_.empty();
@@ -102,7 +100,7 @@ class BoundingVolumeHierarchy: public Hittable<T, X> {
     }
 
     BoundingBox<T, X> bounds() const override {
-        return (root_) ? root_.box : BoundingBox<T, X>{};
+        return (root_) ? root_->box : BoundingBox<T, X>{};
     }
 };
 

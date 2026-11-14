@@ -6,6 +6,7 @@
 #include "cwrender/BaseTypes/VecX.hpp"
 
 using namespace cwrender;
+using Ray3D = RayX<double, 3>;
 
 static auto
     xunit = Ray3D{Vec3D{}, Vec3D{1, 0, 0}},

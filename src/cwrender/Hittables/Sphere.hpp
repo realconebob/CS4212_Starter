@@ -15,6 +15,7 @@
 #include "cwrender/Hittables/Hittable.hpp"
 #include "cwrender/BaseTypes/RayX.hpp"
 #include "cwrender/BaseTypes/VecX.hpp"
+#include "cwrender/Hittables/BoundingBox.hpp"
 
 #include <cmath>
 
@@ -55,7 +56,7 @@ class Sphere3: public Hittable<T, 3> {
         auto p = ray.at(root);
         VecX<T, 3> out_normal = (p - origin_) / radius_;
 
-        this->update(record, p, root, ray, out_normal);
+        record.update(p, root, ray, out_normal);
         return true;
     }
 

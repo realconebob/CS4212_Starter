@@ -35,14 +35,16 @@ struct Renderable: Hittable<T, X>, Material<T, X> {
 
     public:
     Renderable& operator=(const Renderable&) = default;
+    Renderable& operator=(Renderable&&) = default;
     Renderable(const Renderable&) = default;
     Renderable(Renderable&&) = default;
     Renderable() = delete;
     ~Renderable() = default;
 
-    Renderable(Hittable<T, X> collision, Material<T, X> material):
-        collision_  {std::make_unique<Hittable<T, X>>(std::move(collision))},
-        material_   {std::make_unique<Material<T, X>>(std::move(material))}
+    template <std::derived_from<Hittable<T, X>> H, std::derived_from<Material<T, X>> M> // Prevents slicing
+    Renderable(H collision, M material):
+        collision_  {std::make_unique<H>(std::move(collision))},
+        material_   {std::make_unique<M>(std::move(material))}
         {}
 
     std::unique_ptr<Renderable<T, X>> clone() {return std::make_unique<Renderable<T, X>>(*this);}

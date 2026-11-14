@@ -26,9 +26,9 @@ class Material {
     protected:
     Material() = default;
 
-    Material& operator=(const Material&) = delete;
-    Material(const Material&) = delete;
-    Material(Material&&) = delete;
+    Material& operator=(const Material&) = default;
+    Material(const Material&) = default;
+    Material(Material&&) = default;
 
     /**
     @brief The amount of color that should be reflected, channelwise. `VecX<T, 3>{1, 1, 1}` would

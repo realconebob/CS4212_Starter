@@ -32,9 +32,9 @@ class LambertianShader: public Material<T, X> {
 
     [[nodiscard]] bool scatter(const Scene<T, X>& scene, const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten_out, RayX<T, X>& scattered_out) const override {
         auto color = VecX<T, X>::Zeros();
-        for(const Light<T, X>& light: scene.getlights()) {
+        for(const std::unique_ptr<Light<T, X>>& light: scene.getlights()) {
             auto tmpnormal = (record.front_face()) ? record.normal() : -record.normal();
-            auto tolight = light.pos() - record.point();
+            auto tolight = light.get()->pos() - record.point();
             T dist2 = tolight.length_squared();
             tolight = unit(tolight);
 
@@ -42,7 +42,7 @@ class LambertianShader: public Material<T, X> {
             if(scene.intersect({record.point() + T(1e-4) * tmpnormal, tolight}, newrec, Interval<T>{T(1e-4), tolight.length()})) continue;
 
             auto brightness = max<T>(0, dot(tolight, unit(tmpnormal)));
-            color += this->reflection_ * light.color() * (brightness / dist2);
+            color += this->reflection_ * light.get()->color() * (brightness / dist2);
         }
         atten_out = color;
         return true;

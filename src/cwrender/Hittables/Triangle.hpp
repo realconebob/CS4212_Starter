@@ -58,7 +58,7 @@ class Triangle3: public Hittable<T, 3> {
 
         VecX<T, 3> point = ray.origin() + t * ray.dir();
 
-        this->update(record, point, t, ray, normal_);
+        record.update(point, t, ray, normal_);
         return true;
     }
 

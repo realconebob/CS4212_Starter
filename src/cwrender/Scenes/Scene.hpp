@@ -20,7 +20,7 @@
 #include "cwrender/Renderable.hpp"
 
 #include <cstddef>
-#include <initializer_list>
+#include <memory>
 #include <vector>
 
 namespace cwrender {
@@ -28,25 +28,27 @@ namespace cwrender {
 template<Floating T, std::size_t X>
 class Scene: public Hittable<T, X> {
     private:
-    BoundingVolumeHierarchy<T, X> hittables_;
-    std::vector<Light<T, 3>> lights_;
+    BoundingVolumeHierarchy<T, X> hittables_{};
+    std::vector<std::unique_ptr<Light<T, 3>>> lights_{};
 
     template<Floating t, std::size_t x> friend class Hittable;
 
     public:
     Scene(): hittables_{}, lights_{} {}
 
-    Scene(
-        std::initializer_list<Renderable<T, X>> hittables,
-        std::initializer_list<Light<T, X>> lights
-    ): hittables_(hittables), lights_(lights) {}
+    template <typename... Args>
+    requires (sizeof...(Args) > 0 && !(std::same_as<std::remove_cvref_t<Args>, Scene> || ...))
+    explicit Scene(Args&&... args) {
+        (add(std::forward<Args>(args)), ...);
+        hittables_.build_from_internal_list();
+    }
 
-    void hittable_front(const Renderable<T, X>& obj) {hittables_.add_front(obj);}
-    void hittable_back(const Renderable<T, X>& obj) {hittables_.add_back(obj);}
+    void add(Renderable<T, X> r) {hittables_.add_back(std::move(r)); }
 
-    void light_front(const Light<T, X>& obj) {lights_.insert(lights_.begin(), obj);}
-    void light_back(const Light<T, X>& obj) {lights_.push_back(obj);}
-    const std::vector<Light<T, X>>& getlights() const {return lights_;}
+    template <std::derived_from<Light<T, X>> L>
+    void add(L l) { lights_.push_back(std::make_unique<L>(std::move(l))); }
+
+    const std::vector<std::unique_ptr<Light<T, X>>>& getlights() const {return lights_;}
 
 
 
