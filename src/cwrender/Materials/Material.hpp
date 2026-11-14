@@ -50,7 +50,7 @@ class Material {
     public:
     virtual ~Material() = default;
 
-    bool scatter(const Scene<T, X>& scene, const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten_out, RayX<T, X>& scattered_out) const = 0;
+    virtual bool scatter(const Scene<T, X>& scene, const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten_out, RayX<T, X>& scattered_out) const = 0;
 
     const VecX<T, X>& reflection() const {return reflection_;}
     bool override_atten() const {return override_atten_;}

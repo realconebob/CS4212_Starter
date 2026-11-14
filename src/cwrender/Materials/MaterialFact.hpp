@@ -45,8 +45,8 @@ class MaterialFact {
             case PHONG:
             return [&data](){
                 // Populate from map
-                VecX<T, X> spec_reflection;
-                T shiny;
+                VecX<T, X> spec_reflection{};
+                T shiny{};
                 VecX<T, X> albedo = VecX<T, X>::Ones();
 
                 return BlinnPhongShader<T, X>{spec_reflection, shiny, albedo};

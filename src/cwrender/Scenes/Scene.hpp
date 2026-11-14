@@ -17,6 +17,7 @@
 #include "cwrender/BaseTypes/Interval.hpp"
 #include "cwrender/Scenes/Light.hpp"
 #include "cwrender/Scenes/BVT.hpp"
+#include "cwrender/Renderable.hpp"
 
 #include <cstddef>
 #include <initializer_list>
@@ -36,12 +37,12 @@ class Scene: public Hittable<T, X> {
     Scene(): hittables_{}, lights_{} {}
 
     Scene(
-        std::initializer_list<Hittable<T, X>> hittables,
+        std::initializer_list<Renderable<T, X>> hittables,
         std::initializer_list<Light<T, X>> lights
     ): hittables_(hittables), lights_(lights) {}
 
-    void hittable_front(const Hittable<T, X>& obj) {hittables_.add_front(obj);}
-    void hittable_back(const Hittable<T, X>& obj) {hittables_.add_back(obj);}
+    void hittable_front(const Renderable<T, X>& obj) {hittables_.add_front(obj);}
+    void hittable_back(const Renderable<T, X>& obj) {hittables_.add_back(obj);}
 
     void light_front(const Light<T, X>& obj) {lights_.insert(lights_.begin(), obj);}
     void light_back(const Light<T, X>& obj) {lights_.push_back(obj);}
@@ -53,7 +54,7 @@ class Scene: public Hittable<T, X> {
         return hittables_.intersect(ray, record, range);
     }
 
-    BoundingBox<T, X> bounds_impl() const override {
+    BoundingBox<T, X> bounds() const override {
         throw NotImplemented();
     }
 };

@@ -25,18 +25,17 @@ class Plane3: public Hittable<T, 3> {
     template<Floating t, std::size_t x> friend class Hittable;
 
     Triangle3<T> tris_[2]{0};
-    std::shared_ptr<MaterialAny<T, 3>> mat_;
     std::unique_ptr<BoundingBox<T, 3>> bb_;
 
     public:
-    Plane3(const VecX<T, 3>& bottomleft, const VecX<T, 3>& topright, std::shared_ptr<MaterialAny<T, 3>> mat): tris_{Triangle3<T>{}, Triangle3<T>{}}, mat_(mat) {
+    Plane3(const VecX<T, 3>& bottomleft, const VecX<T, 3>& topright): tris_{Triangle3<T>{}, Triangle3<T>{}} {
         VecX<T, 3>
             topleft{bottomleft[0], topright[1], bottomleft[2]},     /// TODO: CHECK Z AXIS
             bottomright{topright[0], bottomleft[1], topright[2]};   /// TODO: CHECK Z AXIS
 
         Triangle3<T>
-            t1{bottomleft, topleft, topright, mat},     // TODO: CHECK NORMALS
-            t2{topright, bottomright, bottomleft, mat}; // TODO: CHECK NORMALS
+            t1{bottomleft, topleft, topright},     // TODO: CHECK NORMALS
+            t2{topright, bottomright, bottomleft}; // TODO: CHECK NORMALS
 
         tris_[0] = t1;
         tris_[1] = t2;

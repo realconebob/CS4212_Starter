@@ -33,7 +33,7 @@ using Scene3D = Scene<double, 3>;
 class SceneLoader : public ISceneLoader {
 public:
     using Vec3 = VecX<double, 3>;
-    using MatPtr = std::shared_ptr<MaterialAny<double, 3>>;
+    using MatPtr = std::shared_ptr<Material<double, 3>>;
 
     struct CameraDesc {
         std::string name, type;
@@ -155,12 +155,12 @@ private:
         if (sd == m_shaders.end())
             throw std::runtime_error("Shape references unknown shader '" + shaderName + "'");
 
-        auto mat = std::make_shared<MaterialAny<double, 3>>(buildMaterial(sd->second));
+        auto mat = std::make_shared<Material<double, 3>>(buildMaterial(sd->second));
         m_materials[shaderName] = mat;
         return mat;
     }
 
-    MaterialAny<double, 3> buildMaterial(const ShaderDesc &d) {
+    Material<double, 3> buildMaterial(const ShaderDesc &d) {
         // Textures: validate the reference, but cwrender has no textured albedo yet.
         for (const ShaderProperty *p : {&d.diffuse, &d.specular, &d.normal, &d.emission}) {
             if (!p->hasTexture) continue;

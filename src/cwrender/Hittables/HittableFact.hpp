@@ -49,27 +49,22 @@ class HittableFactory {
                 // Populate from map
                 VecX<T, 3> origin;
                 T radius;
-                std::shared_ptr<MaterialAny<T, 3>> mat;
 
-                return Sphere3D<T>{origin, radius, mat}.any();
+                return Sphere3<T>{origin, radius};
             }();
 
             case TRIANGLE:
             return [&data](){
                 // Populate from map
                 VecX<T, 3> a, b, c;
-                std::shared_ptr<MaterialAny<T, 3>> mat;
-
-                return Triangle3<T>{a, b, c, mat}.any();
+                return Triangle3<T>{a, b, c};
             }();
 
             case PLANE:
             return [&data](){
                 // Populate from map
-                std::shared_ptr<MaterialAny<T, 3>> mat;
                 VecX<T, 3> topleft, bottomright;
-
-                return Plane3<T>{topleft, bottomright, mat}.any();
+                return Plane3<T>{topleft, bottomright};
             }();
 
             case CUBE:

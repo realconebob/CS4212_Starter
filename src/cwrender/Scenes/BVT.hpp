@@ -13,6 +13,7 @@
 
 #include "cwrender/Helpers.hpp"
 #include "cwrender/Hittables/Hittable.hpp"
+#include "cwrender/Renderable.hpp"
 #include <algorithm>
 #include <cstddef>
 #include <memory>
@@ -26,7 +27,7 @@ class BoundingVolumeHierarchy: public Hittable<T, X> {
     struct Node {
         BoundingBox<T, X> box;
         std::shared_ptr<Node> left, right;
-        std::optional<Hittable<T, X>> shape; // only set on leaves
+        std::optional<Renderable<T, X>> shape; // only set on leaves
 
         bool hit(const RayX<T, X>& ray, HitRecord<T, X>& record, const Interval<T>& range) const {
             if (!box.intersect(ray, record, range)) return false;
@@ -79,16 +80,16 @@ class BoundingVolumeHierarchy: public Hittable<T, X> {
         return node;
     }
 
-    std::vector<Hittable<T, X>> objects_{};
+    std::vector<Renderable<T, X>> objects_{};
 
     public:
     explicit BoundingVolumeHierarchy() {}
-    explicit BoundingVolumeHierarchy(std::vector<Hittable<T, X>> objs) {
+    explicit BoundingVolumeHierarchy(std::vector<Renderable<T, X>> objs) {
         if (!objs.empty()) root_ = build(objs, 0, objs.size());
     }
 
-    void add_front(const Hittable<T, X>& obj) {objects_.insert(objects_.begin(), obj);}
-    void add_back(const Hittable<T, X>& obj) {objects_.push_back(obj);}
+    void add_front(const Renderable<T, X>& obj) {objects_.insert(objects_.begin(), obj);}
+    void add_back(const Renderable<T, X>& obj) {objects_.push_back(obj);}
 
     bool build_from_internal_list() {
         auto res = !objects_.empty();
@@ -96,11 +97,11 @@ class BoundingVolumeHierarchy: public Hittable<T, X> {
         return res;
     }
 
-    bool intersect_impl(const RayX<T, X>& ray, HitRecord<T, X>& record, const Interval<T>& range) const {
+    bool intersect(const RayX<T, X>& ray, HitRecord<T, X>& record, const Interval<T>& range) const override {
         return root_ && root_->hit(ray, record, range);
     }
 
-    BoundingBox<T, X> bounds_impl() const {
+    BoundingBox<T, X> bounds() const override {
         return (root_) ? root_.box : BoundingBox<T, X>{};
     }
 };

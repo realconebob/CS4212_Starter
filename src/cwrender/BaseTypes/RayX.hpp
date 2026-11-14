@@ -21,8 +21,8 @@ template<Floating T, std::size_t X>
 class RayX {
     protected:
     VecX<T, X>
-        point_,
-        dir_;
+        point_{},
+        dir_{};
 
     public:
     #pragma region Constructor
@@ -60,10 +60,6 @@ class RayX {
 
     #pragma endregion
 };
-
-#pragma region Useful Aliases
-using Ray3D = RayX<double, 3>;
-#pragma endregion
 
 }
 #endif

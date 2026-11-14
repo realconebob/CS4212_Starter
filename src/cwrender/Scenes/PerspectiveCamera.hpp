@@ -34,16 +34,16 @@ template<Floating T>
 class PerspectiveCamera3 {
     public:
     #pragma region Set variables
-    VecX<T, 3> lookfrom, lookat, up;
+    VecX<T, 3> lookfrom{}, lookat{}, up{};
     int samplegrid = 8; // 64 samples per pixel
 
-    T aspectratio;
-    int iwidth;
+    T aspectratio = 16.0 / 9;
+    int iwidth = 500;
     #pragma endregion
 
     private:
-    T vfov_;
-    std::function<VecX<T, 3> (*)(const RayX<T, 3>&)> bgcolorizer_ = [](const RayX<T, 3>& ray){
+    T vfov_{20};
+    std::function<VecX<T, 3> (const RayX<T, 3>&)> bgcolorizer_ = [](const RayX<T, 3>& ray){
         VecX<T, 3> udir = unit(ray.dir());
         auto a = T(0.5) * (udir[1] + T(1.0));
         return (T(1.0) - a) * VecX<T, 3>::Ones() + a * VecX<T, 3>(0.5, 0.7, 1.0);
@@ -130,7 +130,7 @@ class PerspectiveCamera3 {
         return VecX<T, 3>(zorandr<T>(-0.5, 0.5), zorandr<T>(-0.5, 0.5), 0);
     }
 
-    VecX<T, 3> raycolor(const Scene<T, 3>& scene, const Ray3D& ray, const Interval<T>& range, int depth) {
+    VecX<T, 3> raycolor(const Scene<T, 3>& scene, const RayX<T, 3>& ray, const Interval<T>& range, int depth) {
         if(depth <= 0) return VecX<T, 3>{};
 
         thread_local HitRecord<T, 3> real_record{};

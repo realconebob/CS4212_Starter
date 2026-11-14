@@ -22,7 +22,7 @@
 
 namespace cwrender {
 
-template<Floating T, std::size_t X> class MaterialAny;
+template<Floating T, std::size_t X> class Material;
 template<Floating T, std::size_t X> class BoundingBox;
 
 /**
@@ -35,14 +35,16 @@ template<Floating T, std::size_t X>
 class HitRecord {
     private:
     template<Floating t, std::size_t x> friend class Hittable;
+    template<Floating t, std::size_t x> friend struct Renderable;
 
-    VecX<T, X> point_, normal_;
-    T t_;
-    std::shared_ptr<MaterialAny<T, X>> mat_; // TODO: Make this not a pointer. MaterialAny should be backed by a std::shared_ptr
-    bool front_face_;
-    bool override_atten_;
+    VecX<T, X> point_{}, normal_{};
+    T t_{NAN};
+    const Material<T, X>* mat_; // Borrowing pointer, not owning. May get replaced with borrowing pointer to Renderable
+    bool front_face_{};
+    bool override_atten_{};
 
-    void update(const VecX<T, X>& point, T t, const RayX<T, X>& ray, const VecX<T, X>& out_normal, std::shared_ptr<MaterialAny<T, X>> material);
+    void update(const VecX<T, X>& point, T t, const RayX<T, X>& ray, const VecX<T, X>& out_normal);
+    void set_mat(const Material<T, X> * const material);
 
     public:
     HitRecord(VecX<T, X> point = {}, VecX<T, X> normal = {}, T t = NAN, bool front = true):
@@ -52,7 +54,7 @@ class HitRecord {
     const VecX<T, X>& point() const {return point_;}
     const VecX<T, X>& normal() const {return normal_;}
     T t() const {return t_;}
-    std::shared_ptr<MaterialAny<T, X>> material() {return mat_;}
+    const Material<T, X>* material() const {return mat_;}
     bool front_face() const {return front_face_;}
 };
 
@@ -68,14 +70,17 @@ class HitRecord {
  * @param material The material of the intersected object
  */
 template<Floating T, std::size_t X>
-void HitRecord<T, X>::update(const VecX<T, X>& point, T t, const RayX<T, X>& ray, const VecX<T, X>& out_normal, std::shared_ptr<MaterialAny<T, X>> material) {
+void HitRecord<T, X>::update(const VecX<T, X>& point, T t, const RayX<T, X>& ray, const VecX<T, X>& out_normal) {
     front_face_ = dot(ray.dir(), out_normal) < 0;
     normal_ = front_face_ ? out_normal : -out_normal;
     point_ = point;
     t_ = t;
-    mat_ = std::move(material);
 }
 
+template<Floating T, std::size_t X>
+void HitRecord<T, X>::set_mat(const Material<T, X> * material) {
+    mat_ = material;
+}
 
 
 template<Floating T, std::size_t X>
@@ -89,8 +94,8 @@ class Hittable {
     Hittable(Hittable&&) = delete;
     virtual ~Hittable() = default;
 
-    bool intersect(const RayX<T, X>& ray, HitRecord<T, X>& record, const Interval<T>& range) const = 0;
-    BoundingBox<T, X> bounds() const = 0;
+    virtual bool intersect(const RayX<T, X>& ray, HitRecord<T, X>& record, const Interval<T>& range) const = 0;
+    virtual BoundingBox<T, X> bounds() const = 0;
 };
 
 }

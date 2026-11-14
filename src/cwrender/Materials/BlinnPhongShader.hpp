@@ -26,8 +26,8 @@ namespace cwrender {
 template<Floating T, std::size_t X>
 class BlinnPhongShader: public Material<T, X> {
     private:
-    VecX<T, X> spec_reflection_;
-    T shiny_;
+    VecX<T, X> spec_reflection_{};
+    T shiny_{};
 
     public:
     BlinnPhongShader(VecX<T, X> spec_reflection, T shiny_, const VecX<T, X>& albedo = VecX<T, X>::Ones()): spec_reflection_(spec_reflection), shiny_(shiny_) {
@@ -38,7 +38,7 @@ class BlinnPhongShader: public Material<T, X> {
     [[nodiscard]] bool scatter(const Scene<T, X>& scene, const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten_out, RayX<T, X>& scattered_out) const override {
         auto viewing = unit(rayin.origin() - record.point());
         auto color = VecX<T, X>::Zeros();
-        for(const LightAny<T, X>& light: scene.getlights()) {
+        for(const Light<T, X>& light: scene.getlights()) {
             auto tmpnormal = (record.front_face()) ? record.normal() : -record.normal();
             VecX<T, X> tolight = light.pos() - record.point();
             T dist2 = tolight.length_squared();

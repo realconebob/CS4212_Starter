@@ -32,7 +32,7 @@ class LambertianShader: public Material<T, X> {
 
     [[nodiscard]] bool scatter(const Scene<T, X>& scene, const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten_out, RayX<T, X>& scattered_out) const override {
         auto color = VecX<T, X>::Zeros();
-        for(const LightAny<T, X>& light: scene.getlights()) {
+        for(const Light<T, X>& light: scene.getlights()) {
             auto tmpnormal = (record.front_face()) ? record.normal() : -record.normal();
             auto tolight = light.pos() - record.point();
             T dist2 = tolight.length_squared();

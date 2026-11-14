@@ -24,8 +24,8 @@ class Cube3: public Hittable<T, 3> {
     private:
     template<Floating t, std::size_t x> friend class Hittable;
 
-    Plane3<T> planes_[6];
-    VecX<T, 3> bottomleft_, topright_;
+    Plane3<T> planes_[6]{};
+    VecX<T, 3> bottomleft_{}, topright_{};
 
     public:
     Cube3(VecX<T, 3> bottomleft, VecX<T, 3> topright):

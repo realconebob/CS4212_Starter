@@ -1,5 +1,5 @@
 add_library(cwrender
-    Helpers.cpp Helpers.hpp
+    Helpers.cpp Helpers.hpp Renderable.hpp
 )
 
 target_include_directories(cwrender PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)

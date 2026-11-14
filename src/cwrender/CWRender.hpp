@@ -17,6 +17,8 @@
 #include "cwrender/Hittables/Hittables.hpp"
 #include "cwrender/Materials/Materials.hpp"
 #include "cwrender/Scenes/Scenes.hpp"
+#include "cwrender/Renderable.hpp"
+#include "cwrender/Helpers.hpp"
 // IWYU pragma: end_exports
 
 #endif

@@ -28,7 +28,7 @@ requires(X >= 1)
 class VecX {
     public:
         #pragma region Variables
-        T vals_[X] = {0};
+        T vals_[X]{0};
         #pragma endregion
 
         #pragma region Construtors
@@ -45,7 +45,7 @@ class VecX {
         }
 
         static VecX<T, X> Ones() {
-            T ones[X] = {};
+            T ones[X]{};
             for(int i = 0; i < X; i++) ones[i] = T(1);
             return VecX<T, X>(ones);
         }
@@ -54,14 +54,14 @@ class VecX {
         }
 
         static VecX<T, X> Minimum(const VecX<T, X>& a, const VecX<T, X>& b) {
-            T vals[X] = {0};
+            T vals[X]{0};
             for(std::size_t i = 0; i < X; i++) {
                 vals[i] = min(a[i], b[i]);
             }
             return VecX<T, X>(vals);
         }
         static VecX<T, X> Maximum(const VecX<T, X>& a, const VecX<T, X>& b) {
-            T vals[X] = {0};
+            T vals[X]{0};
             for(std::size_t i = 0; i < X; i++) {
                 vals[i] = max(a[i], b[i]);
             }
@@ -71,7 +71,7 @@ class VecX {
 
         #pragma region Operators
         VecX operator -() const {
-            T copy[X] = {};
+            T copy[X]{0};
             for(int i = 0; i < X; i++) copy[i] = -vals_[i];
             return VecX(copy);
         }
@@ -126,7 +126,7 @@ class VecX {
         }
 
         VecX<T, X> clamp(T lo, T hi) const {
-            T tmp[X] = {};
+            T tmp[X] {0};
             for(int i = 0; i < X; i++) tmp[i] = clamp_<T>(vals_[i], lo, hi);
             return VecX<T, X>(tmp);
         }
@@ -161,7 +161,7 @@ inline std::ostream& operator<<(std::ostream& out, const VecX<T, X>& v) {
 
 template<Floating T, std::size_t X>
 inline VecX<T, X> operator+(const VecX<T, X>& a, const VecX<T, X>& b) {
-    T res[X] = {};
+    T res[X]{0};
     for(int i = 0; i < X; i++) {
         res[i] = a[i] + b[i];
     }
@@ -170,7 +170,7 @@ inline VecX<T, X> operator+(const VecX<T, X>& a, const VecX<T, X>& b) {
 
 template<Floating T, std::size_t X>
 inline VecX<T, X> operator+(const T& a, const VecX<T, X>& b) {
-    T res[X] = {};
+    T res[X]{0};
     for(int i = 0; i < X; i++) {
         res[i] = a + b[i];
     }
@@ -179,7 +179,7 @@ inline VecX<T, X> operator+(const T& a, const VecX<T, X>& b) {
 
 template<Floating T, std::size_t X>
 inline VecX<T, X> operator+(const VecX<T, X>& a, const T& b) {
-    T res[X] = {};
+    T res[X]{0};
     for(int i = 0; i < X; i++) {
         res[i] = a[i] + b;
     }
@@ -188,7 +188,7 @@ inline VecX<T, X> operator+(const VecX<T, X>& a, const T& b) {
 
 template<Floating T, std::size_t X>
 inline VecX<T, X> operator-(const VecX<T, X>& a, const VecX<T, X>& b) {
-    T res[X] = {};
+    T res[X]{0};
     for(int i = 0; i < X; i++) {
         res[i] = a[i] - b[i];
     }
@@ -197,7 +197,7 @@ inline VecX<T, X> operator-(const VecX<T, X>& a, const VecX<T, X>& b) {
 
 template<Floating T, std::size_t X>
 inline VecX<T, X> operator-(const T& a, const VecX<T, X>& b) {
-    T res[X] = {};
+    T res[X]{0};
     for(int i = 0; i < X; i++) {
         res[i] = a - b[i];
     }
@@ -206,7 +206,7 @@ inline VecX<T, X> operator-(const T& a, const VecX<T, X>& b) {
 
 template<Floating T, std::size_t X>
 inline VecX<T, X> operator-(const VecX<T, X>& a, const T& b) {
-    T res[X] = {};
+    T res[X]{0};
     for(int i = 0; i < X; i++) {
         res[i] = a[i] - b;
     }
@@ -215,7 +215,7 @@ inline VecX<T, X> operator-(const VecX<T, X>& a, const T& b) {
 
 template<Floating T, std::size_t X>
 inline VecX<T, X> operator*(const VecX<T, X>& a, const VecX<T, X>& b) {
-    T res[X] = {};
+    T res[X]{0};
     for(int i = 0; i < X; i++) {
         res[i] = a[i] * b[i];
     }
@@ -224,7 +224,7 @@ inline VecX<T, X> operator*(const VecX<T, X>& a, const VecX<T, X>& b) {
 
 template<Floating T, std::size_t X>
 inline VecX<T, X> operator*(T m, const VecX<T, X>& v) {
-    T res[X] = {};
+    T res[X]{0};
     for(int i = 0; i < X; i++) {
         res[i] = m * v[i];
     }
@@ -277,7 +277,7 @@ template<Floating T, std::size_t X>
 inline VecX<T, X> linetr(const VecX<T, X>& v, const T& oldl, const T& oldh, const T& newl, const T& newh) {
     // (x - min(x)) / (max(x) - min(x)) * (max(new) - min(new)) + min(new)
     T val = 0.0;
-    T res[X] = {};
+    T res[X]{0};
     for(int i = 0; i < X; i++) {
         val = v[i];
         res[i] = ((val * newh) + (-val * newl) + (-oldl * newh) + (oldl * newl)) / (oldh - oldl) + newl;

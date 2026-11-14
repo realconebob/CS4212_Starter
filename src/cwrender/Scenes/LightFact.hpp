@@ -36,7 +36,7 @@ class LightFactory {
             case POINT:
             return [&data](){
                 // Populate from map
-                VecX<T, X> pos, color;
+                VecX<T, X> pos{}, color{};
 
                 return PointLight<T, X>{pos, color}.any();
             }();
