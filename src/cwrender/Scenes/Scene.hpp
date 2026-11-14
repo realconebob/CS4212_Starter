@@ -56,7 +56,7 @@ class Scene: public Hittable<T, X> {
         return hittables_.intersect(ray, record, range);
     }
 
-    BoundingBox<T, X> bounds() const override {
+    const BoundingBox<T, X>* bounds() const override {
         throw NotImplemented();
     }
 };

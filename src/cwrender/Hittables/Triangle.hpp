@@ -27,6 +27,7 @@ class Triangle3: public Hittable<T, 3> {
 
     VecX<T, 3> a_, b_, c_;
     VecX<T, 3> e1_, e2_, normal_;
+    std::unique_ptr<BoundingBox<T, 3>> bb_;
 
     public:
     explicit Triangle3() {}
@@ -34,7 +35,15 @@ class Triangle3: public Hittable<T, 3> {
         a_{a}, b_{b}, c_{c},
         e1_{b - a}, e2_{c - a},
         normal_{unit(cross(e1_, e2_))}
-        {}
+        {
+        VecX<T, 3>
+            min = VecX<T, 3>::Minimum(a_, b_),
+            max = VecX<T, 3>::Maximum(a_, b_);
+        min = VecX<T, 3>::Minimum(min, c_);
+        max = VecX<T, 3>::Maximum(max, c_);
+
+        bb_ = std::make_unique<BoundingBox<T, 3>>(std::move(BoundingBox<T, 3>{min, max}));
+    }
 
     bool intersect(const RayX<T, 3>& ray, HitRecord<T, 3>& record, const Interval<T>& range) const override {
         // Got this from claude because the slides were not clear on how to do this
@@ -62,14 +71,8 @@ class Triangle3: public Hittable<T, 3> {
         return true;
     }
 
-    BoundingBox<T, 3> bounds() const override {
-        VecX<T, 3>
-            min = VecX<T, 3>::Minimum(a_, b_),
-            max = VecX<T, 3>::Maximum(a_, b_);
-        min = VecX<T, 3>::Minimum(min, c_);
-        max = VecX<T, 3>::Maximum(max, c_);
-
-        return BoundingBox<T, 3>{min, max};
+    const BoundingBox<T, 3>* bounds() const override {
+        return bb_.get();
     }
 };
 

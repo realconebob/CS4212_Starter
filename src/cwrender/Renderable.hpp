@@ -61,7 +61,7 @@ struct Renderable: Hittable<T, X>, Material<T, X> {
         return res;
     }
 
-    BoundingBox<T, X> bounds() const override {
+    const BoundingBox<T, X>* bounds() const override {
         if(!collision_) throw std::logic_error("Collision is not initialized");
         return collision_->bounds();
     }

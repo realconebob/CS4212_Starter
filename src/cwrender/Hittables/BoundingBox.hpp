@@ -40,6 +40,13 @@ class BoundingBox: public Hittable<T, X> {
         }
     }
 
+    BoundingBox(const BoundingBox<T, X>* a, const BoundingBox<T, X>* b) {
+        for (std::size_t i = 0; i < X; i++) {
+            minpoint_[i] = std::min(a->minpoint_[i], b->minpoint_[i]);
+            maxpoint_[i] = std::max(a->maxpoint_[i], b->maxpoint_[i]);
+        }
+    }
+
     const VecX<T, X>& min() const {return minpoint_;}
     const VecX<T, X>& max() const {return maxpoint_;}
 
@@ -60,8 +67,8 @@ class BoundingBox: public Hittable<T, X> {
         return true;
     }
 
-    BoundingBox<T, X> bounds() const override {
-        return *this;
+    const BoundingBox<T, X>* bounds() const override {
+        return this;
     }
 };
 

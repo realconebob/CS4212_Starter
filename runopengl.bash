@@ -14,7 +14,7 @@ function runInLocal() {
 }
 
 function buildAndRun() {
-    make o3 && \
+    make o3
     ./buildO3/OpenGL/glfwExample
 
     return $?

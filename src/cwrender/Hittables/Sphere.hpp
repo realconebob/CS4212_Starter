@@ -18,6 +18,7 @@
 #include "cwrender/Hittables/BoundingBox.hpp"
 
 #include <cmath>
+#include <memory>
 
 namespace cwrender {
 
@@ -28,10 +29,12 @@ class Sphere3: public Hittable<T, 3> {
 
     VecX<T, 3> origin_;
     T radius_;
+    std::unique_ptr<BoundingBox<T, 3>> bb_;
 
     public:
     Sphere3(const VecX<T, 3>& origin, T radius):
-        origin_{origin}, radius_{std::abs(radius)}
+        origin_{origin}, radius_{std::abs(radius)},
+        bb_{std::make_unique<BoundingBox<T, 3>>(std::move(BoundingBox<T, 3>(origin_ - radius_, origin_ + radius_)))}
         {}
 
     bool intersect(const RayX<T, 3>& ray, HitRecord<T, 3>& record, const Interval<T>& range) const override {
@@ -60,8 +63,8 @@ class Sphere3: public Hittable<T, 3> {
         return true;
     }
 
-    BoundingBox<T, 3> bounds() const override {
-        return BoundingBox<T, 3>(origin_ - radius_, origin_ + radius_);
+    const BoundingBox<T, 3>* bounds() const override {
+        return bb_.get();
     }
 };
 

@@ -96,7 +96,7 @@ class Hittable {
     virtual ~Hittable() = default;
 
     virtual bool intersect(const RayX<T, X>& ray, HitRecord<T, X>& record, const Interval<T>& range) const = 0;
-    virtual BoundingBox<T, X> bounds() const = 0;
+    virtual const BoundingBox<T, X>* bounds() const = 0;
 };
 
 }

@@ -23,6 +23,7 @@ namespace cwrender {
 template<Floating T, std::size_t X>
 class BoundingVolumeHierarchy: public Hittable<T, X> {
     private:
+    std::unique_ptr<BoundingBox<T, X>> empty_{std::make_unique<BoundingBox<T, X>>(std::move(BoundingBox<T, X>{}))};
     struct Node {
         BoundingBox<T, X> box;
         std::shared_ptr<Node> left, right;
@@ -48,9 +49,9 @@ class BoundingVolumeHierarchy: public Hittable<T, X> {
         auto node = std::make_shared<Node>();
 
         // Bounds of everything in [lo, hi)
-        BoundingBox<T, X> box = objs[lo].bounds();
+        BoundingBox<T, X> box = *objs[lo].bounds();
         for (std::size_t i = lo + 1; i < hi; i++)
-            box = BoundingBox<T, X>(box, objs[i].bounds());   // the union helper
+            box = BoundingBox<T, X>(box, *objs[i].bounds());   // the union helper
         node->box = box;
 
         if (hi - lo == 1) {
@@ -70,7 +71,7 @@ class BoundingVolumeHierarchy: public Hittable<T, X> {
         std::size_t mid = lo + (hi - lo) / 2;
         std::nth_element(objs.begin() + lo, objs.begin() + mid, objs.begin() + hi,
             [axis](const auto& a, const auto& b) {
-                auto ba = a.bounds(), bb = b.bounds();
+                auto ba = *a.bounds(), bb = *b.bounds();
                 return ba.min()[axis] + ba.max()[axis] < bb.min()[axis] + bb.max()[axis];
             });
 
@@ -99,8 +100,8 @@ class BoundingVolumeHierarchy: public Hittable<T, X> {
         return root_ && root_->hit(ray, record, range);
     }
 
-    BoundingBox<T, X> bounds() const override {
-        return (root_) ? root_->box : BoundingBox<T, X>{};
+    const BoundingBox<T, X>* bounds() const override {
+        return (root_) ? &root_->box : empty_.get();
     }
 };
 

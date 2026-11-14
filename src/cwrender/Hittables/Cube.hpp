@@ -16,6 +16,7 @@
 #include "cwrender/Hittables/BoundingBox.hpp"
 #include "cwrender/Hittables/Hittable.hpp"
 #include "cwrender/Hittables/Plane.hpp"
+#include <memory>
 
 namespace cwrender {
 
@@ -24,12 +25,14 @@ class Cube3: public Hittable<T, 3> {
     private:
     template<Floating t, std::size_t x> friend class Hittable;
 
-    Plane3<T> planes_[6]{};
     VecX<T, 3> bottomleft_{}, topright_{};
+    std::unique_ptr<BoundingBox<T, 3>> bb_;
+    Plane3<T> planes_[6]{};
 
     public:
     Cube3(VecX<T, 3> bottomleft, VecX<T, 3> topright):
         bottomleft_(bottomleft), topright_(topright),
+        bb_{std::make_unique<BoundingBox<T, 3>>(std::move(BoundingBox<T, 3>{bottomleft_, topright_}))},
         planes_{ // This is gross
             Plane3<T>::empty(), Plane3<T>::empty(), Plane3<T>::empty(),
             Plane3<T>::empty(), Plane3<T>::empty(), Plane3<T>::empty()
@@ -42,8 +45,8 @@ class Cube3: public Hittable<T, 3> {
         return false;
     }
 
-    BoundingBox<T, 3> bounds() const override {
-        return BoundingBox<T, 3>{bottomleft_, topright_};
+    const BoundingBox<T, 3>* bounds() const override {
+        return bb_.get();
     }
 
 };
