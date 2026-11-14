@@ -21,16 +21,24 @@
 namespace cwrender {
 
 template<Floating T>
-class Triangle3: public Hittable<Triangle3<T>, T, 3> {
+class Triangle3: public Hittable<T, 3> {
     private:
-    template<typename d, Floating t, std::size_t x> friend class Hittable;
-    template<Floating t, std::size_t x> friend class HittableAny;
+    template<Floating t, std::size_t x> friend class Hittable;
 
     VecX<T, 3> a_, b_, c_;
     VecX<T, 3> e1_, e2_, normal_;
     std::shared_ptr<MaterialAny<T, 3>> mat_;
 
-    bool intersect_impl(const RayX<T, 3>& ray, HitRecord<T, 3>& record, const Interval<T>& range) const {
+    public:
+    explicit Triangle3() {}
+    Triangle3(VecX<T, 3> a, VecX<T, 3> b, VecX<T, 3> c, std::shared_ptr<MaterialAny<T, 3>> mat):
+        a_{a}, b_{b}, c_{c},
+        e1_{b - a}, e2_{c - a},
+        normal_{unit(cross(e1_, e2_))},
+        mat_(mat)
+        {}
+
+    bool intersect(const RayX<T, 3>& ray, HitRecord<T, 3>& record, const Interval<T>& range) const override {
         // Got this from claude because the slides were not clear on how to do this
         constexpr T eps = std::numeric_limits<T>::epsilon() * 10;
 
@@ -55,7 +63,7 @@ class Triangle3: public Hittable<Triangle3<T>, T, 3> {
         return true;
     }
 
-    BoundingBox<T, 3> bounds_impl() const {
+    BoundingBox<T, 3> bounds() const override {
         VecX<T, 3>
             min = VecX<T, 3>::Minimum(a_, b_),
             max = VecX<T, 3>::Maximum(a_, b_);
@@ -64,15 +72,6 @@ class Triangle3: public Hittable<Triangle3<T>, T, 3> {
 
         return BoundingBox<T, 3>{min, max};
     }
-
-    public:
-    explicit Triangle3() {}
-    Triangle3(VecX<T, 3> a, VecX<T, 3> b, VecX<T, 3> c, std::shared_ptr<MaterialAny<T, 3>> mat):
-        a_{a}, b_{b}, c_{c},
-        e1_{b - a}, e2_{c - a},
-        normal_{unit(cross(e1_, e2_))},
-        mat_(mat)
-        {}
 };
 
 }

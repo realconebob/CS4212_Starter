@@ -13,6 +13,7 @@
 
 #include "cwrender/Helpers.hpp"
 #include "cwrender/Hittables/Hittable.hpp"
+#include <algorithm>
 #include <cstddef>
 #include <memory>
 #include <optional>
@@ -20,12 +21,12 @@
 namespace cwrender {
 
 template<Floating T, std::size_t X>
-class BoundingVolumeHierarchy: public Hittable<BoundingVolumeHierarchy<T, X>, T, X> {
+class BoundingVolumeHierarchy: public Hittable<T, X> {
     private:
     struct Node {
         BoundingBox<T, X> box;
         std::shared_ptr<Node> left, right;
-        std::optional<HittableAny<T, X>> shape; // only set on leaves
+        std::optional<Hittable<T, X>> shape; // only set on leaves
 
         bool hit(const RayX<T, X>& ray, HitRecord<T, X>& record, const Interval<T>& range) const {
             if (!box.intersect(ray, record, range)) return false;
@@ -43,7 +44,7 @@ class BoundingVolumeHierarchy: public Hittable<BoundingVolumeHierarchy<T, X>, T,
 
     std::shared_ptr<Node> root_;
 
-    std::shared_ptr<Node> build(std::vector<HittableAny<T, X>>& objs, std::size_t lo, std::size_t hi) {
+    std::shared_ptr<Node> build(std::vector<Hittable<T, X>>& objs, std::size_t lo, std::size_t hi) {
         auto node = std::make_shared<Node>();
 
         // Bounds of everything in [lo, hi)
@@ -78,16 +79,16 @@ class BoundingVolumeHierarchy: public Hittable<BoundingVolumeHierarchy<T, X>, T,
         return node;
     }
 
-    std::vector<HittableAny<T, X>> objects_{};
+    std::vector<Hittable<T, X>> objects_{};
 
     public:
     explicit BoundingVolumeHierarchy() {}
-    explicit BoundingVolumeHierarchy(std::vector<HittableAny<T, X>> objs) {
+    explicit BoundingVolumeHierarchy(std::vector<Hittable<T, X>> objs) {
         if (!objs.empty()) root_ = build(objs, 0, objs.size());
     }
 
-    void add_front(const HittableAny<T, X>& obj) {objects_.insert(objects_.begin(), obj);}
-    void add_back(const HittableAny<T, X>& obj) {objects_.push_back(obj);}
+    void add_front(const Hittable<T, X>& obj) {objects_.insert(objects_.begin(), obj);}
+    void add_back(const Hittable<T, X>& obj) {objects_.push_back(obj);}
 
     bool build_from_internal_list() {
         auto res = !objects_.empty();

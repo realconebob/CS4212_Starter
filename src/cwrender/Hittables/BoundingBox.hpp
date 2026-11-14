@@ -19,36 +19,13 @@
 namespace cwrender {
 
 template<Floating T, std::size_t X>
-class BoundingBox: public Hittable<BoundingBox<T, X>, T, X> {
+class BoundingBox: public Hittable<T, X> {
     private:
-    template<typename d, Floating t, std::size_t x> friend class Hittable;
-    template<Floating t, std::size_t x> friend class HittableAny;
+    template<Floating t, std::size_t x> friend class Hittable;
 
     VecX<T, X>
         minpoint_ = VecX<T, X>::Zeros(),
         maxpoint_ = VecX<T, X>::Zeros();
-
-
-    bool intersect_impl(const RayX<T, X>& ray, HitRecord<T, X>& record, const Interval<T>& range) const {
-        T near = range.min, far = range.max;
-
-        for (std::size_t i = 0; i < X; i++) {
-            const T inv_d = T(1) / ray.dir()[i];
-            T t0 = (minpoint_[i] - ray.origin()[i]) * inv_d;
-            T t1 = (maxpoint_[i] - ray.origin()[i]) * inv_d;
-            if (inv_d < T(0)) std::swap(t0, t1);
-
-            if (t0 > near) near = t0;
-            if (t1 < far)  far  = t1;
-
-            if (far < near) return false;
-        }
-        return true;
-    }
-
-    BoundingBox<T, X> bounds_impl() const {
-        return *this;
-    }
 
     public:
     explicit BoundingBox() {}
@@ -65,6 +42,27 @@ class BoundingBox: public Hittable<BoundingBox<T, X>, T, X> {
 
     const VecX<T, X>& min() const {return minpoint_;}
     const VecX<T, X>& max() const {return maxpoint_;}
+
+    bool intersect(const RayX<T, X>& ray, HitRecord<T, X>& record, const Interval<T>& range) const override {
+        T near = range.min, far = range.max;
+
+        for (std::size_t i = 0; i < X; i++) {
+            const T inv_d = T(1) / ray.dir()[i];
+            T t0 = (minpoint_[i] - ray.origin()[i]) * inv_d;
+            T t1 = (maxpoint_[i] - ray.origin()[i]) * inv_d;
+            if (inv_d < T(0)) std::swap(t0, t1);
+
+            if (t0 > near) near = t0;
+            if (t1 < far)  far  = t1;
+
+            if (far < near) return false;
+        }
+        return true;
+    }
+
+    BoundingBox<T, X> bounds() const override {
+        return *this;
+    }
 };
 
 }

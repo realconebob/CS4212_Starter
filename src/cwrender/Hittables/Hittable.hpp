@@ -23,7 +23,6 @@
 namespace cwrender {
 
 template<Floating T, std::size_t X> class MaterialAny;
-template<Floating T, std::size_t X> class HittableAny;
 template<Floating T, std::size_t X> class BoundingBox;
 
 /**
@@ -35,14 +34,15 @@ template<Floating T, std::size_t X> class BoundingBox;
 template<Floating T, std::size_t X>
 class HitRecord {
     private:
-    template<typename d, Floating t, std::size_t x> friend class Hittable;
-    template<Floating t, std::size_t x> friend class HittableAny;
+    template<Floating t, std::size_t x> friend class Hittable;
 
     VecX<T, X> point_, normal_;
     T t_;
     std::shared_ptr<MaterialAny<T, X>> mat_; // TODO: Make this not a pointer. MaterialAny should be backed by a std::shared_ptr
     bool front_face_;
     bool override_atten_;
+
+    void update(const VecX<T, X>& point, T t, const RayX<T, X>& ray, const VecX<T, X>& out_normal, std::shared_ptr<MaterialAny<T, X>> material);
 
     public:
     HitRecord(VecX<T, X> point = {}, VecX<T, X> normal = {}, T t = NAN, bool front = true):
@@ -57,89 +57,40 @@ class HitRecord {
 };
 
 /**
- * @brief Type erasure wrapper for Hittable. Means you can store disperate Hittable types in a single STL
+ * @brief Update the contents of a HitRecord
  *
+ * @tparam T A floating point type
+ * @tparam X The size of the vector
+ * @param point The new point of intersection
+ * @param t How long the ray had to march to reach the intersection
+ * @param ray The ray that created the intersection
+ * @param out_normal The outward facing normal
+ * @param material The material of the intersected object
  */
 template<Floating T, std::size_t X>
-class HittableAny {
-    /// "interface" that must be "implemented" by any shape that is hittable
-    struct Concept {
-        virtual ~Concept() = default;
-        virtual bool intersect(const RayX<T, X>&, HitRecord<T, X>&, const Interval<T>&) const = 0;
-        virtual BoundingBox<T, X> bounds() const = 0;
-    };
+void HitRecord<T, X>::update(const VecX<T, X>& point, T t, const RayX<T, X>& ray, const VecX<T, X>& out_normal, std::shared_ptr<MaterialAny<T, X>> material) {
+    front_face_ = dot(ray.dir(), out_normal) < 0;
+    normal_ = front_face_ ? out_normal : -out_normal;
+    point_ = point;
+    t_ = t;
+    mat_ = std::move(material);
+}
 
-    /// Wrapper / adapter. "Stores" original type through template, but is "erased" to a Concept when stored in self_
-    template<typename H>
-    struct Model final: Concept {
-        explicit Model(H h) : obj_(std::move(h)) {}
 
-        bool intersect(const RayX<T, X>& ray, HitRecord<T, X>& record, const Interval<T>& range) const override {
-            return obj_.intersect_impl(ray, record, range); // dispatches into the CRTP call, still static from here down
-        }
-        BoundingBox<T, X> bounds() const override {return obj_.bounds_impl();}
 
-        H obj_;
-    };
-
-    std::shared_ptr<const Concept> self_;
-
-public:
-    template<typename H>
-    requires (!std::same_as<H, HittableAny> && std::move_constructible<H>)
-    HittableAny(H h): self_(std::make_shared<const Model<H>>(std::move(h))) {}
-
-    bool intersect(const RayX<T, X>& ray, HitRecord<T, X>& record, const Interval<T>& range) const { return self_->intersect(ray, record, range); }
-    BoundingBox<T, X> bounds() const {return self_->bounds();}
-};
-
-/**
- * @brief CRTP Hittable. Derive from this and implement intersect_impl() to be a generic Hittable
- *
- */
-template<typename Derived, Floating T, std::size_t X>
+template<Floating T, std::size_t X>
 class Hittable {
-    private:
-    friend Derived;
-    template<Floating t, std::size_t x> friend class HittableAny;
-
-    const Derived& self_cast() const {return static_cast<const Derived&>(*this);}
-    Derived& self_cast() {return static_cast<Derived&>(*this);}
-
     protected:
     Hittable() = default;
-    ~Hittable() = default;
-    /**
-    * @brief Updates a HitRecord after a successful intersection. Flips the normal
-    *        so it always opposes the incoming ray, and records which side was hit.
-    *
-    * @param record     Record to fill in
-    * @param point      Intersection point
-    * @param t          Ray parameter at the intersection
-    * @param ray        Incident ray (used to determine front/back face)
-    * @param out_normal Outward-facing surface normal at the point
-    * @param material   Material of the surface that was hit
-    */
-    static void update(HitRecord<T, X>& record, const VecX<T, X>& point, T t, const RayX<T, X>& ray, const VecX<T, X>& out_normal, std::shared_ptr<MaterialAny<T, X>> material) {
-        record.front_face_ = dot(ray.dir(), out_normal) < 0;
-        record.normal_ = record.front_face_ ? out_normal : -out_normal;
-        record.point_ = point;
-        record.t_ = t;
-        record.mat_ = std::move(material);
-    }
 
     public:
-    template<typename D = Derived>
-    bool intersect(const RayX<T, X>& ray, HitRecord<T, X>& record, const Interval<T>& range) const {
-        return self_cast().intersect_impl(ray, record, range);
-    }
+    Hittable& operator=(const Hittable&) = delete;
+    Hittable(const Hittable&) = delete;
+    Hittable(Hittable&&) = delete;
+    virtual ~Hittable() = default;
 
-    BoundingBox<T, X> bounds() const {
-        return self_cast().bounds_impl();
-    }
-
-    HittableAny<T, X> any() &  {return HittableAny<T, X>(self_cast());}
-    HittableAny<T, X> any() && {return HittableAny<T, X>(std::move(self_cast()));}
+    bool intersect(const RayX<T, X>& ray, HitRecord<T, X>& record, const Interval<T>& range) const = 0;
+    BoundingBox<T, X> bounds() const = 0;
 };
 
 }

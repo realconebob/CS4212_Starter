@@ -22,23 +22,18 @@
 namespace cwrender {
 
 template<Floating T, std::size_t X>
-class DiffuseShader: public Material<DiffuseShader<T, X>, T, X> {
+class DiffuseShader: public Material<T, X> {
     public:
     DiffuseShader(const VecX<T, X>& albedo = VecX<T, X>::Ones()) {
         this->reflection_ = albedo;
     }
 
-    [[nodiscard]] bool scatter(const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten, RayX<T, X>& scattered, const Scene<T, X>& scene) const {
-        return _scatter(rayin, record, atten, scattered, scene);
-    }
-
-    // There's a way to make this private but idc right now
-    [[nodiscard]] bool _scatter(const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten, RayX<T, X>& scattered, const Scene<T, X>& scene) const {
+    [[nodiscard]] bool scatter(const Scene<T, X>& scene, const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten_out, RayX<T, X>& scattered_out) const override {
         auto scatter_direction = record.normal() + randunitv<T, X>();
         if(scatter_direction.near_zero()) scatter_direction = record.normal();
 
-        scattered = RayX<T, X>{record.point(), scatter_direction};
-        atten = this->reflection_;
+        scattered_out = RayX<T, X>{record.point(), scatter_direction};
+        atten_out = this->reflection_;
         return true;
     }
 };

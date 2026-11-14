@@ -22,6 +22,7 @@
 
 #include <cmath>
 #include <cstddef>
+#include <functional>
 #include <vector>
 
 namespace cwrender {
@@ -42,6 +43,12 @@ class PerspectiveCamera3 {
 
     private:
     T vfov_;
+    std::function<VecX<T, 3> (*)(const RayX<T, 3>&)> bgcolorizer_ = [](const RayX<T, 3>& ray){
+        VecX<T, 3> udir = unit(ray.dir());
+        auto a = T(0.5) * (udir[1] + T(1.0));
+        return (T(1.0) - a) * VecX<T, 3>::Ones() + a * VecX<T, 3>(0.5, 0.7, 1.0);
+    };
+
     #pragma region Calculated variables
     int iheight() const {
         auto tmp = int(iwidth / aspectratio);
@@ -123,26 +130,25 @@ class PerspectiveCamera3 {
         return VecX<T, 3>(zorandr<T>(-0.5, 0.5), zorandr<T>(-0.5, 0.5), 0);
     }
 
-    VecX<T, 3> raycolor(const Ray3D& ray, const HittableAny<T, 3>& world, const Scene<T, 3>& scene, HitRecord<T, 3>& record, const Interval<T>& range, int depth) {
+    VecX<T, 3> raycolor(const Scene<T, 3>& scene, const Ray3D& ray, const Interval<T>& range, int depth) {
         if(depth <= 0) return VecX<T, 3>{};
 
         thread_local HitRecord<T, 3> real_record{};
 
-        if(world.intersect(ray, real_record, range)) {
-            RayX<T, 3> scattered;
+        if(scene.intersect(ray, real_record, range)) {
+            RayX<T, 3> scattered{};
             VecX<T, 3> atten{};
-            if(real_record.material()->scatter(ray, real_record, atten, scattered, scene))
+
+            if(real_record.material()->scatter(scene, ray, real_record, atten, scattered)) {
                 return (real_record.material()->override_atten())
                     ? atten
-                    : atten * raycolor(scattered, world, scene, real_record, range, depth - 1);
+                    : atten * raycolor(scene, scattered, range, depth - 1);
+            }
 
             return VecX<T, 3>{};
         }
 
-        // This should get extracted out into a background color / colorizer
-        VecX<T, 3> udir = unit(ray.dir());
-        auto a = T(0.5) * (udir[1] + T(1.0));
-        return (T(1.0) - a) * VecX<T, 3>::Ones() + a * VecX<T, 3>(0.5, 0.7, 1.0);
+        return bgcolorizer_(ray);
     }
 
     template <RayColorizer<T, 3> Colorizer>

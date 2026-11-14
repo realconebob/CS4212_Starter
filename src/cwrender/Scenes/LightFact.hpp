@@ -29,7 +29,7 @@ class LightFactory {
         TOOBIG,
     };
 
-    static LightAny<T, X> build(TYPE type, const std::unordered_map<std::string, std::string>& data) {
+    static Light<T, X> build(TYPE type, const std::unordered_map<std::string, std::string>& data) {
         switch (type) {
             default: throw std::invalid_argument("<LightFactory::build>: Given invalid light type");
 

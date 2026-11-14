@@ -27,8 +27,8 @@ namespace cwrender {
 
 template<Floating T, std::size_t X>
 class HittableFactory {
-    template<typename d, Floating t, std::size_t x> friend class Hittable;
-    template<Floating t, std::size_t x> friend class HittableAny;
+    private:
+    HittableFactory() = delete; // This should be enough to stop people from making factories instead of just using the function
 
     public:
     enum TYPE {
@@ -40,7 +40,7 @@ class HittableFactory {
         TOOBIG,
     };
 
-    static HittableAny<T, X> build(TYPE type, const std::unordered_map<std::string, std::string>& data) {
+    static Hittable<T, X> build(TYPE type, const std::unordered_map<std::string, std::string>& data) {
         switch (type) {
             default: throw std::invalid_argument("Given invalid hittable type");
 

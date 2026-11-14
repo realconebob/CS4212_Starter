@@ -23,20 +23,15 @@
 namespace cwrender {
 
 template<Floating T, std::size_t X>
-class NormalMapShader: public Material<NormalMapShader<T, X>, T, X> {
+class NormalMapShader: public Material<T, X> {
     public:
     NormalMapShader() {
         this->reflection_ = VecX<T, X>::Ones(); // Not entirely necessary but whatever
         this->override_atten_ = true;
     }
 
-    [[nodiscard]] bool scatter(const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten, RayX<T, X>& scattered, const Scene<T, X>& scene) const {
-        return _scatter(rayin, record, atten, scattered, scene);
-    }
-
-    // There's a way to make this private but idc right now
-    [[nodiscard]] bool _scatter(const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten, RayX<T, X>& scattered, const Scene<T, X>& scene) const {
-        atten = 0.5 * (record.normal() + VecX<T, X>::Ones());
+    [[nodiscard]] bool scatter(const Scene<T, X>& scene, const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten_out, RayX<T, X>& scattered_out) const override {
+        atten_out = 0.5 * (record.normal() + VecX<T, X>::Ones());
         return true;
     }
 };

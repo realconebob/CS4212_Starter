@@ -22,7 +22,7 @@
 namespace cwrender {
 
 template<Floating T, std::size_t X>
-class MetalShader: public Material<MetalShader<T, X>, T, X> {
+class MetalShader: public Material<T, X> {
     private:
     T fuzz_;
 
@@ -31,18 +31,13 @@ class MetalShader: public Material<MetalShader<T, X>, T, X> {
         this->reflection_ = albedo;
     }
 
-    [[nodiscard]] bool scatter(const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten, RayX<T, X>& scattered, const Scene<T, X>& scene) const {
-        return _scatter(rayin, record, atten, scattered, scene);
-    }
-
-    // There's a way to make this private but idc right now
-    [[nodiscard]] bool _scatter(const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten, RayX<T, X>& scattered, const Scene<T, X>& scene) const {
+    [[nodiscard]] bool scatter(const Scene<T, X>& scene, const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten_out, RayX<T, X>& scattered_out) const override {
         VecX<T, X> reflected = reflect(rayin.dir(), record.normal());
         reflected = unit(reflected) + (fuzz_ * randunitv<T, X>());
 
-        scattered = RayX<T, X>(record.point(), reflected);
-        atten = this->reflection_;
-        return (dot(scattered.dir(), record.normal()) > 0);
+        scattered_out = RayX<T, X>(record.point(), reflected);
+        atten_out = this->reflection_;
+        return (dot(scattered_out.dir(), record.normal()) > 0);
     }
 };
 

@@ -23,19 +23,14 @@
 namespace cwrender {
 
 template<Floating T, std::size_t X>
-class LambertianShader: public Material<LambertianShader<T, X>, T, X> {
+class LambertianShader: public Material<T, X> {
     public:
     LambertianShader(const VecX<T, X>& albedo = VecX<T, X>::Ones()) {
         this->reflection_ = albedo;
         this->override_atten_ = true;
     }
 
-    [[nodiscard]] bool scatter(const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten, RayX<T, X>& scattered, const Scene<T, X>& scene) const {
-        return _scatter(rayin, record, atten, scattered, scene);
-    }
-
-    // There's a way to make this private but idc right now
-    [[nodiscard]] bool _scatter(const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten, RayX<T, X>& scattered, const Scene<T, X>& scene) const {
+    [[nodiscard]] bool scatter(const Scene<T, X>& scene, const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten_out, RayX<T, X>& scattered_out) const override {
         auto color = VecX<T, X>::Zeros();
         for(const LightAny<T, X>& light: scene.getlights()) {
             auto tmpnormal = (record.front_face()) ? record.normal() : -record.normal();
@@ -49,7 +44,7 @@ class LambertianShader: public Material<LambertianShader<T, X>, T, X> {
             auto brightness = max<T>(0, dot(tolight, unit(tmpnormal)));
             color += this->reflection_ * light.color() * (brightness / dist2);
         }
-        atten = color;
+        atten_out = color;
         return true;
     }
 };

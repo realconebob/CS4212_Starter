@@ -24,7 +24,7 @@
 namespace cwrender {
 
 template<Floating T, std::size_t X>
-class BlinnPhongShader: public Material<BlinnPhongShader<T, X>, T, X> {
+class BlinnPhongShader: public Material<T, X> {
     private:
     VecX<T, X> spec_reflection_;
     T shiny_;
@@ -35,12 +35,7 @@ class BlinnPhongShader: public Material<BlinnPhongShader<T, X>, T, X> {
         this->override_atten_ = true;
     }
 
-    [[nodiscard]] bool scatter(const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten, RayX<T, X>& scattered, const Scene<T, X>& scene) const {
-        return _scatter(rayin, record, atten, scattered, scene);
-    }
-
-    // There's a way to make this private but idc right now
-    [[nodiscard]] bool _scatter(const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten, RayX<T, X>& scattered, const Scene<T, X>& scene) const {
+    [[nodiscard]] bool scatter(const Scene<T, X>& scene, const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten_out, RayX<T, X>& scattered_out) const override {
         auto viewing = unit(rayin.origin() - record.point());
         auto color = VecX<T, X>::Zeros();
         for(const LightAny<T, X>& light: scene.getlights()) {
@@ -61,7 +56,7 @@ class BlinnPhongShader: public Material<BlinnPhongShader<T, X>, T, X> {
 
             color += radiance * (this->reflection_ * ndot + spec_reflection_ * spec);
         }
-        atten = color;
+        atten_out = color;
         return true;
     }
 };
