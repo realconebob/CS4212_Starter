@@ -26,17 +26,17 @@ int main(int argc, char *argv[]) {
 
     Scene3D world;
     auto loader = std::make_shared<SceneLoader>(world);
-    SceneParser_JSON(loader).parseFileData("../../sceneData/scenes_A/cwalstrom_fa26.json");
+    SceneParser_JSON(loader).parseFileData("../../sceneData/scenes_A/spheres_1M.json");
     loader->finalize();
 
-    auto camera = loader->makeCamera(16.0 / 9, 1000);   // aspect, image width
-    camera.samplegrid = 8;
+    auto camera = loader->makeCamera(1, 1000);   // aspect, image width
+    camera.samplegrid = 4;
 
     auto fb = FB3D{(std::size_t)camera.get_iwidth(), (std::size_t)camera.get_iheight()};
     fb.clear();
 
     camera.rendertobuffer(fb, [&world, &camera](const RayX<double, 3>& r) {
-        return camera.raycolor(world, r, Interval<double>::camera(), 50);
+        return camera.raycolor(world, r, Interval<double>::camera(), 5);
     });
 
     PNGRenderer<double>(fb, "out.png").render(true);

@@ -44,9 +44,8 @@ class Scene: public Hittable<T, X> {
     }
 
     void add(Renderable<T, X> r) {hittables_.add_back(std::move(r)); }
-
-    template <std::derived_from<Light<T, X>> L>
-    void add(L l) { lights_.push_back(std::make_unique<L>(std::move(l))); }
+    template <std::derived_from<Light<T, X>> L> void add(L l) { lights_.push_back(std::make_unique<L>(std::move(l))); }
+    void build() {hittables_.build_from_internal_list();}
 
     const std::vector<std::unique_ptr<Light<T, X>>>& getlights() const {return lights_;}
 

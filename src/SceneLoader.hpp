@@ -22,20 +22,9 @@
 namespace cwrender {
 using Scene3D = Scene<double, 3>;
 
-// Usage:
-//   Scene3D scene;
-//   auto loader = std::make_shared<SceneLoader>(scene);
-//   SceneParser_JSON(loader).parseFileData(path);
-//   loader->finalize();            // <-- nothing reaches `scene` until this
-//
-// The ISceneLoader callbacks only RECORD descriptors. The parser calls them in
-// the order camera -> light -> shader -> shape -> texture, so shaders arrive
-// before the textures they name. Building during the callbacks would hit
-// unresolved references; finalize() builds everything once all names exist.
 class SceneLoader : public ISceneLoader {
 public:
     using Vec3 = VecX<double, 3>;
-    using MatPtr = std::shared_ptr<Material<double, 3>>;
 
     struct CameraDesc {
         std::string name, type;
@@ -111,18 +100,31 @@ public:
 
     // ----------------------------------------------------------------- build
     void finalize() {
-        if (m_finalized) throw std::logic_error("SceneLoader::finalize() called twice");
-        m_finalized = true;
+    if (m_finalized) throw std::logic_error("SceneLoader::finalize() called twice");
+    m_finalized = true;
 
-        if (m_areaLightCount > 0) unsupported("area lights (" + std::to_string(m_areaLightCount) + " in file)");
-        if (!m_params.envMapFile.empty()) unsupported("environment maps");
+    if (m_areaLightCount > 0) unsupported("area lights (" + std::to_string(m_areaLightCount) + " in file)");
+    if (!m_params.envMapFile.empty()) unsupported("environment maps");
 
-        for (const auto &l : m_pointLights)
-            m_scene.add(PointLight<double, 3>{l.pos, l.color});
+    for (const auto &l : m_pointLights)
+        m_scene.add(PointLight<double, 3>{l.pos, l.color /* * 10e3 */});
 
-        for (const auto &s : m_shapes)
-            addHittable(s);
-    }
+    for (const auto &s : m_shapes)
+        addHittable(s);
+
+    m_scene.build(); // see Scene change below
+
+
+    std::fprintf(stderr, "lights=%zu shapes=%zu shaders=%zu\n", m_scene.getlights().size(), m_shapes.size(), m_shaders.size());
+    for (auto &[n, d] : m_shaders)
+        std::fprintf(stderr, "shader %s type=%s diffuse=(%g %g %g) spec=(%g %g %g) phong=%g\n",
+            n.c_str(), d.type.c_str(),
+            d.diffuse.data.x, d.diffuse.data.y, d.diffuse.data.z,
+            d.specular.data.x, d.specular.data.y, d.specular.data.z, d.phongExp);
+    for (auto &l : m_pointLights)
+        std::fprintf(stderr, "light pos=(%g %g %g) color=(%g %g %g)\n",
+            l.pos[0], l.pos[1], l.pos[2], l.color[0], l.color[1], l.color[2]);
+}
 
 private:
     struct PointLightRec { Vec3 pos, color; };
@@ -139,7 +141,6 @@ private:
     std::unordered_map<std::string, ShaderDesc> m_shaders;
     std::unordered_map<std::string, TextureRec> m_textures;
     std::vector<ShapeDesc> m_shapes;
-    std::unordered_map<std::string, MatPtr> m_materials; // built lazily, shared between shapes
 
     static Vec3 toVec(const vec &v) { return Vec3(v.x, v.y, v.z); }
 
@@ -149,48 +150,57 @@ private:
     }
 
     // ------------------------------------------------------------- materials
-    MatPtr material(const std::string &shaderName) {
-        if (auto it = m_materials.find(shaderName); it != m_materials.end())
-            return it->second;
-
-        auto sd = m_shaders.find(shaderName);
-        if (sd == m_shaders.end())
-            throw std::runtime_error("Shape references unknown shader '" + shaderName + "'");
-
-        auto mat = std::make_shared<Material<double, 3>>(buildMaterial(sd->second));
-        m_materials[shaderName] = mat;
-        return mat;
+    const ShaderDesc &shader(const std::string &name) const {
+        auto it = m_shaders.find(name);
+        if (it == m_shaders.end())
+            throw std::runtime_error("Shape references unknown shader '" + name + "'");
+        return it->second;
     }
 
-    Material<double, 3> buildMaterial(const ShaderDesc &d) {
-        // Textures: validate the reference, but cwrender has no textured albedo yet.
+    void validateTextures(const ShaderDesc &d) const {
+        // cwrender has no textured albedo yet; just validate the reference.
         for (const ShaderProperty *p : {&d.diffuse, &d.specular, &d.normal, &d.emission}) {
             if (!p->hasTexture) continue;
             if (!m_textures.count(p->textureName))
                 throw std::runtime_error("Shader '" + d.name + "' references unknown texture '" + p->textureName + "'");
             unsupported("textured shader '" + d.name + "'");
         }
+    }
 
+    // Builds the concrete material for a shader and passes it BY VALUE to f.
+    // f must be a generic lambda: Renderable needs the concrete type to own a copy.
+    template <typename F>
+    void withMaterial(const ShaderDesc &d, F &&f) const {
+        validateTextures(d);
         const std::string &t = d.type;
 
         // TODO: confirm "Diffuse" should map to Lambertian rather than DiffuseShader
-        if (t == "Lambertian" || t == "Diffuse")
-            return LambertianShader<double, 3>{toVec(d.diffuse.data)};
+        if (t == "Lambertian" || t == "Diffuse") {
+            f(LambertianShader<double, 3>{toVec(d.diffuse.data)});
+        }
+        else if (t == "BlinnPhong" || t == "Phong") {
+            f(BlinnPhongShader<double, 3>{toVec(d.specular.data), double(d.phongExp), toVec(d.diffuse.data)});
+        }
+        else if (t == "Mirror" || t == "Metal") {
+            // no albedo in the file: perfect white reflector, roughness -> fuzz
+            f(MetalShader<double, 3>{Vec3::Ones(), double(d.roughness)});
+        }
+        else if (t == "Normal") {
+            f(NormalMapShader<double, 3>{});
+        }
+        else {
+            // Glaze, Dielectric, BlinnPhongMirrored, CoolToWarm, Emitter, unknown
+            unsupported("shader type '" + t + "' (shader '" + d.name + "')");
+            f(LambertianShader<double, 3>{Vec3(0.5, 0.5, 0.5)}); // non-strict fallback
+        }
+    }
 
-        // Phong and BlinnPhong both land on BlinnPhongShader
-        if (t == "BlinnPhong" || t == "Phong")
-            return BlinnPhongShader<double, 3>{toVec(d.specular.data), double(d.phongExp), toVec(d.diffuse.data)};
-
-        // "Mirror" has no albedo field in the file: perfect white reflector, roughness -> fuzz
-        if (t == "Mirror" || t == "Metal")
-            return MetalShader<double, 3>{Vec3::Ones(), double(d.roughness)};
-
-        if (t == "Normal")
-            return NormalMapShader<double, 3>{};
-
-        // Glaze, Dielectric, BlinnPhongMirrored, CoolToWarm, Emitter, unknown
-        unsupported("shader type '" + t + "' (shader '" + d.name + "')");
-        return LambertianShader<double, 3>{Vec3(0.5, 0.5, 0.5)}; // non-strict fallback
+    // Pairs a concrete shape with the concrete material for `sd` and adds it to the scene.
+    template <typename H>
+    void emit(H shape, const ShaderDesc &sd) {
+        withMaterial(sd, [&](auto mat) {
+            m_scene.add(Renderable<double, 3>{std::move(shape), std::move(mat)});
+        });
     }
 
     // --------------------------------------------------------------- shapes
@@ -199,10 +209,10 @@ private:
         if (!s.hasXForm) return toVec(v);
         glm::vec4 p = s.localXForm * glm::vec4(v.x, v.y, v.z, 1.0f);
         return Vec3(p.x, p.y, p.z);
-    };
+    }
 
     void addHittable(const ShapeDesc &s) {
-        MatPtr mat = material(s.shaderNameReference);
+        const ShaderDesc &sd = shader(s.shaderNameReference); // fail early on bad references
 
         if (s.type == "sphere") {
             Vec3 center = xformPoint(s, s.center);
@@ -218,15 +228,13 @@ private:
                     unsupported("non-uniform scale on sphere '" + s.name + "'");
                 radius *= sx;
             }
-            m_scene.add(Sphere3<double>{center, radius, mat});
+            emit(Sphere3<double>{center, radius}, sd);
         }
         else if (s.type == "triangle") {
-            m_scene.add(Triangle3<double>{
-                xformPoint(s, s.v0), xformPoint(s, s.v1), xformPoint(s, s.v2), mat});
+            emit(Triangle3<double>{xformPoint(s, s.v0), xformPoint(s, s.v1), xformPoint(s, s.v2)}, sd);
         }
         else if (s.type == "plane") {
-            m_scene.add(Renderable<double, 3>{Plane3<double>{
-                xformPoint(s, s.v0), xformPoint(s, s.v1)}, mat});
+            emit(Plane3<double>{xformPoint(s, s.v0), xformPoint(s, s.v1)}, sd);
         }
         else {
             // "box" (CUBE not implemented), "mesh" (no mesh loader), "instance"

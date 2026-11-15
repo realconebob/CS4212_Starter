@@ -19,6 +19,7 @@
 #include "cwrender/Scenes/Light.hpp"
 
 #include <cstddef>
+#include <memory>
 
 namespace cwrender {
 
@@ -32,17 +33,19 @@ class LambertianShader: public Material<T, X> {
 
     [[nodiscard]] bool scatter(const Scene<T, X>& scene, const RayX<T, X>& rayin, const HitRecord<T, X>& record, VecX<T, X>& atten_out, RayX<T, X>& scattered_out) const override {
         auto color = VecX<T, X>::Zeros();
-        for(const std::unique_ptr<Light<T, X>>& light: scene.getlights()) {
-            auto tmpnormal = (record.front_face()) ? record.normal() : -record.normal();
-            auto tolight = light.get()->pos() - record.point();
-            T dist2 = tolight.length_squared();
+        for(const std::unique_ptr<Light<T, X>>& lightptr: scene.getlights()) {
+            auto light = lightptr.get();
+            VecX<T, X> tolight = light->pos() - record.point();
+            auto dist = tolight.length();
             tolight = unit(tolight);
 
-            HitRecord<T, X> newrec{};
-            if(scene.intersect({record.point() + T(1e-4) * tmpnormal, tolight}, newrec, Interval<T>{T(1e-4), tolight.length()})) continue;
+            auto brightness = max<T>(0, dot(tolight, unit(record.normal())));
+            if(brightness <= 0) continue;
 
-            auto brightness = max<T>(0, dot(tolight, unit(tmpnormal)));
-            color += this->reflection_ * light.get()->color() * (brightness / dist2);
+            HitRecord<T, X> newrec{};
+            if(scene.intersect({record.point() + T(1e-4) * record.normal(), tolight}, newrec, Interval<T>{T(1e-4), dist})) continue;
+
+            color += this->reflection_ * light->color() * brightness;
         }
         atten_out = color;
         return true;

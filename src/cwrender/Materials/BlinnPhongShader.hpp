@@ -39,20 +39,18 @@ class BlinnPhongShader: public Material<T, X> {
         auto viewing = unit(rayin.origin() - record.point());
         auto color = VecX<T, X>::Zeros();
         for(const std::unique_ptr<Light<T, X>>& light: scene.getlights()) {
-            auto tmpnormal = (record.front_face()) ? record.normal() : -record.normal();
             VecX<T, X> tolight = light.get()->pos() - record.point();
-            T dist2 = tolight.length_squared();
+            T dist = tolight.length();
             tolight = unit(tolight);
 
-            T ndot = max<T>(0, dot(tmpnormal, tolight));
+            T ndot = max<T>(0, dot(record.normal(), tolight));
             if (ndot <= 0) continue;
 
             HitRecord<T, X> newrec{};
-            if(scene.intersect({record.point() + T(1e-4) * tmpnormal, tolight}, newrec, Interval<T>{T(1e-4), tolight.length()})) continue;
+            if(scene.intersect({record.point() + T(1e-4) * record.normal(), tolight}, newrec, Interval<T>{T(1e-4), dist})) continue;
 
-            auto radiance = light.get()->color() / dist2;
-            T spec = std::pow(max<T>(0, dot(tmpnormal, unit(tolight + viewing))), shiny_);
-
+            auto radiance = light.get()->color();
+            T spec = std::pow(max<T>(0, dot(record.normal(), unit(tolight + viewing))), shiny_);
 
             color += radiance * (this->reflection_ * ndot + spec_reflection_ * spec);
         }
